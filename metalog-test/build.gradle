@@ -1,0 +1,23 @@
+plugins {
+    id 'java-library-kit'
+    id 'maven-publish-kit'
+}
+
+apply from: "${rootDir}/gradle/java-publishing.gradle"
+
+javadoc {
+    exclude '**/**'
+}
+
+dependencies {
+    api project(':metalog-api')
+    api libs.contracts.test
+    api libs.contracts.api
+
+    testImplementation libs.contracts
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
