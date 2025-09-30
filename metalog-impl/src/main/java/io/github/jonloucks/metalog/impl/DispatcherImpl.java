@@ -2,7 +2,7 @@ package io.github.jonloucks.metalog.impl;
 
 import io.github.jonloucks.contracts.api.AutoClose;
 import io.github.jonloucks.contracts.api.AutoOpen;
-import io.github.jonloucks.metalog.api.Metalogs;
+import io.github.jonloucks.metalog.api.Metalog;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -45,7 +45,7 @@ final class DispatcherImpl implements Dispatcher, AutoOpen, AutoClose {
                         if (!executorService.awaitTermination(millis, MILLISECONDS)) {
                             executorService.shutdownNow();
                             if (!executorService.awaitTermination(millis, MILLISECONDS)) {
-                                System.err.println("Metalogs dispatcher failed to shutdown");
+                                System.err.println("Metalog dispatcher failed to shutdown");
                             }
                         }
                     } catch (InterruptedException ex) {
@@ -59,11 +59,11 @@ final class DispatcherImpl implements Dispatcher, AutoOpen, AutoClose {
         }
     }
     
-    DispatcherImpl(Metalogs.Config config) {
+    DispatcherImpl(Metalog.Config config) {
         this.config = config;
     }
     
-    private final Metalogs.Config config;
+    private final Metalog.Config config;
     private final IdempotentImpl openState = new IdempotentImpl();
     private Executor executor = null;
 }

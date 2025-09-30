@@ -2,7 +2,7 @@ package io.github.jonloucks.metalog.test;
 
 import io.github.jonloucks.contracts.api.AutoClose;
 import io.github.jonloucks.metalog.api.Entity;
-import io.github.jonloucks.metalog.api.Metalogs;
+import io.github.jonloucks.metalog.api.Metalog;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 
 import static io.github.jonloucks.contracts.api.GlobalContracts.claimContract;
 import static io.github.jonloucks.contracts.test.Tools.assertThrown;
-import static io.github.jonloucks.metalog.api.GlobalMetalogs.createMetalogs;
+import static io.github.jonloucks.metalog.api.GlobalMetalog.createMetalog;
 import static io.github.jonloucks.metalog.test.EntityTests.EntityTestsTools.newEntityBuilder;
 import static io.github.jonloucks.metalog.test.EntityTests.EntityTestsTools.runWithScenario;
 import static io.github.jonloucks.metalog.test.Tools.createTestEntity;
@@ -226,8 +226,8 @@ public interface EntityTests {
         
         @FunctionalInterface
         interface ScenarioConfig extends Consumer<Entity.Builder<?>> {
-            default Metalogs.Config getMetalogsConfig() {
-                return Metalogs.Config.DEFAULT;
+            default Metalog.Config getMetalogConfig() {
+                return Metalog.Config.DEFAULT;
             }
         }
         
@@ -236,8 +236,8 @@ public interface EntityTests {
         }
         
         static void runWithScenario(ScenarioConfig scenarioConfig) {
-            final Metalogs metalogs = createMetalogs(scenarioConfig.getMetalogsConfig());
-            try (AutoClose closeLogs = metalogs.open()) {
+            final Metalog metalog = createMetalog(scenarioConfig.getMetalogConfig());
+            try (AutoClose closeLogs = metalog.open()) {
                 AutoClose ignoreWarning = closeLogs;
                 scenarioConfig.accept(newEntityBuilder());
             }

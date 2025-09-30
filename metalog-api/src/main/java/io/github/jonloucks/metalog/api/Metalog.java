@@ -5,10 +5,10 @@ import io.github.jonloucks.contracts.api.*;
 import java.time.Duration;
 
 /**
- * The Metalogs service API
+ * The Metalog service API
  */
-public interface Metalogs extends Publisher, Filterable, AutoOpen {
-    Contract<Metalogs> CONTRACT = Contract.create(Metalogs.class);
+public interface Metalog extends Publisher, Filterable, AutoOpen {
+    Contract<Metalog> CONTRACT = Contract.create(Metalog.class);
     
     AutoClose subscribe(Subscriber config);
     
@@ -17,31 +17,31 @@ public interface Metalogs extends Publisher, Filterable, AutoOpen {
         };
         
         /**
-         * @return if true, reflection might be used to locate the MetalogsFactory
+         * @return if true, reflection might be used to locate the MetalogFactory
          */
         default boolean useReflection() {
             return true;
         }
         
         /**
-         * @return the class name to use if reflection is used to find the MetalogsFactory
+         * @return the class name to use if reflection is used to find the MetalogFactory
          */
         default String reflectionClassName() {
             return "io.github.jonloucks.metalog.impl.ServiceFactoryImpl";
         }
         
         /**
-         * @return if true, the ServiceLoader might be used to locate the MetalogsFactory
+         * @return if true, the ServiceLoader might be used to locate the MetalogFactory
          */
         default boolean useServiceLoader() {
             return true;
         }
         
         /**
-         * @return the class name to load from the ServiceLoader to find the MetalogsFactory
+         * @return the class name to load from the ServiceLoader to find the MetalogFactory
          */
-        default Class<? extends MetalogsFactory> serviceLoaderClass() {
-            return MetalogsFactory.class;
+        default Class<? extends MetalogFactory> serviceLoaderClass() {
+            return MetalogFactory.class;
         }
         
         /**
