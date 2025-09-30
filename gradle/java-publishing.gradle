@@ -1,0 +1,81 @@
+String getConfig(String name, String theDefault) {
+    final Provider<String> variable = providers.environmentVariable(name);
+    if (variable.isPresent()) {
+        return variable.orElse(theDefault).get()
+    }
+    final Object value = project.findProperty(name)
+    if (null == value) {
+        return theDefault
+    }
+    return value.toString()
+}
+
+String getWorkflowName() {
+    getConfig("PROJECT_WORKFLOW", "unknown")
+}
+
+boolean doingDeveloperRelease() {
+    "developer-release" == getWorkflowName()
+}
+
+boolean doingMainRelease() {
+    "main-release" == getWorkflowName() && !isSnapshot()
+}
+
+boolean isSnapshot() {
+    (version as String).endsWith("SNAPSHOT")
+}
+
+boolean doingSnapshotRelease() {
+    "main-release" == getWorkflowName()  && isSnapshot()
+}
+
+boolean doingRelease() {
+    doingDeveloperRelease()|| doingMainRelease() || doingSnapshotRelease()
+}
+
+boolean doingSigning() {
+    doingRelease()
+}
+
+if (doingSigning()) {
+    println "Doing signing"
+    apply plugin:  'signing-kit'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            pom {
+                name = 'Contracts'
+                description = 'Metalog. A low impact and highly performant structured meta logging library for Java'
+                url = 'https://github.com/jonloucks/metalog'
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'https://github.com/jonloucks/metalog?tab=MIT-1-ov-file#MIT-1-ov-file'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'jonloucks'
+                        name = 'Jon Loucks'
+                        email = 'j.loucks@comcast.net'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/jonloucks/metalog.git'
+                    developerConnection = 'scm:git:ssh://github.com:jonloucks/metalog.git'
+                    url = 'https://github.com/jonloucks/metalog'
+                }
+            }
+        }
+    }
+}
+
+if (doingSigning()) {
+    signing {
+        sign publishing.publications.mavenJava
+    }
+}

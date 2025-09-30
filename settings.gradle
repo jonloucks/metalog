@@ -1,0 +1,10 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal() // Also include the Gradle Plugin Portal for other plugins
+        mavenLocal() // Add mavenLocal to the repositories for plugin resolution
+    }
+}
+
+include 'metalog-api'
+include 'metalog-test'
+include 'metalog-impl'

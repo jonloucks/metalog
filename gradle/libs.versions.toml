@@ -1,0 +1,8 @@
+[versions]
+contracts-version = "[2.0.3,3.0.0)"
+gradle-kit-version = "[0.0.0,1.0.0)"
+
+[libraries]
+contracts-api = { module = "io.github.jonloucks.contracts:contracts-api", version.ref = "contracts-version" }
+contracts-test = { module = "io.github.jonloucks.contracts:contracts-test", version.ref = "contracts-version" }
+contracts = { module = "io.github.jonloucks.contracts:contracts", version.ref = "contracts-version" }

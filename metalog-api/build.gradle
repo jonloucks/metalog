@@ -1,0 +1,17 @@
+plugins {
+    id 'java-library-kit'
+    id 'maven-publish-kit'
+}
+
+apply from: "${rootDir}/gradle/java-publishing.gradle"
+
+dependencies {
+    api libs.contracts.api
+
+    testRuntimeOnly libs.contracts
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
