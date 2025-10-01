@@ -64,12 +64,13 @@ jobs:
       - name: Copy Code Coverage and Source Documentation
         working-directory: gh-pages
         run: |
-          rm -rf docs/javadoc/
-          mkdir -p docs/javadoc
-          cp -r "${{ github.workspace }}/main-project/build/docs/javadoc/"* docs/javadoc/
-          rm -rf gh-pages/docs/jacoco/
-          mkdir -p docs/jacoco
-          cp -r "${{ github.workspace }}/main-project/build/reports/jacoco/test/"* docs/jacoco/
+          rm -rf docs/
+          rm -rf javadoc/
+          mkdir -p javadoc
+          cp -r "${{ github.workspace }}/main-project/build/docs/javadoc/html/"* javadoc/
+          rm -rf jacoco/
+          mkdir -p jacoco
+          cp -r "${{ github.workspace }}/main-project/build/reports/jacoco/test/"* jacoco/
 
       - name: Commit and Push gh-pages
         uses: EndBug/add-and-commit@v9
