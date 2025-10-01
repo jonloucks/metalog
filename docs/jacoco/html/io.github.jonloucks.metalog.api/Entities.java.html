@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Entities.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">metalog</a> &gt; <a href="index.source.html" class="el_package">io.github.jonloucks.metalog.api</a> &gt; <span class="el_source">Entities.java</span></div><h1>Entities.java</h1><pre class="source lang-java linenums">package io.github.jonloucks.metalog.api;
+
+import io.github.jonloucks.contracts.api.Contract;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+
+public interface Entities {
+    
+    @FunctionalInterface
+    interface Visitor&lt;T&gt; {
+        boolean visit(T t);
+    }
+    
+    void visitEach(Visitor&lt;? super Entity&gt; visitor);
+    
+    Optional&lt;Entity&gt; findFirstIf(Predicate&lt;? super Entity&gt; filter);
+    
+    &lt;T&gt; Optional&lt;T&gt; findFirstWithType(Predicate&lt;? super Entity&gt; filter, Class&lt;T&gt; type);
+
+    List&lt;Entity&gt; findAllIf(Predicate&lt;? super Entity&gt; filter);
+
+    &lt;T&gt; List&lt;T&gt; findAllByNameWithType(String name, Class&lt;T&gt; type);
+    
+    &lt;T&gt; List&lt;T&gt; findAllWithType(Predicate&lt;? super Entity&gt; filter, Class&lt;T&gt; type);
+    
+    &lt;T&gt; Optional&lt;T&gt; findFirstByNameWithType(String name, Class&lt;T&gt; type);
+    
+    List&lt;Entity&gt; asList();
+    
+    boolean isEmpty();
+    
+    int size();
+    
+    interface Builder&lt;B extends Builder&lt;B&gt;&gt; extends Entities {
+<span class="fc" id="L39">        Contract&lt;Supplier&lt;Entities.Builder&lt;?&gt;&gt;&gt; FACTORY_CONTRACT = Contract.create(&quot;Entities Builder Factory&quot;);</span>
+        
+        boolean replaceIf(Predicate&lt;? super Entity&gt; filter, Entity entity);
+        
+        boolean removeIf(Predicate&lt;? super Entity&gt; filter);
+        
+        B unique(boolean unique);
+        
+        B entity(Consumer&lt;Entity.Builder&lt;?&gt;&gt; builder);
+        
+        B entity(Entity entity);
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DispatcherImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">metalog</a> &gt; <a href="index.source.html" class="el_package">io.github.jonloucks.metalog.impl</a> &gt; <span class="el_source">DispatcherImpl.java</span></div><h1>DispatcherImpl.java</h1><pre class="source lang-java linenums">package io.github.jonloucks.metalog.impl;
+
+import io.github.jonloucks.contracts.api.AutoClose;
+import io.github.jonloucks.contracts.api.AutoOpen;
+import io.github.jonloucks.metalog.api.Metalog;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
+final class DispatcherImpl implements Dispatcher, AutoOpen, AutoClose {
+    
+    @Override
+    public void execute(Runnable command) {
+<span class="fc" id="L17">        executor.execute(command);</span>
+<span class="fc" id="L18">    }</span>
+    
+    @Override
+    public AutoClose open() {
+<span class="pc bpc" id="L22" title="1 of 2 branches missed.">        if (openState.transitionToOpen()) {</span>
+<span class="pc bpc" id="L23" title="1 of 2 branches missed.">            if (config.backlogThreadCount() &lt;= 0) {</span>
+<span class="nc" id="L24">                executor = Runnable::run;</span>
+<span class="pc bpc" id="L25" title="1 of 2 branches missed.">            } else if (config.backlogThreadCount() &gt; 1) {</span>
+<span class="nc" id="L26">                executor = Executors.newFixedThreadPool(config.backlogThreadCount());</span>
+            } else {
+<span class="fc" id="L28">                executor = Executors.newSingleThreadExecutor();</span>
+            }
+<span class="fc" id="L30">            return this;</span>
+        } else {
+<span class="nc" id="L32">            return () -&gt; {};</span>
+        }
+    }
+    
+    @Override
+    public void close() {
+<span class="pc bpc" id="L38" title="1 of 2 branches missed.">        if (openState.transitionToClosed()) {</span>
+            try {
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">                if (executor instanceof ExecutorService) {</span>
+<span class="fc" id="L41">                    final ExecutorService executorService = (ExecutorService) executor;</span>
+<span class="fc" id="L42">                    final long millis = Math.max(1, config.shutdownTimeout().toMillis()/2);</span>
+<span class="fc" id="L43">                    executorService.shutdown();</span>
+                    try {
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">                        if (!executorService.awaitTermination(millis, MILLISECONDS)) {</span>
+<span class="nc" id="L46">                            executorService.shutdownNow();</span>
+<span class="nc bnc" id="L47" title="All 2 branches missed.">                            if (!executorService.awaitTermination(millis, MILLISECONDS)) {</span>
+<span class="nc" id="L48">                                System.err.println(&quot;Metalog dispatcher failed to shutdown&quot;);</span>
+                            }
+                        }
+<span class="nc" id="L51">                    } catch (InterruptedException ex) {</span>
+<span class="nc" id="L52">                        executorService.shutdownNow();</span>
+<span class="nc" id="L53">                        Thread.currentThread().interrupt();</span>
+<span class="fc" id="L54">                    }</span>
+                }
+            } finally {
+<span class="fc" id="L57">                executor = null;</span>
+            }
+        }
+<span class="fc" id="L60">    }</span>
+    
+<span class="fc" id="L62">    DispatcherImpl(Metalog.Config config) {</span>
+<span class="fc" id="L63">        this.config = config;</span>
+<span class="fc" id="L64">    }</span>
+    
+    private final Metalog.Config config;
+<span class="fc" id="L67">    private final IdempotentImpl openState = new IdempotentImpl();</span>
+<span class="fc" id="L68">    private Executor executor = null;</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

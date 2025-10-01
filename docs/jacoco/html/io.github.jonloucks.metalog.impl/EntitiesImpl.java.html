@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EntitiesImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">metalog</a> &gt; <a href="index.source.html" class="el_package">io.github.jonloucks.metalog.impl</a> &gt; <span class="el_source">EntitiesImpl.java</span></div><h1>EntitiesImpl.java</h1><pre class="source lang-java linenums">package io.github.jonloucks.metalog.impl;
+
+import io.github.jonloucks.metalog.api.Entities;
+import io.github.jonloucks.metalog.api.Entity;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import static io.github.jonloucks.contracts.api.Checks.nullCheck;
+import static io.github.jonloucks.metalog.impl.Internal.*;
+
+final class EntitiesImpl implements Entities, Entities.Builder&lt;EntitiesImpl&gt; {
+
+    @Override
+    public void visitEach(Visitor&lt;? super Entity&gt; visitor) {
+<span class="fc" id="L19">        final Visitor&lt;? super Entity&gt; validVisitor = nullCheck(visitor, &quot;visitor was null&quot;);</span>
+<span class="fc bfc" id="L20" title="All 2 branches covered.">        for (Entity entity : list) {</span>
+<span class="fc bfc" id="L21" title="All 2 branches covered.">            if (!validVisitor.visit(entity)) {</span>
+<span class="fc" id="L22">                return;</span>
+            }
+<span class="fc" id="L24">        }</span>
+<span class="fc" id="L25">    }</span>
+
+    @Override
+    public Optional&lt;Entity&gt; findFirstIf(Predicate&lt;? super Entity&gt; filter) {
+<span class="fc" id="L29">        return list.stream().filter(filterCheck(filter)).findFirst();</span>
+    }
+
+    @Override
+    public List&lt;Entity&gt; findAllIf(Predicate&lt;? super Entity&gt; filter) {
+<span class="fc" id="L34">        return list.stream().filter(filterCheck(filter)).collect(Collectors.toList());</span>
+    }
+    
+    @Override
+    public boolean replaceIf(Predicate&lt;? super Entity&gt; filter, Entity entity) {
+<span class="fc" id="L39">        final Predicate&lt;? super Entity&gt; validFilter = filterCheck(filter);</span>
+<span class="fc" id="L40">        final Entity validEntity = entityCheck(entity);</span>
+<span class="fc" id="L41">        boolean replaced = false;</span>
+        
+<span class="fc" id="L43">        final ListIterator&lt;Entity&gt; iterator = list.listIterator();</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        while (iterator.hasNext()) {</span>
+<span class="fc" id="L45">            final Entity nextEntity = iterator.next();</span>
+<span class="fc bfc" id="L46" title="All 2 branches covered.">            if (validFilter.test(nextEntity)) {</span>
+<span class="fc" id="L47">                iterator.set(validEntity);</span>
+<span class="fc" id="L48">                replaced = true;</span>
+            }
+<span class="fc" id="L50">        }</span>
+<span class="fc" id="L51">        return replaced;</span>
+    }
+    
+    @Override
+    public boolean removeIf(Predicate&lt;? super Entity&gt; filter) {
+<span class="nc" id="L56">        return list.removeIf(filterCheck(filter));</span>
+    }
+    
+    @Override
+    public boolean isEmpty() {
+<span class="fc" id="L61">        return list.isEmpty();</span>
+    }
+    
+    @Override
+    public int size() {
+<span class="fc" id="L66">        return list.size();</span>
+    }
+    
+    @Override
+    public EntitiesImpl unique(boolean unique) {
+<span class="fc" id="L71">        this.unique = unique;</span>
+<span class="fc" id="L72">        return this;</span>
+    }
+    
+    @Override
+    public EntitiesImpl entity(Consumer&lt;Entity.Builder&lt;?&gt;&gt; action) {
+<span class="fc" id="L77">        final Consumer&lt;Entity.Builder&lt;?&gt;&gt; validAction = nullCheck(action, &quot;action was null&quot;);</span>
+<span class="fc" id="L78">        final EntityImpl builder = new EntityImpl();</span>
+<span class="fc" id="L79">        validAction.accept(builder);</span>
+<span class="fc" id="L80">        entity(builder);</span>
+<span class="fc" id="L81">        return this;</span>
+    }
+    
+    @Override
+    public EntitiesImpl entity(Entity entity) {
+<span class="fc" id="L86">        final Entity validEntity = entityCheck(entity);</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">        if (unique) {</span>
+<span class="fc bfc" id="L88" title="All 2 branches covered.">            if (!replaceIf(p -&gt; sameName(p, validEntity), validEntity)) {</span>
+<span class="fc" id="L89">                list.addLast(validEntity);</span>
+            }
+        } else {
+<span class="fc" id="L92">            list.addLast(validEntity);</span>
+        }
+<span class="fc" id="L94">        return this;</span>
+    }
+    
+    @Override
+    public &lt;T&gt; Optional&lt;T&gt; findFirstByNameWithType(String name, Class&lt;T&gt; type) {
+<span class="fc" id="L99">        return findFirstWithType(byName(name), typeCheck(type));</span>
+    }
+    
+    @Override
+    public List&lt;Entity&gt; asList() {
+<span class="fc" id="L104">        return new ArrayList&lt;&gt;(list);</span>
+    }
+    
+    @Override
+    public &lt;T&gt; Optional&lt;T&gt; findFirstWithType(Predicate&lt;? super Entity&gt; filter, Class&lt;T&gt; type) {
+<span class="fc" id="L109">        final Predicate&lt;? super Entity&gt; validFilter = filterCheck(filter);</span>
+<span class="fc" id="L110">        final Class&lt;T&gt; validType = typeCheck(type);</span>
+<span class="fc" id="L111">        final AtomicReference&lt;T&gt; result = new AtomicReference&lt;&gt;();</span>
+        
+<span class="fc" id="L113">        visitEach( entity -&gt; {</span>
+<span class="fc" id="L114">            final Optional&lt;Object&gt; optionalValue = entity.getValue();</span>
+<span class="fc bfc" id="L115" title="All 2 branches covered.">            if (validFilter.test(entity)) {</span>
+<span class="pc bpc" id="L116" title="1 of 2 branches missed.">                if (optionalValue.isPresent()) {</span>
+<span class="fc" id="L117">                    final Object value = optionalValue.get();</span>
+<span class="pc bpc" id="L118" title="2 of 4 branches missed.">                    if (validType.isInstance(value) &amp;&amp; validFilter.test(entity)) {</span>
+<span class="fc" id="L119">                        result.set(validType.cast(value));</span>
+<span class="fc" id="L120">                        return false;</span>
+                    }
+                }
+            }
+<span class="fc" id="L124">            return true;</span>
+        });
+        
+<span class="fc" id="L127">        return Optional.ofNullable(result.get());</span>
+    }
+    
+    @Override
+    public &lt;T&gt; List&lt;T&gt; findAllByNameWithType(String name, Class&lt;T&gt; type) {
+<span class="nc" id="L132">        return findAllWithType(byName(name), typeCheck(type));</span>
+    }
+    
+    @Override
+    public &lt;T&gt; List&lt;T&gt; findAllWithType(Predicate&lt;? super Entity&gt; filter, Class&lt;T&gt; type) {
+<span class="fc" id="L137">        final Predicate&lt;? super Entity&gt; validFilter = filterCheck(filter);</span>
+<span class="fc" id="L138">        final Class&lt;T&gt; validType = typeCheck(type);</span>
+<span class="fc" id="L139">        final LinkedList&lt;T&gt; matchedList = new LinkedList&lt;&gt;();</span>
+        
+<span class="fc" id="L141">        visitEach( entity -&gt; {</span>
+<span class="fc" id="L142">            final Optional&lt;Object&gt; optionalValue = entity.getValue();</span>
+<span class="fc bfc" id="L143" title="All 2 branches covered.">            if (validFilter.test(entity)) {</span>
+<span class="fc bfc" id="L144" title="All 2 branches covered.">                if (optionalValue.isPresent()) {</span>
+<span class="fc" id="L145">                    final Object value = optionalValue.get();</span>
+<span class="pc bpc" id="L146" title="1 of 4 branches missed.">                    if (validType.isInstance(value) &amp;&amp; validFilter.test(entity)) {</span>
+<span class="fc" id="L147">                        matchedList.add(validType.cast(value));</span>
+                    }
+                }
+            }
+<span class="fc" id="L151">            return true;</span>
+        });
+<span class="fc bfc" id="L153" title="All 2 branches covered.">        return matchedList.isEmpty() ? Collections.emptyList() : matchedList;</span>
+    }
+
+<span class="fc" id="L156">    EntitiesImpl() {</span>
+    
+<span class="fc" id="L158">    }</span>
+    
+    private static boolean sameName(Entity a, Entity b) {
+<span class="fc" id="L161">        return optionalEquals(a.getName(), b.getName());</span>
+    }
+    
+<span class="fc" id="L164">    private final LinkedList&lt;Entity&gt; list = new LinkedList&lt;&gt;();</span>
+    private boolean unique;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

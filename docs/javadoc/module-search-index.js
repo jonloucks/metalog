@@ -1,0 +1,1 @@
+moduleSearchIndex = [{"l":"io.github.jonloucks.metalog"}];updateSearchResults();

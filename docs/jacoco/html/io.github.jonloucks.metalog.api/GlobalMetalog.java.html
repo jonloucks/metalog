@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GlobalMetalog.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">metalog</a> &gt; <a href="index.source.html" class="el_package">io.github.jonloucks.metalog.api</a> &gt; <span class="el_source">GlobalMetalog.java</span></div><h1>GlobalMetalog.java</h1><pre class="source lang-java linenums">package io.github.jonloucks.metalog.api;
+
+import io.github.jonloucks.contracts.api.AutoClose;
+
+import java.util.function.Consumer;
+
+import static io.github.jonloucks.contracts.api.Checks.nullCheck;
+
+public final class GlobalMetalog {
+    
+    /**
+     * @see Metalog#publish(Log)
+     */
+    public static void publish(Log log) {
+<span class="nc" id="L15">        INSTANCE.metalog.publish(log);</span>
+<span class="nc" id="L16">    }</span>
+    
+    /**
+     * @see Metalog#publish(Log, Meta)
+     */
+    public static void publish(Log log, Meta meta) {
+<span class="nc" id="L22">        INSTANCE.metalog.publish(log, meta);</span>
+<span class="nc" id="L23">    }</span>
+    
+    /**
+     * @see Metalog#publish(Log, Consumer)
+     */
+    public static void publish(Log log, Consumer&lt;Meta.Builder&lt;?&gt;&gt; metaBuilder) {
+<span class="nc" id="L29">        INSTANCE.metalog.publish(log, metaBuilder);</span>
+<span class="nc" id="L30">    }</span>
+ 
+    /**
+     * @see Metalog#isEnabled()
+     */
+    public static boolean isEnabled() {
+<span class="nc" id="L36">        return INSTANCE.metalog.isEnabled();</span>
+    }
+    
+    /**
+     * @see Metalog#subscribe(Subscriber)
+     */
+    public static AutoClose subscribe(Subscriber subscriber) {
+<span class="nc" id="L43">        return INSTANCE.metalog.subscribe(subscriber);</span>
+    }
+    
+    /**
+     * Return the global instance of Contracts
+     * @return the instance
+     */
+    public static Metalog getInstance() {
+<span class="nc" id="L51">        return INSTANCE.metalog;</span>
+    }
+    
+    /**
+     * @param config the service configuration
+     * @return the new service
+     * @see MetalogFactory#create(Metalog.Config)
+     * Create a standalone Contracts service.
+     * Note: Services created from this method are destink any that used internally
+     * &lt;p&gt;
+     * Caller is responsible for invoking open() before use and close when no longer needed
+     * &lt;/p&gt;
+     */
+    public static Metalog createMetalog(Metalog.Config config) {
+<span class="fc" id="L65">        final Metalog.Config validConfig = nullCheck(config, &quot;Metalog config was null&quot;);</span>
+<span class="fc" id="L66">        final MetalogFactoryFinder factoryFinder = new MetalogFactoryFinder(config);</span>
+<span class="fc" id="L67">        final MetalogFactory factory = nullCheck(factoryFinder.find(), &quot;find() was null&quot;);</span>
+<span class="fc" id="L68">        final Metalog service = factory.create(validConfig);</span>
+        
+<span class="fc" id="L70">        return nullCheck(service, &quot;createService() was null&quot;);</span>
+    }
+    
+<span class="fc" id="L73">    private GlobalMetalog() {</span>
+<span class="fc" id="L74">        this.metalog = createMetalog(new Metalog.Config() {});</span>
+<span class="fc" id="L75">        this.close = metalog.open();</span>
+<span class="fc" id="L76">    }</span>
+    
+<span class="fc" id="L78">    private static final GlobalMetalog INSTANCE = new GlobalMetalog();</span>
+    
+    private final Metalog metalog;
+    @SuppressWarnings({&quot;FieldCanBeLocal&quot;, &quot;unused&quot;})
+    private final AutoClose close;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

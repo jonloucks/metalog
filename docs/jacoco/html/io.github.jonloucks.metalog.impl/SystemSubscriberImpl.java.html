@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SystemSubscriberImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">metalog</a> &gt; <a href="index.source.html" class="el_package">io.github.jonloucks.metalog.impl</a> &gt; <span class="el_source">SystemSubscriberImpl.java</span></div><h1>SystemSubscriberImpl.java</h1><pre class="source lang-java linenums">package io.github.jonloucks.metalog.impl;
+
+import io.github.jonloucks.contracts.api.AutoClose;
+import io.github.jonloucks.contracts.api.AutoOpen;
+import io.github.jonloucks.metalog.api.*;
+
+import java.util.function.Predicate;
+
+final class SystemSubscriberImpl implements SystemSubscriber, Filterable, AutoOpen, AutoClose {
+    
+    private final Metalog.Config config;
+    
+    @Override
+    public void receive(Log log, Meta meta) {
+<span class="nc bnc" id="L15" title="All 2 branches missed.">        if (test(meta)) {</span>
+<span class="nc bnc" id="L16" title="All 3 branches missed.">            switch (meta.getChannel()) {</span>
+                case &quot;info&quot;:
+                case &quot;system.out&quot;:
+<span class="nc" id="L19">                    System.out.println(log.get());</span>
+<span class="nc" id="L20">                    break;</span>
+                case &quot;error&quot;:
+                case &quot;warn&quot;:
+                case &quot;system.err&quot;:
+<span class="nc" id="L24">                    System.err.println(log.get());</span>
+                    break;
+            }
+        }
+<span class="nc" id="L28">    }</span>
+    
+    @Override
+    public AutoClose addFilter(Predicate&lt;Meta&gt; filter) {
+<span class="nc" id="L32">        return filters.addFilter(filter);</span>
+    }
+    
+    @Override
+    public boolean test(Meta meta) {
+<span class="nc" id="L37">        return filters.test(meta);</span>
+    }
+    
+    @Override
+    public AutoClose open() {
+<span class="pc bpc" id="L42" title="1 of 2 branches missed.">        if (openState.transitionToOpen()) {</span>
+<span class="fc" id="L43">            closeSubscription = config.contracts().claim(Metalog.CONTRACT).subscribe(this);</span>
+        }
+<span class="fc" id="L45">        return () -&gt; {};</span>
+    }
+    
+    @Override
+    public void close() {
+<span class="nc bnc" id="L50" title="All 2 branches missed.">        if (openState.transitionToClosed()) {</span>
+<span class="nc" id="L51">            final AutoClose autoClose = closeSubscription;</span>
+<span class="nc" id="L52">            closeSubscription = null;</span>
+<span class="nc bnc" id="L53" title="All 2 branches missed.">            if ( autoClose != null) {</span>
+<span class="nc" id="L54">                autoClose.close();</span>
+            }
+        }
+<span class="nc" id="L57">    }</span>
+    
+<span class="fc" id="L59">    SystemSubscriberImpl(Metalog.Config config) {</span>
+<span class="fc" id="L60">        this.config = config;</span>
+<span class="fc" id="L61">    }</span>
+    
+<span class="fc" id="L63">    private final IdempotentImpl openState = new IdempotentImpl();</span>
+<span class="fc" id="L64">    private final Filterable filters = new FiltersImpl();</span>
+    private AutoClose closeSubscription;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

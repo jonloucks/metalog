@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EntitiesTests.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">metalog</a> &gt; <a href="index.source.html" class="el_package">io.github.jonloucks.metalog.test</a> &gt; <span class="el_source">EntitiesTests.java</span></div><h1>EntitiesTests.java</h1><pre class="source lang-java linenums">package io.github.jonloucks.metalog.test;
+
+import io.github.jonloucks.contracts.api.AutoClose;
+import io.github.jonloucks.metalog.api.Entities;
+import io.github.jonloucks.metalog.api.Entity;
+import io.github.jonloucks.metalog.api.Metalog;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+
+import java.time.Instant;
+import java.time.temporal.Temporal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+
+import static io.github.jonloucks.contracts.api.GlobalContracts.claimContract;
+import static io.github.jonloucks.contracts.test.Tools.assertObject;
+import static io.github.jonloucks.contracts.test.Tools.assertThrown;
+import static io.github.jonloucks.metalog.api.GlobalMetalog.createMetalog;
+import static io.github.jonloucks.metalog.test.EntitiesTests.EntitiesTestsTools.runWithScenario;
+import static io.github.jonloucks.metalog.test.Tools.createTestEntity;
+import static org.junit.jupiter.api.Assertions.*;
+
+@SuppressWarnings({&quot;Convert2MethodRef&quot;, &quot;CodeBlock2Expr&quot;})
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+public interface EntitiesTests {
+    
+    @Test
+    default void entities_IsObject() {
+<span class="fc" id="L35">        runWithScenario( entities -&gt; {</span>
+<span class="fc" id="L36">            assertObject(entities);</span>
+<span class="fc" id="L37">        });</span>
+<span class="fc" id="L38">    }</span>
+    
+    @Test
+    default void entities_entity_WithNullEntity_Throws() {
+<span class="fc" id="L42">        runWithScenario( entities -&gt; {</span>
+<span class="fc" id="L43">            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -&gt; {</span>
+<span class="nc" id="L44">                entities.entity((Entity) null);</span>
+<span class="nc" id="L45">            });</span>
+            
+<span class="fc" id="L47">            assertThrown(thrown);</span>
+<span class="fc" id="L48">        });</span>
+<span class="fc" id="L49">    }</span>
+    
+    @Test
+    default void entities_entity_WithMany_Works() {
+<span class="fc" id="L53">        runWithScenario( entities -&gt; {</span>
+<span class="fc" id="L54">            final List&lt;Entity&gt; expected = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L55">            final int entityCount = 1234;</span>
+            
+<span class="fc" id="L57">            entities.unique(false);</span>
+            
+<span class="fc bfc" id="L59" title="All 2 branches covered.">            for (int i = 0; i &lt; entityCount; i++) {</span>
+<span class="fc" id="L60">                final Entity entity = createTestEntity(&quot;same name&quot;);</span>
+                
+<span class="fc" id="L62">                entities.entity(entity);</span>
+<span class="fc" id="L63">                expected.add(entity);</span>
+            }
+
+<span class="fc" id="L66">            assertFalse(entities.isEmpty(), &quot;Entities should not be empty&quot;);</span>
+<span class="fc" id="L67">            assertEquals(entityCount, entities.size(), &quot;Entities size &quot;);</span>
+<span class="fc" id="L68">            final List&lt;Entity&gt; found = entities.asList();</span>
+<span class="fc" id="L69">            assertNotNull(found);</span>
+<span class="fc" id="L70">            assertEquals(entityCount, found.size(), &quot;Found size&quot;);</span>
+<span class="fc" id="L71">            assertEquals(expected, found, &quot;Entities should be equal to&quot;);</span>
+<span class="fc" id="L72">        });</span>
+<span class="fc" id="L73">    }</span>
+    
+    @Test
+    default void entities_entity_WithManyMixed_Works() {
+<span class="fc" id="L77">        runWithScenario( entities -&gt; {</span>
+<span class="fc" id="L78">            final int entityCount = 1234;</span>
+            
+<span class="fc" id="L80">            entities.unique(true);</span>
+            
+<span class="fc" id="L82">            final int uniqueNames = 5;</span>
+            
+<span class="fc bfc" id="L84" title="All 2 branches covered.">            for (int i = 0; i &lt; entityCount; i++) {</span>
+<span class="fc" id="L85">                entities.entity(createTestEntity(&quot;entity&quot; + (i%uniqueNames)));</span>
+            }
+            
+<span class="fc" id="L88">            assertFalse(entities.isEmpty(), &quot;Entities should be empty&quot;);</span>
+<span class="fc" id="L89">            assertEquals(uniqueNames, entities.size(), &quot;Entities size &quot;);</span>
+<span class="fc" id="L90">            final List&lt;Entity&gt; found = entities.findAllIf(p -&gt; true);</span>
+<span class="fc" id="L91">            assertNotNull(found);</span>
+<span class="fc" id="L92">            assertEquals(uniqueNames, found.size(), &quot;Found size&quot;);</span>
+<span class="fc" id="L93">        });</span>
+<span class="fc" id="L94">    }</span>
+    
+    @Test
+    default void entities_entity_WithManyMixed_Worksx() {
+<span class="fc" id="L98">        runWithScenario( entities -&gt; {</span>
+<span class="fc" id="L99">            final List&lt;Entity&gt; expected = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L100">            final int entityCount = 100;</span>
+            
+<span class="fc" id="L102">            entities.unique(false);</span>
+            
+<span class="fc bfc" id="L104" title="All 2 branches covered.">            for (int i = 0; i &lt; entityCount; i++) {</span>
+                final Object value;
+<span class="fc bfc" id="L106" title="All 3 branches covered.">                switch (i%5) {</span>
+                    case 0:
+<span class="fc" id="L108">                        value = null;</span>
+<span class="fc" id="L109">                        break;</span>
+                    case 1:
+<span class="fc" id="L111">                        value = Instant.now();</span>
+<span class="fc" id="L112">                        break;</span>
+                    default:
+<span class="fc" id="L114">                        value = i;</span>
+                        break;
+                }
+<span class="fc" id="L117">                final Entity entity = createTestEntity(&quot;same name&quot;, value);</span>
+                
+<span class="fc" id="L119">                entities.entity(entity);</span>
+<span class="fc" id="L120">                expected.add(entity);</span>
+            }
+            
+<span class="fc" id="L123">            final List&lt;Integer&gt; integers = entities.findAllWithType(e-&gt;true, Integer.class);</span>
+<span class="fc" id="L124">            final List&lt;Instant&gt;  instants = entities.findAllWithType(e-&gt;true, Instant.class);</span>
+<span class="fc" id="L125">            final List&lt;Boolean&gt; booleans = entities.findAllWithType(e-&gt;true, Boolean.class);</span>
+<span class="fc" id="L126">            final List&lt;Temporal&gt; temporals = entities.findAllWithType(e-&gt;true, Temporal.class);</span>
+<span class="fc" id="L127">            final List&lt;Integer&gt; failedIntegers = entities.findAllWithType(e-&gt;false, Integer.class);</span>
+            
+<span class="fc" id="L129">            assertAll(</span>
+<span class="fc" id="L130">                () -&gt; assertEquals(60, integers.size(), &quot;Integers size &quot;),</span>
+<span class="fc" id="L131">                () -&gt; assertEquals(20, instants.size(), &quot;Instants size &quot;),</span>
+<span class="fc" id="L132">                () -&gt; assertEquals(0, booleans.size(), &quot;Booleans size &quot;),</span>
+<span class="fc" id="L133">                () -&gt; assertEquals(20, temporals.size(), &quot;Temporals size &quot;),</span>
+<span class="fc" id="L134">                () -&gt; assertEquals(0, failedIntegers.size(), &quot;Failed Integers size&quot;)</span>
+            );
+<span class="fc" id="L136">        });</span>
+<span class="fc" id="L137">    }</span>
+    
+    @Test
+    default void entities_entity_WithNullAction_Throws() {
+<span class="fc" id="L141">        runWithScenario( entities -&gt; {</span>
+<span class="fc" id="L142">            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -&gt; {</span>
+<span class="nc" id="L143">                entities.entity((Consumer&lt;Entity.Builder&lt;?&gt;&gt;) null);</span>
+<span class="nc" id="L144">            });</span>
+            
+<span class="fc" id="L146">            assertThrown(thrown);</span>
+<span class="fc" id="L147">        });</span>
+<span class="fc" id="L148">    }</span>
+    
+    @Test
+    default void entities_replaceIf_WithNullFilter_Throws() {
+<span class="pc" id="L152">        final Entity entity = () -&gt; &quot;&quot;;</span>
+<span class="fc" id="L153">        runWithScenario( entities -&gt; {</span>
+<span class="fc" id="L154">            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -&gt; {</span>
+<span class="nc" id="L155">                entities.replaceIf(null, entity);</span>
+<span class="nc" id="L156">            });</span>
+            
+<span class="fc" id="L158">            assertThrown(thrown);</span>
+<span class="fc" id="L159">        });</span>
+<span class="fc" id="L160">    }</span>
+    
+    @Test
+    default void entities_replaceIf_WithNullEntity_Throws() {
+<span class="pc" id="L164">        final Predicate&lt;? super Entity&gt; filter = e -&gt; true;</span>
+<span class="fc" id="L165">        runWithScenario( entities -&gt; {</span>
+<span class="fc" id="L166">            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -&gt; {</span>
+<span class="nc" id="L167">                entities.replaceIf(filter, null);</span>
+<span class="nc" id="L168">            });</span>
+            
+<span class="fc" id="L170">            assertThrown(thrown);</span>
+<span class="fc" id="L171">        });</span>
+<span class="fc" id="L172">    }</span>
+
+    @Test
+    default void entities_visitEach_WithNullVisitor_Throws() {
+<span class="fc" id="L176">        runWithScenario( entities -&gt; {</span>
+<span class="fc" id="L177">            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -&gt; {</span>
+<span class="nc" id="L178">                entities.visitEach(null);</span>
+<span class="nc" id="L179">            });</span>
+            
+<span class="fc" id="L181">            assertThrown(thrown);</span>
+<span class="fc" id="L182">        });</span>
+<span class="fc" id="L183">    }</span>
+    
+    @Test
+    default void entities_removeIf_WithNullFilter_Throws() {
+<span class="fc" id="L187">        runWithScenario( entities -&gt; {</span>
+<span class="fc" id="L188">            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -&gt; {</span>
+<span class="nc" id="L189">                entities.removeIf(null);</span>
+<span class="nc" id="L190">            });</span>
+            
+<span class="fc" id="L192">            assertThrown(thrown);</span>
+<span class="fc" id="L193">        });</span>
+<span class="fc" id="L194">    }</span>
+    
+    @Test
+    default void entities_findAllIf_WithNullFilter_Throws() {
+<span class="fc" id="L198">        runWithScenario( entities -&gt; {</span>
+<span class="fc" id="L199">            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -&gt; {</span>
+<span class="nc" id="L200">                entities.findAllIf(null);</span>
+<span class="nc" id="L201">            });</span>
+            
+<span class="fc" id="L203">            assertThrown(thrown);</span>
+<span class="fc" id="L204">        });</span>
+<span class="fc" id="L205">    }</span>
+    
+    @Test
+    default void entities_findAllWithType_WithNullFilter_Throws() {
+<span class="fc" id="L209">        runWithScenario( entities -&gt; {</span>
+<span class="fc" id="L210">            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -&gt; {</span>
+<span class="nc" id="L211">                entities.findAllWithType(null, String.class);</span>
+<span class="nc" id="L212">            });</span>
+            
+<span class="fc" id="L214">            assertThrown(thrown);</span>
+<span class="fc" id="L215">        });</span>
+<span class="fc" id="L216">    }</span>
+    
+    @Test
+    default void entities_findAllWithType_WithNullType_Throws() {
+<span class="pc" id="L220">        final Predicate&lt;? super Entity&gt; filter = e -&gt; true;</span>
+        
+<span class="fc" id="L222">        runWithScenario( entities -&gt; {</span>
+<span class="fc" id="L223">            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -&gt; {</span>
+<span class="nc" id="L224">                entities.findAllWithType(filter, null);</span>
+<span class="nc" id="L225">            });</span>
+            
+<span class="fc" id="L227">            assertThrown(thrown);</span>
+<span class="fc" id="L228">        });</span>
+<span class="fc" id="L229">    }</span>
+    
+    //    public &lt;T&gt; List&lt;T&gt; findAllWithType(Predicate&lt;? super Entity&gt; filter, Class&lt;T&gt; type) {
+    
+    @Test
+    default void entities_findAllByNameWithType_WithNullName_Throws() {
+<span class="fc" id="L235">        final Class&lt;String&gt; type = String.class;</span>
+<span class="fc" id="L236">        runWithScenario( entities -&gt; {</span>
+<span class="fc" id="L237">            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -&gt; {</span>
+<span class="nc" id="L238">                entities.findAllByNameWithType(null, type);</span>
+<span class="nc" id="L239">            });</span>
+            
+<span class="fc" id="L241">            assertThrown(thrown);</span>
+<span class="fc" id="L242">        });</span>
+<span class="fc" id="L243">    }</span>
+    
+    @Test
+    default void entities_findFirstIf_WithNullFilter_Throws() {
+<span class="fc" id="L247">        final Class&lt;String&gt; type = String.class;</span>
+<span class="fc" id="L248">        runWithScenario( entities -&gt; {</span>
+<span class="fc" id="L249">            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -&gt; {</span>
+<span class="nc" id="L250">                entities.findFirstIf(null);</span>
+<span class="nc" id="L251">            });</span>
+            
+<span class="fc" id="L253">            assertThrown(thrown);</span>
+<span class="fc" id="L254">        });</span>
+<span class="fc" id="L255">    }</span>
+    
+    final class EntitiesTestsTools {
+        private EntitiesTestsTools() {
+        }
+        
+        @FunctionalInterface
+        interface ScenarioConfig extends Consumer&lt;Entities.Builder&lt;?&gt;&gt; {
+            default Metalog.Config getMetalogConfig() {
+<span class="fc" id="L264">                return Metalog.Config.DEFAULT;</span>
+            }
+        }
+        
+        static void runWithScenario(ScenarioConfig scenarioConfig) {
+<span class="fc" id="L269">            final Metalog metalog = createMetalog(scenarioConfig.getMetalogConfig());</span>
+<span class="fc" id="L270">            try (AutoClose closeLogs = metalog.open()) {</span>
+<span class="fc" id="L271">                AutoClose ignoreWarning = closeLogs;</span>
+<span class="fc" id="L272">                scenarioConfig.accept(claimContract(Entities.Builder.FACTORY_CONTRACT).get());</span>
+            }
+<span class="fc" id="L274">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

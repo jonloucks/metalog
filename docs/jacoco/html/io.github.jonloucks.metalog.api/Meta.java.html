@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Meta.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">metalog</a> &gt; <a href="index.source.html" class="el_package">io.github.jonloucks.metalog.api</a> &gt; <span class="el_source">Meta.java</span></div><h1>Meta.java</h1><pre class="source lang-java linenums">package io.github.jonloucks.metalog.api;
+
+import io.github.jonloucks.contracts.api.Contract;
+
+import java.time.temporal.Temporal;
+import java.util.Optional;
+import java.util.function.Supplier;
+
+import static java.util.Optional.empty;
+
+public interface Meta extends Entity {
+<span class="pc" id="L12">    Meta DEFAULT = () -&gt; &quot;&quot;;</span>
+    
+    default String getChannel() {
+<span class="nc" id="L15">        return &quot;info&quot;;</span>
+    }
+    
+    default Optional&lt;String&gt; getSequenceKey() {
+<span class="nc" id="L19">        return empty();</span>
+    }
+    
+    default boolean isBlocking() {
+<span class="nc" id="L23">        return false;</span>
+    }
+    
+    default Optional&lt;Temporal&gt; getTimestamp() {
+<span class="nc" id="L27">        return empty();</span>
+    }
+    
+    default Optional&lt;Throwable&gt; getThrown() {
+<span class="nc" id="L31">        return empty();</span>
+    }
+    
+    default Optional&lt;Thread&gt; getThread() {
+<span class="nc" id="L35">        return empty();</span>
+    }
+    
+    interface Builder&lt;B extends Builder&lt;B&gt; &amp; Entity.Builder&lt;B&gt;&gt; extends Meta, Entity.Builder&lt;B&gt; {
+<span class="fc" id="L39">        Contract&lt;Supplier&lt;Meta.Builder&lt;?&gt;&gt;&gt; FACTORY_CONTRACT = Contract.create(&quot;Meta Builder Factory&quot;);</span>
+        
+        B name(String name);
+
+        B id(String id);
+        
+        B channel(String channel);
+        
+        B sequenceKey(String sequenceKey);
+        
+        B blocking(boolean temporal);
+        
+        B thrown(Throwable thrown);
+        
+        B timestamp(Temporal timestamp);
+  
+        B thread(Thread thread);
+        
+        B copy(Meta meta);
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
