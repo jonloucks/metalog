@@ -62,13 +62,14 @@ jobs:
           PROJECT_WORKFLOW: 'main-pull-request'
 
       - name: Copy Code Coverage and Source Documentation
+        working-directory: gh-pages
         run: |
-          rm -rf gh-pages/docs/javadoc/
-          mkdir -p gh-pages/docs/javadoc/
-          cp -r main-project/build/docs/javadoc/* gh-pages/docs/javadoc/
+          rm -rf docs/javadoc/
+          mkdir -p docs/javadoc
+          cp -r main-project/build/docs/javadoc/* docs/javadoc/
           rm -rf gh-pages/docs/jacoco/
-          mkdir -p gh-pages/docs/javadoc/
-          cp -r main-project/build/reports/jacoco/test/* gh-pages/docs/jacoco/
+          mkdir -p docs/jacoco
+          cp -r main-project/build/reports/jacoco/test/* docs/jacoco/
 
       - name: Commit and Push gh-pages
         uses: EndBug/add-and-commit@v9
