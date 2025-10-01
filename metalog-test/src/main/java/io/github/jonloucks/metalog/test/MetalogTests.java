@@ -14,23 +14,23 @@ import java.util.function.Consumer;
 
 import static io.github.jonloucks.contracts.test.Tools.assertThrown;
 import static io.github.jonloucks.contracts.test.Tools.sleep;
-import static io.github.jonloucks.metalog.api.GlobalMetalogs.createMetalogs;
-import static io.github.jonloucks.metalog.test.MetalogsTests.SmokeTestsTools.runWithScenario;
+import static io.github.jonloucks.metalog.api.GlobalMetalog.createMetalog;
+import static io.github.jonloucks.metalog.test.MetalogTests.SmokeTestsTools.runWithScenario;
 import static io.github.jonloucks.metalog.test.Tools.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public interface MetalogsTests {
+public interface MetalogTests {
     
     @Test
-    default void metalogs_addFilter_WithNull_Throws() {
+    default void metalog_addFilter_WithNull_Throws() {
 
-        runWithScenario(metalogs -> {
+        runWithScenario(metalog -> {
             final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
                 //noinspection resource
-                metalogs.addFilter(null);
+                metalog.addFilter(null);
             });
             
             assertThrown(thrown);
@@ -38,17 +38,17 @@ public interface MetalogsTests {
     }
     
     @Test
-    default void metalogs_WithThrown_Works(@Mock Subscriber subscriber, @Mock Log log) {
+    default void metalog_WithThrown_Works(@Mock Subscriber subscriber, @Mock Log log) {
         final String text = uniqueString();
         when(log.get()).thenReturn(text);
         final String id = uniqueString();
         
-        runWithScenario(metalogs -> {
-            try (AutoClose closeSubscriber = metalogs.subscribe(subscriber)) {
+        runWithScenario(metalog -> {
+            try (AutoClose closeSubscriber = metalog.subscribe(subscriber)) {
                 final AutoClose ignored = closeSubscriber;
                 final Throwable thrown = new ArithmeticException("oops");
                 
-                metalogs.publish(log, b -> b.id(id).thrown(thrown));
+                metalog.publish(log, b -> b.id(id).thrown(thrown));
                 
                 sleep(Duration.ofSeconds(1));
                 
@@ -58,41 +58,41 @@ public interface MetalogsTests {
     }
     
     @Test
-    default void metalogs_subscribe_close_while_queued_Works(@Mock Subscriber subscriber, @Mock Log log) {
+    default void metalog_subscribe_close_while_queued_Works(@Mock Subscriber subscriber, @Mock Log log) {
         final String text = uniqueString();
         when(log.get()).thenReturn(text);
         final String id = uniqueString();
         
-        runWithScenario(metalogs -> {
-            try (AutoClose closeSubscriber = metalogs.subscribe(subscriber)) {
+        runWithScenario(metalog -> {
+            try (AutoClose closeSubscriber = metalog.subscribe(subscriber)) {
                 final AutoClose ignored = closeSubscriber;
                 
-                metalogs.publish(log, b -> b.id(id));
+                metalog.publish(log, b -> b.id(id));
             }
             
             // subscription is closed and should no longer receive logs
-            metalogs.publish(log, b -> b.id(id));
+            metalog.publish(log, b -> b.id(id));
             sleep(Duration.ofSeconds(1));
             verify(subscriber, times(0)).receive(any(), metaWithId(id));
         });
     }
     
     @Test
-    default void metalogs_subscribe_close_Works(@Mock Subscriber subscriber, @Mock Log log) {
+    default void metalog_subscribe_close_Works(@Mock Subscriber subscriber, @Mock Log log) {
         final String text = uniqueString();
         when(log.get()).thenReturn(text);
         final String id = uniqueString();
         
-        runWithScenario(metalogs -> {
-            try (AutoClose closeSubscriber = metalogs.subscribe(subscriber)) {
+        runWithScenario(metalog -> {
+            try (AutoClose closeSubscriber = metalog.subscribe(subscriber)) {
                 final AutoClose ignored = closeSubscriber;
                 
-                metalogs.publish(log, b -> b.id(id));
+                metalog.publish(log, b -> b.id(id));
                 sleep(Duration.ofSeconds(1));
             }
             
             // subscription is closed and should no longer receive logs
-            metalogs.publish(log, b -> b.id(id));
+            metalog.publish(log, b -> b.id(id));
             sleep(Duration.ofSeconds(1));
             verify(subscriber, times(1)).receive(any(), metaWithId(id));
         });
@@ -102,17 +102,17 @@ public interface MetalogsTests {
         private SmokeTestsTools() {
         }
 
-        interface ScenarioConfig extends Consumer<Metalogs>{
-            default Metalogs.Config getMetalogsConfig() {
-                return Metalogs.Config.DEFAULT;
+        interface ScenarioConfig extends Consumer<Metalog>{
+            default Metalog.Config getMetalogConfig() {
+                return Metalog.Config.DEFAULT;
             }
         }
         
         static void runWithScenario(ScenarioConfig scenarioConfig) {
-            final Metalogs metalogs = createMetalogs(scenarioConfig.getMetalogsConfig());
-            try (AutoClose closeLogs = metalogs.open()) {
+            final Metalog metalog = createMetalog(scenarioConfig.getMetalogConfig());
+            try (AutoClose closeLogs = metalog.open()) {
                 AutoClose ignoreWarning = closeLogs;
-                scenarioConfig.accept(metalogs);
+                scenarioConfig.accept(metalog);
             }
         }
     }

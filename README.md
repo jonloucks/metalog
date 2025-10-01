@@ -3,4 +3,4 @@ Metalog.  A low impact and highly performant structured meta logging library for
 
 
 ## Badges
-![Coverage Badge](https://raw.githubusercontent.com/jonloucks/metalogs/refs/heads/badges/main-coverage.svg)
+![Coverage Badge](https://raw.githubusercontent.com/jonloucks/metalog/refs/heads/badges/main-coverage.svg)

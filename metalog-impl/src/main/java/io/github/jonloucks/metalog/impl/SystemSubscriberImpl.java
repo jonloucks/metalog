@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 
 final class SystemSubscriberImpl implements SystemSubscriber, Filterable, AutoOpen, AutoClose {
     
-    private final Metalogs.Config config;
+    private final Metalog.Config config;
     
     @Override
     public void receive(Log log, Meta meta) {
@@ -40,7 +40,7 @@ final class SystemSubscriberImpl implements SystemSubscriber, Filterable, AutoOp
     @Override
     public AutoClose open() {
         if (openState.transitionToOpen()) {
-            closeSubscription = config.contracts().claim(Metalogs.CONTRACT).subscribe(this);
+            closeSubscription = config.contracts().claim(Metalog.CONTRACT).subscribe(this);
         }
         return () -> {};
     }
@@ -56,7 +56,7 @@ final class SystemSubscriberImpl implements SystemSubscriber, Filterable, AutoOp
         }
     }
     
-    SystemSubscriberImpl(Metalogs.Config config) {
+    SystemSubscriberImpl(Metalog.Config config) {
         this.config = config;
     }
     

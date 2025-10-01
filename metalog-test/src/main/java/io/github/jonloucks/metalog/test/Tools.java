@@ -6,8 +6,8 @@ import java.util.UUID;
 
 import io.github.jonloucks.metalog.api.Entity;
 import io.github.jonloucks.metalog.api.Meta;
-import io.github.jonloucks.metalog.api.Metalogs;
-import io.github.jonloucks.metalog.api.MetalogsFactory;
+import io.github.jonloucks.metalog.api.MetalogFactory;
+import io.github.jonloucks.metalog.api.Metalog;
 
 import static io.github.jonloucks.contracts.test.Tools.sanitize;
 import static org.mockito.AdditionalMatchers.and;
@@ -18,9 +18,9 @@ public final class Tools {
     public static void clean() {
         io.github.jonloucks.contracts.test.Tools.clean();
         sanitize(()-> {
-            final Metalogs.Config config = new Metalogs.Config() {};
+            final Metalog.Config config = new Metalog.Config() {};
             if (config.useServiceLoader()) {
-                final ServiceLoader<? extends MetalogsFactory> loader = ServiceLoader.load(config.serviceLoaderClass());
+                final ServiceLoader<? extends MetalogFactory> loader = ServiceLoader.load(config.serviceLoaderClass());
                 loader.reload();
             }
         });

@@ -13,7 +13,7 @@ import static io.github.jonloucks.contracts.api.Checks.nullCheck;
 import static io.github.jonloucks.metalog.impl.Internal.*;
 import static java.util.Optional.ofNullable;
 
-final class MetalogsImpl implements Metalogs, AutoClose {
+final class MetalogImpl implements Metalog, AutoClose {
     
     @Override
     public void publish(Log log, Meta meta) {
@@ -21,7 +21,7 @@ final class MetalogsImpl implements Metalogs, AutoClose {
         final Meta validMeta = metaCheck(meta);
         
         if (!openState.isOpen()) {
-            throw new IllegalStateException("Metalogs is not open");
+            throw new IllegalStateException("Metalog is not open");
         }
         
         if (!subscribers.isEmpty() && isEnabled() && test(validMeta)) {
@@ -90,7 +90,7 @@ final class MetalogsImpl implements Metalogs, AutoClose {
         }
     }
     
-    MetalogsImpl(Config config) {
+    MetalogImpl(Config config) {
         this.config = configCheck(config);
         final Promisors promisors = config.contracts().claim(Promisors.CONTRACT);
         this.repository = config.contracts().claim(Repository.FACTORY).get();
@@ -99,8 +99,8 @@ final class MetalogsImpl implements Metalogs, AutoClose {
     }
     
     private void bindContracts(Config config, Promisors promisors) {
-        repository.store(Metalogs.CONTRACT, () -> this);
-        repository.store(MetalogsFactory.CONTRACT, promisors.createLifeCyclePromisor(MetalogsFactoryImpl::new));
+        repository.store(Metalog.CONTRACT, () -> this);
+        repository.store(MetalogFactory.CONTRACT, promisors.createLifeCyclePromisor(MetalogFactoryImpl::new));
         repository.store(Dispatcher.CONTRACT, promisors.createLifeCyclePromisor(()-> new DispatcherImpl(config)));
         repository.store(Entities.Builder.FACTORY_CONTRACT, () -> EntitiesImpl::new);
         repository.store(Entity.Builder.FACTORY_CONTRACT, () -> EntityImpl::new);
