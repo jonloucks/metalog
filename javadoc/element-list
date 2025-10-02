@@ -1,2 +1,2 @@
-module:io.github.jonloucks.metalog
-io.github.jonloucks.metalog
+module:io.github.jonloucks.metalog.api
+io.github.jonloucks.metalog.api

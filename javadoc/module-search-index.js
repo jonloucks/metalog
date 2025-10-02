@@ -1,1 +1,1 @@
-moduleSearchIndex = [{"l":"io.github.jonloucks.metalog"}];updateSearchResults();
+moduleSearchIndex = [{"l":"io.github.jonloucks.metalog.api"}];updateSearchResults();

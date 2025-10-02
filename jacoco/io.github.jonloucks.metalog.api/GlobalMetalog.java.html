@@ -6,41 +6,44 @@ import java.util.function.Consumer;
 
 import static io.github.jonloucks.contracts.api.Checks.nullCheck;
 
+/**
+ * Globally shared Metalog singleton
+ */
 public final class GlobalMetalog {
     
     /**
      * @see Metalog#publish(Log)
      */
     public static void publish(Log log) {
-<span class="nc" id="L15">        INSTANCE.metalog.publish(log);</span>
-<span class="nc" id="L16">    }</span>
+<span class="nc" id="L18">        INSTANCE.metalog.publish(log);</span>
+<span class="nc" id="L19">    }</span>
     
     /**
      * @see Metalog#publish(Log, Meta)
      */
     public static void publish(Log log, Meta meta) {
-<span class="nc" id="L22">        INSTANCE.metalog.publish(log, meta);</span>
-<span class="nc" id="L23">    }</span>
+<span class="nc" id="L25">        INSTANCE.metalog.publish(log, meta);</span>
+<span class="nc" id="L26">    }</span>
     
     /**
      * @see Metalog#publish(Log, Consumer)
      */
     public static void publish(Log log, Consumer&lt;Meta.Builder&lt;?&gt;&gt; metaBuilder) {
-<span class="nc" id="L29">        INSTANCE.metalog.publish(log, metaBuilder);</span>
-<span class="nc" id="L30">    }</span>
+<span class="nc" id="L32">        INSTANCE.metalog.publish(log, metaBuilder);</span>
+<span class="nc" id="L33">    }</span>
  
     /**
      * @see Metalog#isEnabled()
      */
     public static boolean isEnabled() {
-<span class="nc" id="L36">        return INSTANCE.metalog.isEnabled();</span>
+<span class="nc" id="L39">        return INSTANCE.metalog.isEnabled();</span>
     }
     
     /**
      * @see Metalog#subscribe(Subscriber)
      */
     public static AutoClose subscribe(Subscriber subscriber) {
-<span class="nc" id="L43">        return INSTANCE.metalog.subscribe(subscriber);</span>
+<span class="nc" id="L46">        return INSTANCE.metalog.subscribe(subscriber);</span>
     }
     
     /**
@@ -48,7 +51,7 @@ public final class GlobalMetalog {
      * @return the instance
      */
     public static Metalog getInstance() {
-<span class="nc" id="L51">        return INSTANCE.metalog;</span>
+<span class="nc" id="L54">        return INSTANCE.metalog;</span>
     }
     
     /**
@@ -62,20 +65,20 @@ public final class GlobalMetalog {
      * &lt;/p&gt;
      */
     public static Metalog createMetalog(Metalog.Config config) {
-<span class="fc" id="L65">        final Metalog.Config validConfig = nullCheck(config, &quot;Metalog config was null&quot;);</span>
-<span class="fc" id="L66">        final MetalogFactoryFinder factoryFinder = new MetalogFactoryFinder(config);</span>
-<span class="fc" id="L67">        final MetalogFactory factory = nullCheck(factoryFinder.find(), &quot;find() was null&quot;);</span>
-<span class="fc" id="L68">        final Metalog service = factory.create(validConfig);</span>
+<span class="fc" id="L68">        final Metalog.Config validConfig = nullCheck(config, &quot;Metalog config was null&quot;);</span>
+<span class="fc" id="L69">        final MetalogFactoryFinder factoryFinder = new MetalogFactoryFinder(config);</span>
+<span class="fc" id="L70">        final MetalogFactory factory = nullCheck(factoryFinder.find(), &quot;find() was null&quot;);</span>
+<span class="fc" id="L71">        final Metalog service = factory.create(validConfig);</span>
         
-<span class="fc" id="L70">        return nullCheck(service, &quot;createService() was null&quot;);</span>
+<span class="fc" id="L73">        return nullCheck(service, &quot;createService() was null&quot;);</span>
     }
     
-<span class="fc" id="L73">    private GlobalMetalog() {</span>
-<span class="fc" id="L74">        this.metalog = createMetalog(new Metalog.Config() {});</span>
-<span class="fc" id="L75">        this.close = metalog.open();</span>
-<span class="fc" id="L76">    }</span>
+<span class="fc" id="L76">    private GlobalMetalog() {</span>
+<span class="fc" id="L77">        this.metalog = createMetalog(new Metalog.Config() {});</span>
+<span class="fc" id="L78">        this.close = metalog.open();</span>
+<span class="fc" id="L79">    }</span>
     
-<span class="fc" id="L78">    private static final GlobalMetalog INSTANCE = new GlobalMetalog();</span>
+<span class="fc" id="L81">    private static final GlobalMetalog INSTANCE = new GlobalMetalog();</span>
     
     private final Metalog metalog;
     @SuppressWarnings({&quot;FieldCanBeLocal&quot;, &quot;unused&quot;})
