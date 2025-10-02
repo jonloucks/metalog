@@ -6,6 +6,9 @@ import java.util.function.Consumer;
 
 import static io.github.jonloucks.contracts.api.Checks.nullCheck;
 
+/**
+ * Globally shared Metalog singleton
+ */
 public final class GlobalMetalog {
     
     /**

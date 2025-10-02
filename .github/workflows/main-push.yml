@@ -64,12 +64,8 @@ jobs:
       - name: Copy Code Coverage and Source Documentation
         working-directory: gh-pages
         run: |
-          rm -rf docs/
-          rm -rf javadoc/
-          mkdir -p javadoc
-          cp -r "${{ github.workspace }}/main-project/build/docs/javadoc/"* javadoc/
-          rm -rf jacoco/
-          mkdir -p jacoco
+          rm -rf javadoc/ jacoco/ ; mkdir -p javadoc ; mkdir -p jacoco
+          cp -r "${{ github.workspace }}/main-project/${{ github.event.repository.name }}-api/build/docs/javadoc/"* javadoc/
           cp -r "${{ github.workspace }}/main-project/build/reports/jacoco/test/html/"* jacoco/
 
       - name: Commit and Push gh-pages

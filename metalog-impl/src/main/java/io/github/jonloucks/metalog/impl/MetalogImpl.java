@@ -17,18 +17,18 @@ final class MetalogImpl implements Metalog, AutoClose {
     
     @Override
     public void publish(Log log, Meta meta) {
-        final Log validLog = logCheck(log);
-        final Meta validMeta = metaCheck(meta);
-        
         if (!openState.isOpen()) {
             throw new IllegalStateException("Metalog is not open");
         }
+        
+        final Log validLog = new InvokeGetOnlyOnce(logCheck(log));
+        final Meta validMeta = null == meta ? Meta.DEFAULT : meta;
         
         if (!subscribers.isEmpty() && isEnabled() && test(validMeta)) {
             if (validMeta.isBlocking()) {
                 dispatch(validLog, validMeta);
             } else {
-                dispatcher.execute(() -> dispatch(log, meta));
+                dispatcher.execute(() -> dispatch(validLog, validMeta));
             }
         }
     }
