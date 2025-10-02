@@ -5,11 +5,21 @@ import io.github.jonloucks.contracts.api.*;
 import java.time.Duration;
 
 /**
- * The Metalog service API
+ * The Metalog API
+ *
+ * @see io.github.jonloucks.metalog.api.Publisher
  */
 public interface Metalog extends Publisher, Filterable, AutoOpen {
+    /**
+     * Access the current Metalog implementation
+     */
     Contract<Metalog> CONTRACT = Contract.create(Metalog.class);
     
+    /**
+     * Subscribe
+     * @param config
+     * @return
+     */
     AutoClose subscribe(Subscriber config);
     
     interface Config {

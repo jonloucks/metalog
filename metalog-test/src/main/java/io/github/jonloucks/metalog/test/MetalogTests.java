@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.mockito.stubbing.Answer;
 
 import java.time.Duration;
 import java.util.function.Consumer;
@@ -42,6 +43,14 @@ public interface MetalogTests {
         final String text = uniqueString();
         when(log.get()).thenReturn(text);
         final String id = uniqueString();
+        
+        doAnswer((Answer<Void>) invocation -> {
+            final Log passedLog = (Log)invocation.getArguments()[0];
+            passedLog.get();
+            passedLog.get();
+            passedLog.get();
+            return null; // Void methods return null in doAnswer
+        }).when(subscriber).receive(any(), any());
         
         runWithScenario(metalog -> {
             try (AutoClose closeSubscriber = metalog.subscribe(subscriber)) {
