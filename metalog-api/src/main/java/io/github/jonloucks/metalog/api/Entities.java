@@ -44,7 +44,7 @@ public interface Entities {
         
         B unique(boolean unique);
         
-        B entity(Consumer<Entity.Builder<?>> builder);
+        B entity(Consumer<Entity.Builder<?>> builderConsumer);
         
         B entity(Entity entity);
     }

@@ -19,7 +19,7 @@ final class DispatcherImpl implements Dispatcher, AutoOpen, AutoClose {
     
     @Override
     public AutoClose open() {
-        if (openState.transitionToOpen()) {
+        if (openState.transitionToOpened()) {
             if (config.backlogThreadCount() <= 0) {
                 executor = Runnable::run;
             } else if (config.backlogThreadCount() > 1) {
@@ -29,7 +29,7 @@ final class DispatcherImpl implements Dispatcher, AutoOpen, AutoClose {
             }
             return this;
         } else {
-            return () -> {};
+            return () -> {}; // all open calls after the first get a do nothing close
         }
     }
     
@@ -45,7 +45,7 @@ final class DispatcherImpl implements Dispatcher, AutoOpen, AutoClose {
                         if (!executorService.awaitTermination(millis, MILLISECONDS)) {
                             executorService.shutdownNow();
                             if (!executorService.awaitTermination(millis, MILLISECONDS)) {
-                                System.err.println("Metalog dispatcher failed to shutdown");
+                                System.err.println("Metalog dispatcher failed to shutdown.");
                             }
                         }
                     } catch (InterruptedException ex) {

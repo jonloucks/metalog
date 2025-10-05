@@ -6,7 +6,7 @@ final class IdempotentImpl {
     IdempotentImpl() {
     }
     
-    boolean transitionToOpen() {
+    boolean transitionToOpened() {
         return state.compareAndSet(IS_CLOSED, IS_OPEN);
     }
     

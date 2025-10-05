@@ -18,8 +18,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static io.github.jonloucks.contracts.api.GlobalContracts.claimContract;
-import static io.github.jonloucks.contracts.test.Tools.assertObject;
-import static io.github.jonloucks.contracts.test.Tools.assertThrown;
+import static io.github.jonloucks.contracts.test.Tools.*;
 import static io.github.jonloucks.metalog.api.GlobalMetalog.createMetalog;
 import static io.github.jonloucks.metalog.test.EntitiesTests.EntitiesTestsTools.runWithScenario;
 import static io.github.jonloucks.metalog.test.Tools.createTestEntity;
@@ -50,22 +49,23 @@ public interface EntitiesTests {
     
     @Test
     default void entities_entity_WithMany_Works() {
-        runWithScenario( entities -> {
+        runWithScenario( entitiesBuilder -> {
             final List<Entity> expected = new ArrayList<>();
             final int entityCount = 1234;
             
-            entities.unique(false);
+            Entities.Builder<?> returnBuilder = entitiesBuilder.unique(false);
             
             for (int i = 0; i < entityCount; i++) {
                 final Entity entity = createTestEntity("same name");
                 
-                entities.entity(entity);
+                entitiesBuilder.entity(entity);
                 expected.add(entity);
             }
 
-            assertFalse(entities.isEmpty(), "Entities should not be empty");
-            assertEquals(entityCount, entities.size(), "Entities size ");
-            final List<Entity> found = entities.asList();
+            assertNotNull(returnBuilder);
+            assertFalse(entitiesBuilder.isEmpty(), "Entities should not be empty");
+            assertEquals(entityCount, entitiesBuilder.size(), "Entities size ");
+            final List<Entity> found = entitiesBuilder.asList();
             assertNotNull(found);
             assertEquals(entityCount, found.size(), "Found size");
             assertEquals(expected, found, "Entities should be equal to");
@@ -96,7 +96,6 @@ public interface EntitiesTests {
     @Test
     default void entities_entity_WithManyMixed_Worksx() {
         runWithScenario( entities -> {
-            final List<Entity> expected = new ArrayList<>();
             final int entityCount = 100;
             
             entities.unique(false);
@@ -117,7 +116,6 @@ public interface EntitiesTests {
                 final Entity entity = createTestEntity("same name", value);
                 
                 entities.entity(entity);
-                expected.add(entity);
             }
             
             final List<Integer> integers = entities.findAllWithType(e->true, Integer.class);
@@ -244,7 +242,6 @@ public interface EntitiesTests {
     
     @Test
     default void entities_findFirstIf_WithNullFilter_Throws() {
-        final Class<String> type = String.class;
         runWithScenario( entities -> {
             final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
                 entities.findFirstIf(null);
@@ -254,8 +251,14 @@ public interface EntitiesTests {
         });
     }
     
+    @Test
+    default void entities_InternalCoverage() {
+        assertInstantiateThrows(EntitiesTestsTools.class);
+    }
+    
     final class EntitiesTestsTools {
         private EntitiesTestsTools() {
+            throw new AssertionError("Illegal constructor");
         }
         
         @FunctionalInterface

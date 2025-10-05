@@ -9,7 +9,7 @@ import io.github.jonloucks.contracts.api.GlobalContracts;
 public final class Stub {
  
     private Stub() {
-        throw new AssertionError("Illegal constructor");
+        throw new AssertionError("Illegal constructor call.");
     }
     
     /**

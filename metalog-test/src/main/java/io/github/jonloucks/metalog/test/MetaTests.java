@@ -17,36 +17,27 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static io.github.jonloucks.contracts.api.GlobalContracts.claimContract;
+import static io.github.jonloucks.contracts.test.Tools.assertInstantiateThrows;
+import static io.github.jonloucks.contracts.test.Tools.assertThrown;
 import static io.github.jonloucks.metalog.api.GlobalMetalog.createMetalog;
 import static io.github.jonloucks.metalog.test.MetaTests.MetaTestsTools.newMetaBuilder;
 import static io.github.jonloucks.metalog.test.MetaTests.MetaTestsTools.runWithScenario;
 import static org.junit.jupiter.api.Assertions.*;
 
+@SuppressWarnings("CodeBlock2Expr")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public interface MetaTests {
     
     @Test
     default void meta_InitialValues() {
-        runWithScenario( meta -> {
-            assertFalse(meta.getName().isPresent());
-            assertFalse(meta.getId().isPresent());
-            assertFalse(meta.getValue().isPresent());
-            assertEquals("info", meta.getChannel());
-            assertFalse(meta.getSequenceKey().isPresent());
-            assertFalse(meta.getCorrelations().isPresent());
-            assertFalse(meta.isBlocking());
-            assertFalse(meta.getThread().isPresent());
-            assertFalse(meta.getThrown().isPresent());
-            assertFalse(meta.getTimestamp().isPresent());
-            assertNull(meta.get());
-        });
+        runWithScenario(Tools::assertMetaDefaults);
     }
     
     @Test
     default void meta_copy_WithMeta1_Works() {
-        runWithScenario(meta -> {
-            final Throwable thrown = new RuntimeException("Oh no!");
+        runWithScenario(metaBuilder -> {
+            final Throwable thrown = new RuntimeException("Oh no.");
             final Thread thread = Thread.currentThread();
             final Instant timestamp = Instant.now();
             final Meta.Builder<?> fromBuilder = newMetaBuilder();
@@ -58,78 +49,78 @@ public interface MetaTests {
                 .name("name1")
                 .value("value1")
                 .channel("channel1")
-                .sequenceKey("sequenceKey1")
-                .blocking(true)
+                .key("sequenceKey1")
+                .block(true)
                 .thread(thread)
                 .thrown(thrown)
-                .timestamp(timestamp);
+                .time(timestamp);
             
-            meta.copy(fromBuilder);
+            metaBuilder.copy(fromBuilder);
             
-            assertEquals("value1", meta.get());
-            assertTrue(meta.getName().isPresent());
-            assertEquals("name1", meta.getName().get());
-            assertTrue(meta.getId().isPresent());
-            assertEquals("id1", meta.getId().get());
-            assertTrue(meta.getValue().isPresent());
-            assertEquals("value1", meta.getValue().get());
-            assertEquals(fromBuilder.getChannel(), meta.getChannel());
-            assertTrue(meta.getSequenceKey().isPresent());
-            assertEquals("sequenceKey1", meta.getSequenceKey().get());
-            assertTrue(meta.getCorrelations().isPresent());
-            assertTrue(meta.getTimestamp().isPresent());
-            assertEquals(timestamp, meta.getTimestamp().get());
-            assertTrue(meta.getThrown().isPresent());
-            assertEquals(thrown, meta.getThrown().get());
-            assertEquals(fromBuilder.isBlocking(), meta.isBlocking());
-            assertTrue(meta.getThread().isPresent());
-            assertEquals(thread, meta.getThread().get());
+            assertEquals("value1", metaBuilder.get());
+            assertTrue(metaBuilder.getName().isPresent());
+            assertEquals("name1", metaBuilder.getName().get());
+            assertTrue(metaBuilder.getId().isPresent());
+            assertEquals("id1", metaBuilder.getId().get());
+            assertTrue(metaBuilder.getValue().isPresent());
+            assertEquals("value1", metaBuilder.getValue().get());
+            assertEquals(fromBuilder.getChannel(), metaBuilder.getChannel());
+            assertTrue(metaBuilder.getKey().isPresent());
+            assertEquals("sequenceKey1", metaBuilder.getKey().get());
+            assertTrue(metaBuilder.getCorrelations().isPresent());
+            assertTrue(metaBuilder.getTime().isPresent());
+            assertEquals(timestamp, metaBuilder.getTime().get());
+            assertTrue(metaBuilder.getThrown().isPresent());
+            assertEquals(thrown, metaBuilder.getThrown().get());
+            assertEquals(fromBuilder.isBlock(), metaBuilder.isBlock());
+            assertTrue(metaBuilder.getThread().isPresent());
+            assertEquals(thread, metaBuilder.getThread().get());
         });
     }
     
     @Test
     default void meta_copy_WithMeta_Works() {
-        runWithScenario(meta -> {
-            final Throwable thrown = new RuntimeException("Oh no!");
+        runWithScenario(metaBuilder -> {
+            final Throwable thrown = new RuntimeException("Oh no.");
             final Thread thread = Thread.currentThread();
             final Instant timestamp = Instant.now();
-            meta.id("id1")
+            metaBuilder.id("id1")
                 .name("name1")
                 .value("value1")
                 .channel("channel1")
-                .sequenceKey("sequenceKey1")
-                .blocking(true)
+                .key("sequenceKey1")
+                .block(true)
                 .thread(thread)
                 .thrown(thrown)
-                .timestamp(timestamp);
+                .time(timestamp);
             
             final Meta.Builder<?> fromBuilder = newMetaBuilder();
             
-            meta.copy(fromBuilder);
+            metaBuilder.copy(fromBuilder);
             
-            assertTrue(meta.getName().isPresent());
-            assertEquals("name1", meta.getName().get());
-            assertTrue(meta.getId().isPresent());
-            assertEquals("id1", meta.getId().get());
-            assertTrue(meta.getValue().isPresent());
-            assertEquals("value1", meta.getValue().get());
-            assertEquals(fromBuilder.getChannel(), meta.getChannel());
-            assertTrue(meta.getSequenceKey().isPresent());
-            assertEquals("sequenceKey1", meta.getSequenceKey().get());
-            assertTrue(meta.getCorrelations().isPresent());
-            assertTrue(meta.getTimestamp().isPresent());
-            assertEquals(timestamp, meta.getTimestamp().get());
-            assertTrue(meta.getThrown().isPresent());
-            assertEquals(thrown, meta.getThrown().get());
-            assertEquals(fromBuilder.isBlocking(), meta.isBlocking());
-            assertTrue(meta.getThread().isPresent());
-            assertEquals(thread, meta.getThread().get());
+            assertTrue(metaBuilder.getName().isPresent());
+            assertEquals("name1", metaBuilder.getName().get());
+            assertTrue(metaBuilder.getId().isPresent());
+            assertEquals("id1", metaBuilder.getId().get());
+            assertTrue(metaBuilder.getValue().isPresent());
+            assertEquals("value1", metaBuilder.getValue().get());
+            assertEquals(fromBuilder.getChannel(), metaBuilder.getChannel());
+            assertTrue(metaBuilder.getKey().isPresent());
+            assertEquals("sequenceKey1", metaBuilder.getKey().get());
+            assertTrue(metaBuilder.getCorrelations().isPresent());
+            assertTrue(metaBuilder.getTime().isPresent());
+            assertEquals(timestamp, metaBuilder.getTime().get());
+            assertTrue(metaBuilder.getThrown().isPresent());
+            assertEquals(thrown, metaBuilder.getThrown().get());
+            assertEquals(fromBuilder.isBlock(), metaBuilder.isBlock());
+            assertTrue(metaBuilder.getThread().isPresent());
+            assertEquals(thread, metaBuilder.getThread().get());
         });
     }
     @Test
     default void meta_copy_WithEntity_Works() {
-        runWithScenario(meta -> {
-            final Throwable thrown = new RuntimeException("Oh no!");
+        runWithScenario(metaBuilder -> {
+            final Throwable thrown = new RuntimeException("Oh no.");
             final Thread thread = Thread.currentThread();
             final Instant timestamp = Instant.now();
             final Meta.Builder<?> fromBuilder = newMetaBuilder();
@@ -141,45 +132,59 @@ public interface MetaTests {
                 .name("name1")
                 .value("value1")
                 .channel("channel1")
-                .sequenceKey("sequenceKey1")
-                .blocking(true)
+                .key("sequenceKey1")
+                .block(true)
                 .thread(thread)
                 .thrown(thrown)
-                .timestamp(timestamp);
+                .time(timestamp);
             
-            meta.copy((Entity.Builder<?>)fromBuilder);
+            metaBuilder.copy((Entity.Builder<?>)fromBuilder);
             
-            assertEquals("value1", meta.get());
-            assertTrue(meta.getName().isPresent());
-            assertEquals("name1", meta.getName().get());
-            assertTrue(meta.getId().isPresent());
-            assertEquals("id1", meta.getId().get());
-            assertTrue(meta.getValue().isPresent());
-            assertEquals("value1", meta.getValue().get());
-            assertEquals("info", meta.getChannel());
-            assertFalse(meta.getSequenceKey().isPresent());
+            assertEquals("value1", metaBuilder.get());
+            assertTrue(metaBuilder.getName().isPresent());
+            assertEquals("name1", metaBuilder.getName().get());
+            assertTrue(metaBuilder.getId().isPresent());
+            assertEquals("id1", metaBuilder.getId().get());
+            assertTrue(metaBuilder.getValue().isPresent());
+            assertEquals("value1", metaBuilder.getValue().get());
+            assertEquals("info", metaBuilder.getChannel());
+            assertFalse(metaBuilder.getKey().isPresent());
 //            assertEquals("sequenceKey1", meta.getSequenceKey().get());
-            assertTrue(meta.getCorrelations().isPresent());
-            assertTrue(meta.getTimestamp().isPresent());
-            assertEquals(timestamp, meta.getTimestamp().get());
-            assertTrue(meta.getThrown().isPresent());
-            assertEquals(thrown, meta.getThrown().get());
-            assertFalse(meta.isBlocking());
-            assertTrue(meta.getThread().isPresent());
-            assertEquals(thread, meta.getThread().get());
+            assertTrue(metaBuilder.getCorrelations().isPresent());
+            assertTrue(metaBuilder.getTime().isPresent());
+            assertEquals(timestamp, metaBuilder.getTime().get());
+            assertTrue(metaBuilder.getThrown().isPresent());
+            assertEquals(thrown, metaBuilder.getThrown().get());
+            assertFalse(metaBuilder.isBlock());
+            assertTrue(metaBuilder.getThread().isPresent());
+            assertEquals(thread, metaBuilder.getThread().get());
+        });
+    }
+    
+    @Test
+    default void meta_Timestamp_Works() {
+        runWithScenario( metaBuilder -> {
+            final Meta.Builder<?> returnBuilder = metaBuilder.time();
+            
+            final Optional<Temporal> optionalTimestamp = metaBuilder.getTime();
+            
+            assertSame(metaBuilder, returnBuilder );
+            assertTrue(optionalTimestamp.isPresent());
+            assertNotNull(optionalTimestamp.get());
         });
     }
     
     
     @Test
-    default void meta_Timestamp_Works() {
-        runWithScenario( meta -> {
+    default void meta_Timestamp_WithTime_Works() {
+        runWithScenario( metaBuilder -> {
             final Instant timestamp = Instant.now();
             
-            meta.timestamp(timestamp);
+            final Meta.Builder<?> returnBuilder = metaBuilder.time(timestamp);
             
-            final Optional<Temporal> optionalTimestamp = meta.getTimestamp();
+            final Optional<Temporal> optionalTimestamp = metaBuilder.getTime();
             
+            assertSame(metaBuilder, returnBuilder );
             assertTrue(optionalTimestamp.isPresent());
             assertEquals(timestamp, optionalTimestamp.get());
         });
@@ -187,13 +192,14 @@ public interface MetaTests {
     
     @Test
     default void meta_Thread_Works() {
-        runWithScenario( meta -> {
+        runWithScenario( metaBuilder -> {
             final Thread thread = Thread.currentThread();
             
-            meta.thread(thread);
+            final Meta.Builder<?> returnBuilder = metaBuilder.thread(thread);
             
-            final Optional<Thread> optionalThread = meta.getThread();
+            final Optional<Thread> optionalThread = metaBuilder.getThread();
             
+            assertSame(metaBuilder, returnBuilder );
             assertTrue(optionalThread.isPresent());
             assertEquals(thread, optionalThread.get());
         });
@@ -201,20 +207,92 @@ public interface MetaTests {
     
     @Test
     default void meta_Throwable_Works() {
-        runWithScenario( meta -> {
+        runWithScenario( metaBuilder -> {
             final Throwable thrown = new RuntimeException("Error");
             
-            meta.thrown(thrown);
+            final Meta.Builder<?> returnBuilder = metaBuilder.thrown(thrown);
             
-            final Optional<Throwable> optionalThrown = meta.getThrown();
+            final Optional<Throwable> optionalThrown = metaBuilder.getThrown();
             
+            assertSame(metaBuilder, returnBuilder );
             assertTrue(optionalThrown.isPresent());
             assertEquals(thrown, optionalThrown.get());
         });
     }
     
+    @Test
+    default void meta_thrown_WithNullThrowable_Removes() {
+        runWithScenario( metaBuilder -> {
+            final Throwable thrown = new RuntimeException("Error");
+            
+            metaBuilder.thrown(thrown);
+            final Meta.Builder<?> returnBuilder = metaBuilder.thrown(null);
+            
+            final Optional<Throwable> optionalThrown = metaBuilder.getThrown();
+            
+            assertSame(metaBuilder, returnBuilder );
+            assertFalse(optionalThrown.isPresent());
+        });
+    }
+    
+    @Test
+    default void meta_thread_WithNullThrowable_Removes() {
+        runWithScenario( metaBuilder -> {
+            final Thread thread = new Thread(()->{});
+            
+            metaBuilder.thread(thread);
+            final Meta.Builder<?> returnBuilder = metaBuilder.thread(null);
+            
+            final Optional<Thread> optionalThread = metaBuilder.getThread();
+            
+            assertSame(metaBuilder, returnBuilder );
+            assertFalse(optionalThread.isPresent());
+        });
+    }
+    
+    @Test
+    default void meta_timestamp_WithNullThrowable_Removes() {
+        runWithScenario( metaBuilder -> {
+            final Instant timestamp = Instant.now();
+            
+            metaBuilder.time(timestamp);
+            final Meta.Builder<?> returnBuilder = metaBuilder.time(null);
+            
+            final Optional<Temporal> optionalTemporal = metaBuilder.getTime();
+            
+            assertSame(metaBuilder, returnBuilder );
+            assertFalse(optionalTemporal.isPresent());
+        });
+    }
+    
+    @Test
+    default void meta_correlation_WithNullEntity_Throws() {
+        runWithScenario(builder -> {
+            final IllegalArgumentException thrown = assertThrows( IllegalArgumentException.class, () -> {
+                builder.correlation((Entity) null);
+            });
+            assertThrown(thrown);
+        });
+    }
+    
+    @Test
+    default void meta_correlations_WithNullBuilder_Throws() {
+        runWithScenario(builder -> {
+            final IllegalArgumentException thrown = assertThrows( IllegalArgumentException.class, () -> {
+                builder.correlations( null);
+            });
+            assertThrown(thrown);
+        });
+    }
+    
+    @Test
+    default void meta_InternalCoverage() {
+        assertInstantiateThrows(MetaTestsTools.class);
+    }
+    
     final class MetaTestsTools {
         private MetaTestsTools() {
+            throw new AssertionError("Illegal constructor");
         }
         
         @FunctionalInterface

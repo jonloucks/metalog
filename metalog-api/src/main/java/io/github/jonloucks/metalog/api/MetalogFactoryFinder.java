@@ -3,18 +3,19 @@ package io.github.jonloucks.metalog.api;
 import io.github.jonloucks.contracts.api.ContractException;
 import io.github.jonloucks.contracts.api.Contracts;
 
-import java.lang.reflect.Constructor;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
+import static io.github.jonloucks.contracts.api.Checks.configCheck;
 import static io.github.jonloucks.contracts.api.Checks.nullCheck;
+import static java.util.Optional.ofNullable;
 
+/**
+ * Responsible for locating and creating the MetalogFactory for a deployment.
+ */
 final class MetalogFactoryFinder {
-    private final Metalog.Config config;
-    private final Contracts contracts;
-    
     MetalogFactoryFinder(Metalog.Config config) {
-        this.config = nullCheck(config, "config was null");
+        this.config = configCheck(config);
         this.contracts = config.contracts();
     }
     
@@ -31,34 +32,41 @@ final class MetalogFactoryFinder {
     private Optional<? extends MetalogFactory> createByServiceLoader() {
         if (config.useServiceLoader()) {
             try {
-                final Class<? extends MetalogFactory> servicFactoryClass = nullCheck(config.serviceLoaderClass(), "config.serviceLoaderClass() was null");
-                final ServiceLoader<? extends MetalogFactory> serviceLoader = ServiceLoader.load(servicFactoryClass);
-                return serviceLoader.findFirst();
+                return ServiceLoader.load(getServiceFactoryClass()).findFirst();
             } catch (Throwable thrown) {
                 return Optional.empty();
             }
         }
         return Optional.empty();
+    }
+    
+    private Class<? extends MetalogFactory> getServiceFactoryClass() {
+        return nullCheck(config.serviceLoaderClass(), "Metalog Service Loader class must be present.");
     }
     
     private Optional<MetalogFactory> createByReflection() {
         if (config.useReflection()) {
-            final String className = nullCheck(config.reflectionClassName(), "config.reflectionClassName() was null");
-            if (className.isEmpty()) {
-                return Optional.empty();
-            }
-            try {
-                final Class<?> bootstrapClass = Class.forName(className);
-                final Constructor<?> bootstrapConstructor = bootstrapClass.getConstructor();
-                return Optional.of((MetalogFactory) bootstrapConstructor.newInstance());
-            } catch (Throwable thrown) {
-                return Optional.empty();
-            }
+            return getReflectionClassName().map(this::createNewInstance);
         }
         return Optional.empty();
     }
     
-    private ContractException newNotFoundException() {
-        return new ContractException("Unable to find GlobalMetalog MetalogFactory");
+    private MetalogFactory createNewInstance(String className) {
+        try {
+            return (MetalogFactory)Class.forName(className).getConstructor().newInstance();
+        } catch (Throwable thrown) {
+            return null;
+        }
     }
+
+    private Optional<String> getReflectionClassName() {
+        return ofNullable(config.reflectionClassName()).filter(x -> !x.isEmpty());
+    }
+    
+    private ContractException newNotFoundException() {
+        return new ContractException("Unable to find Metalog factory.");
+    }
+    
+    private final Metalog.Config config;
+    private final Contracts contracts;
 }

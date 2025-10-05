@@ -4,6 +4,7 @@ import io.github.jonloucks.contracts.api.AutoClose;
 
 import java.util.function.Consumer;
 
+import static io.github.jonloucks.contracts.api.Checks.configCheck;
 import static io.github.jonloucks.contracts.api.Checks.nullCheck;
 
 /**
@@ -33,13 +34,6 @@ public final class GlobalMetalog {
     }
  
     /**
-     * @see Metalog#isEnabled()
-     */
-    public static boolean isEnabled() {
-        return INSTANCE.metalog.isEnabled();
-    }
-    
-    /**
      * @see Metalog#subscribe(Subscriber)
      */
     public static AutoClose subscribe(Subscriber subscriber) {
@@ -55,26 +49,25 @@ public final class GlobalMetalog {
     }
     
     /**
-     * @param config the service configuration
-     * @return the new service
+     * @param config the Metalog configuration
+     * @return the new Metalog
      * @see MetalogFactory#create(Metalog.Config)
-     * Create a standalone Contracts service.
      * Note: Services created from this method are destink any that used internally
      * <p>
      * Caller is responsible for invoking open() before use and close when no longer needed
      * </p>
      */
     public static Metalog createMetalog(Metalog.Config config) {
-        final Metalog.Config validConfig = nullCheck(config, "Metalog config was null");
+        final Metalog.Config validConfig = configCheck(config);
         final MetalogFactoryFinder factoryFinder = new MetalogFactoryFinder(config);
-        final MetalogFactory factory = nullCheck(factoryFinder.find(), "find() was null");
-        final Metalog service = factory.create(validConfig);
+        final MetalogFactory factory = nullCheck(factoryFinder.find(), "Metalog factory must be present.");
+        final Metalog metalog = factory.create(validConfig);
         
-        return nullCheck(service, "createService() was null");
+        return nullCheck(metalog, "Metalog could not be created.");
     }
     
     private GlobalMetalog() {
-        this.metalog = createMetalog(new Metalog.Config() {});
+        this.metalog = createMetalog(Metalog.Config.DEFAULT);
         this.close = metalog.open();
     }
     
