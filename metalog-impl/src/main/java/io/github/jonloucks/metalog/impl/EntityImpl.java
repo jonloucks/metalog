@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static io.github.jonloucks.contracts.api.Checks.nullCheck;
+import static io.github.jonloucks.contracts.api.Checks.builderConsumerCheck;
 import static io.github.jonloucks.metalog.impl.Internal.entityCheck;
 import static java.util.Optional.ofNullable;
 
@@ -45,8 +45,8 @@ final class EntityImpl implements Entity, Entity.Builder<EntityImpl> {
     }
     
     @Override
-    public EntityImpl correlation(Consumer<Builder<?>> action) {
-        entityList.entity(action);
+    public EntityImpl correlation(Consumer<Builder<?>> builderConsumer) {
+        entityList.entity(builderConsumer);
         return this;
     }
     
@@ -57,21 +57,20 @@ final class EntityImpl implements Entity, Entity.Builder<EntityImpl> {
     }
     
     @Override
-    public EntityImpl correlations(Consumer<Entities.Builder<?>> builder) {
-        final Consumer<Entities.Builder<?>> validBuilder = nullCheck(builder, "builder was null");
+    public EntityImpl correlations(Consumer<Entities.Builder<?>> builderConsumer) {
         
-        validBuilder.accept(entityList);
+        builderConsumerCheck(builderConsumer).accept(entityList);
        
         return this;
     }
     
     @Override
-    public EntityImpl copy(Entity fromEntity) {
-        final Entity validFromEntity = entityCheck(fromEntity);
+    public EntityImpl copy(Entity entity) {
+        final Entity validFromEntity = entityCheck(entity);
         
-        fromEntity.getId().ifPresent(this::id);
-        fromEntity.getName().ifPresent(this::name);
-        fromEntity.getValue().ifPresent(this::value);
+        entity.getId().ifPresent(this::id);
+        entity.getName().ifPresent(this::name);
+        entity.getValue().ifPresent(this::value);
         
         validFromEntity.getCorrelations().ifPresent(c -> c.visitEach(e -> {
                 correlation(e);
@@ -107,7 +106,7 @@ final class EntityImpl implements Entity, Entity.Builder<EntityImpl> {
                 text = textSupplier.get();
             }
         }
-        return text;
+        return null == text ? "" : text;
     }
     
     EntityImpl() {

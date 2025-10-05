@@ -12,6 +12,7 @@ import org.mockito.quality.Strictness;
 import java.util.function.Consumer;
 
 import static io.github.jonloucks.contracts.api.GlobalContracts.claimContract;
+import static io.github.jonloucks.contracts.test.Tools.assertInstantiateThrows;
 import static io.github.jonloucks.contracts.test.Tools.assertThrown;
 import static io.github.jonloucks.metalog.api.GlobalMetalog.createMetalog;
 import static io.github.jonloucks.metalog.test.EntityTests.EntityTestsTools.newEntityBuilder;
@@ -31,7 +32,7 @@ public interface EntityTests {
             assertFalse(builder.getName().isPresent());
             assertFalse(builder.getValue().isPresent());
             assertFalse(builder.getCorrelations().isPresent());
-            assertNull(builder.get());
+            assertNotNull(builder.get());
         });
     }
     
@@ -186,8 +187,9 @@ public interface EntityTests {
         runWithScenario( builder -> {
             final Entity entity = createTestEntity("hello");
             
-            builder.correlation(entity);
+            final Entity.Builder<?> returnBuilder = builder.correlation(entity);
             
+            assertNotNull(returnBuilder);
             assertTrue(builder.getCorrelations().isPresent());
             assertFalse(builder.getCorrelations().get().isEmpty());
             assertEquals(1, builder.getCorrelations().get().size());
@@ -220,8 +222,14 @@ public interface EntityTests {
         });
     }
     
+    @Test
+    default void entity_InternalCoverage() {
+        assertInstantiateThrows(EntityTestsTools.class);
+    }
+    
     final class EntityTestsTools {
         private EntityTestsTools() {
+            throw new AssertionError("Illegal constructor");
         }
         
         @FunctionalInterface

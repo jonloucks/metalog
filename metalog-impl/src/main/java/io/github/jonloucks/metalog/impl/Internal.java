@@ -8,60 +8,39 @@ import io.github.jonloucks.metalog.api.Meta;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static io.github.jonloucks.contracts.api.Checks.nameCheck;
 import static io.github.jonloucks.contracts.api.Checks.nullCheck;
 
 final class Internal {
+    
+    /**
+     * Utility class instantiation protection
+     * Test coverage not possible, java module protections in place
+     */
     private Internal() {
-        throw new AssertionError("Illegal constructor");
+        throw new AssertionError("Illegal constructor call.");
     }
     
     static <T extends Log> T logCheck(T log) {
-        return nullCheck(log, "log was null");
+        return nullCheck(log, "Log must be present.");
     }
     
     static <T extends Meta> T metaCheck(T meta) {
-        return nullCheck(meta, "meta was null");
-    }
-    
-    static <T> T configCheck(T config) {
-        return nullCheck(config, "config was null");
-    }
-    
-    static <T> T builderCheck(T builder) {
-        return nullCheck(builder, "builder was null");
-    }
-    
-    static <T> Class<T> typeCheck(Class<T> type) {
-        return nullCheck(type, "type was null");
+        return nullCheck(meta, "Meta must be present.");
     }
     
     static Entity entityCheck(Entity entity) {
-        return nullCheck(entity, "entity was null");
+        return nullCheck(entity, "Entity must be present.");
     }
     
     static <T> Predicate<T> filterCheck(Predicate<T> filter) {
-        return nullCheck(filter, "filter was null");
+        return nullCheck(filter, "Filter must be present.");
     }
-    
-    static <T> String nameCheck(String name) {
-        return nullCheck(name, "name was null");
+   
+    static String channelCheck(String name) {
+        return nullCheck(name, "Channel must be present.");
     }
-    
-    static <T> String channelCheck(String name) {
-        return nullCheck(name, "channel was null");
-    }
-    
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    static <T> boolean optionalEquals(Optional<T> a, Optional<T> b) {
-        if (a == b) {
-            return true;
-        }
-        if (null == a || null == b) {
-            return false;
-        }
-        return a.isPresent() && b.isPresent() && a.get().equals(b.get());
-    }
-    
+
     static <T> Optional<T> findFirstByNameAndType(Entity entity, String name, Class<T> type) {
         final Optional<Entities> optional = entity.getCorrelations();
         if (optional.isPresent()) {
@@ -73,10 +52,6 @@ final class Internal {
     static Predicate<? super Entity> byName(String name) {
         final String validName = nameCheck(name);
         
-        return entity -> {
-            final Optional<String> optionalName = entity.getName();
-            return optionalName.filter(s -> validName.equals(s)).isPresent();
-        };
+        return entity -> entity.getName().filter(s -> validName.equals(s)).isPresent();
     }
-
 }

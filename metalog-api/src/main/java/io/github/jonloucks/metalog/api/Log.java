@@ -11,4 +11,11 @@ import java.util.function.Supplier;
  */
 @FunctionalInterface
 public interface Log extends Supplier<CharSequence> {
+    
+    /**
+     * @return the log message
+     * Implementations can rely on this method being called at most one time
+     */
+    @Override
+    CharSequence get();
 }

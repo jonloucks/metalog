@@ -9,14 +9,14 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static io.github.jonloucks.contracts.api.Checks.nullCheck;
+import static io.github.jonloucks.contracts.api.Checks.*;
 import static io.github.jonloucks.metalog.impl.Internal.*;
 
 final class EntitiesImpl implements Entities, Entities.Builder<EntitiesImpl> {
 
     @Override
     public void visitEach(Visitor<? super Entity> visitor) {
-        final Visitor<? super Entity> validVisitor = nullCheck(visitor, "visitor was null");
+        final Visitor<? super Entity> validVisitor = nullCheck(visitor, "Visitor must be present.");
         for (Entity entity : list) {
             if (!validVisitor.visit(entity)) {
                 return;
@@ -73,10 +73,9 @@ final class EntitiesImpl implements Entities, Entities.Builder<EntitiesImpl> {
     }
     
     @Override
-    public EntitiesImpl entity(Consumer<Entity.Builder<?>> action) {
-        final Consumer<Entity.Builder<?>> validAction = nullCheck(action, "action was null");
+    public EntitiesImpl entity(Consumer<Entity.Builder<?>> builderConsumer) {
         final EntityImpl builder = new EntityImpl();
-        validAction.accept(builder);
+        builderConsumerCheck(builderConsumer).accept(builder);
         entity(builder);
         return this;
     }
@@ -85,12 +84,12 @@ final class EntitiesImpl implements Entities, Entities.Builder<EntitiesImpl> {
     public EntitiesImpl entity(Entity entity) {
         final Entity validEntity = entityCheck(entity);
         if (unique) {
-            if (!replaceIf(p -> sameName(p, validEntity), validEntity)) {
-                list.addLast(validEntity);
+            final Optional<String> optionalName = validEntity.getName();
+            if (optionalName.isPresent() && replaceIf(byName(optionalName.get()), validEntity)) {
+                return this;
             }
-        } else {
-            list.addLast(validEntity);
         }
+        list.addLast(validEntity);
         return this;
     }
     
@@ -156,11 +155,7 @@ final class EntitiesImpl implements Entities, Entities.Builder<EntitiesImpl> {
     EntitiesImpl() {
     
     }
-    
-    private static boolean sameName(Entity a, Entity b) {
-        return optionalEquals(a.getName(), b.getName());
-    }
-    
+  
     private final LinkedList<Entity> list = new LinkedList<>();
     private boolean unique;
 }

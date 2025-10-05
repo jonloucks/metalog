@@ -19,14 +19,14 @@ final class MetaImpl implements Meta.Builder<MetaImpl>, Entity.Builder<MetaImpl>
     }
 
     @Override
-    public MetaImpl blocking(boolean blocking) {
-        this.blocking = blocking;
+    public MetaImpl block(boolean block) {
+        this.block = block;
         return this;
     }
     
     @Override
-    public MetaImpl sequenceKey(String sequenceKey) {
-        this.sequenceKey = sequenceKey;
+    public MetaImpl key(String key) {
+        this.key = key;
         return this;
     }
     
@@ -57,23 +57,23 @@ final class MetaImpl implements Meta.Builder<MetaImpl>, Entity.Builder<MetaImpl>
     }
     
     @Override
-    public MetaImpl timestamp(Temporal timestamp) {
+    public MetaImpl time(Temporal timestamp) {
         if (timestamp == null) {
-            thisEntity.correlations( b -> b.removeIf(byName(TIMESTAMP_ENTITY_NAME)));
+            thisEntity.correlations( b -> b.removeIf(byName(TIME_ENTITY_NAME)));
         } else {
-            return correlation(b -> b.name(TIMESTAMP_ENTITY_NAME).value(timestamp));
+            return correlation(b -> b.name(TIME_ENTITY_NAME).value(timestamp));
         }
         return this;
     }
     
     @Override
-    public boolean isBlocking() {
-        return blocking;
+    public boolean isBlock() {
+        return block;
     }
     
     @Override
-    public Optional<Temporal> getTimestamp() {
-        return findFirstByNameAndType(thisEntity, TIMESTAMP_ENTITY_NAME, Temporal.class);
+    public Optional<Temporal> getTime() {
+        return findFirstByNameAndType(thisEntity, TIME_ENTITY_NAME, Temporal.class);
     }
     
     @Override
@@ -87,8 +87,8 @@ final class MetaImpl implements Meta.Builder<MetaImpl>, Entity.Builder<MetaImpl>
     }
     
     @Override
-    public Optional<String> getSequenceKey() {
-        return Optional.ofNullable(sequenceKey);
+    public Optional<String> getKey() {
+        return Optional.ofNullable(key);
     }
 
     @Override
@@ -135,8 +135,8 @@ final class MetaImpl implements Meta.Builder<MetaImpl>, Entity.Builder<MetaImpl>
     }
     
     @Override
-    public MetaImpl correlation(Consumer<Entity.Builder<?>> action) {
-        thisEntity.correlation(action);
+    public MetaImpl correlation(Consumer<Entity.Builder<?>> builderConsumer) {
+        thisEntity.correlation(builderConsumer);
         return this;
     }
     
@@ -147,8 +147,8 @@ final class MetaImpl implements Meta.Builder<MetaImpl>, Entity.Builder<MetaImpl>
     }
     
     @Override
-    public MetaImpl correlations(Consumer<Entities.Builder<?>> builder) {
-        thisEntity.correlations(builder);
+    public MetaImpl correlations(Consumer<Entities.Builder<?>> builderConsumer) {
+        thisEntity.correlations(builderConsumer);
         return this;
     }
     
@@ -158,16 +158,16 @@ final class MetaImpl implements Meta.Builder<MetaImpl>, Entity.Builder<MetaImpl>
         
         thisEntity.copy(validFromMeta);
         
-        blocking(validFromMeta.isBlocking());
+        block(validFromMeta.isBlock());
         channel(validFromMeta.getChannel());
-        validFromMeta.getSequenceKey().ifPresent(this::sequenceKey);
+        validFromMeta.getKey().ifPresent(this::key);
         
         return this;
     }
     
     @Override
-    public MetaImpl copy(Entity fromEntity) {
-        thisEntity.copy(fromEntity);
+    public MetaImpl copy(Entity entity) {
+        thisEntity.copy(entity);
         return this;
     }
     
@@ -181,11 +181,11 @@ final class MetaImpl implements Meta.Builder<MetaImpl>, Entity.Builder<MetaImpl>
     }
     
     private static final String THROWN_ENTITY_NAME = "thrown";
-    private static final String TIMESTAMP_ENTITY_NAME = "timestamp";
+    private static final String TIME_ENTITY_NAME = "time";
     private static final String THREAD_ENTITY_NAME = "thread";
     
-    private boolean blocking;
-    private String sequenceKey;
+    private boolean block;
+    private String key;
     private String channel = "info";
     private final EntityImpl thisEntity = new EntityImpl();
 }

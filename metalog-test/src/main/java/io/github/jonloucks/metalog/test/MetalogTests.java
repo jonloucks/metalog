@@ -10,13 +10,12 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.mockito.stubbing.Answer;
 
-import java.time.Duration;
 import java.util.function.Consumer;
 
+import static io.github.jonloucks.contracts.test.Tools.assertInstantiateThrows;
 import static io.github.jonloucks.contracts.test.Tools.assertThrown;
-import static io.github.jonloucks.contracts.test.Tools.sleep;
 import static io.github.jonloucks.metalog.api.GlobalMetalog.createMetalog;
-import static io.github.jonloucks.metalog.test.MetalogTests.SmokeTestsTools.runWithScenario;
+import static io.github.jonloucks.metalog.test.MetalogTests.MetalogTestsTools.runWithScenario;
 import static io.github.jonloucks.metalog.test.Tools.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -55,12 +54,10 @@ public interface MetalogTests {
         runWithScenario(metalog -> {
             try (AutoClose closeSubscriber = metalog.subscribe(subscriber)) {
                 final AutoClose ignored = closeSubscriber;
-                final Throwable thrown = new ArithmeticException("oops");
+                final Throwable thrown = new ArithmeticException("Oops.");
                 
-                metalog.publish(log, b -> b.id(id).thrown(thrown));
-                
-                sleep(Duration.ofSeconds(1));
-                
+                metalog.publish(log, b -> b.id(id).thrown(thrown).block());
+     
                 verify(subscriber, times(1)).receive(any(), metaWithIdThrown(id, thrown));
             }
         });
@@ -76,13 +73,12 @@ public interface MetalogTests {
             try (AutoClose closeSubscriber = metalog.subscribe(subscriber)) {
                 final AutoClose ignored = closeSubscriber;
                 
-                metalog.publish(log, b -> b.id(id));
+                metalog.publish(log, b -> b.id(id).block());
             }
             
             // subscription is closed and should no longer receive logs
-            metalog.publish(log, b -> b.id(id));
-            sleep(Duration.ofSeconds(1));
-            verify(subscriber, times(0)).receive(any(), metaWithId(id));
+            metalog.publish(log, b -> b.id(id).block());
+            verify(subscriber, times(1)).receive(any(), metaWithId(id));
         });
     }
     
@@ -96,19 +92,23 @@ public interface MetalogTests {
             try (AutoClose closeSubscriber = metalog.subscribe(subscriber)) {
                 final AutoClose ignored = closeSubscriber;
                 
-                metalog.publish(log, b -> b.id(id));
-                sleep(Duration.ofSeconds(1));
+                metalog.publish(log, b -> b.id(id).block());
             }
             
             // subscription is closed and should no longer receive logs
-            metalog.publish(log, b -> b.id(id));
-            sleep(Duration.ofSeconds(1));
+            metalog.publish(log, b -> b.id(id).block());
             verify(subscriber, times(1)).receive(any(), metaWithId(id));
         });
     }
     
-    final class SmokeTestsTools {
-        private SmokeTestsTools() {
+    @Test
+    default void metalog_InternalCoverage() {
+        assertInstantiateThrows(MetalogTestsTools.class);
+    }
+    
+    final class MetalogTestsTools {
+        private MetalogTestsTools() {
+            throw new AssertionError("Illegal constructor call.");
         }
 
         interface ScenarioConfig extends Consumer<Metalog>{

@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import static io.github.jonloucks.contracts.api.Checks.nullCheck;
+import static io.github.jonloucks.contracts.api.Checks.*;
 import static io.github.jonloucks.metalog.impl.Internal.*;
 import static java.util.Optional.ofNullable;
 
@@ -18,14 +18,14 @@ final class MetalogImpl implements Metalog, AutoClose {
     @Override
     public void publish(Log log, Meta meta) {
         if (!openState.isOpen()) {
-            throw new IllegalStateException("Metalog is not open");
+            throw new IllegalStateException("Metalog must be open.");
         }
         
-        final Log validLog = new InvokeGetOnlyOnce(logCheck(log));
+        final Log validLog = new InvokeOnlyOnce(log);
         final Meta validMeta = null == meta ? Meta.DEFAULT : meta;
         
-        if (!subscribers.isEmpty() && isEnabled() && test(validMeta)) {
-            if (validMeta.isBlocking()) {
+        if (!subscribers.isEmpty() && test(validMeta)) {
+            if (validMeta.isBlock()) {
                 dispatch(validLog, validMeta);
             } else {
                 dispatcher.execute(() -> dispatch(validLog, validMeta));
@@ -35,21 +35,11 @@ final class MetalogImpl implements Metalog, AutoClose {
   
     @Override
     public void publish(Log log, Consumer<Meta.Builder<?>> builderConsumer) {
-        final Log validLog = logCheck(log);
-        final Consumer<Meta.Builder<?>> validBuilderConsumer = nullCheck(builderConsumer, "builderConsumer was null");
-        
         final Meta.Builder<?> metaBuilder = metaFactory.get();
-        
-        validBuilderConsumer.accept(metaBuilder);
-        
-        publish(validLog, metaBuilder);
+        builderConsumerCheck(builderConsumer).accept(metaBuilder);
+        publish(logCheck(log), metaBuilder);
     }
- 
-    @Override
-    public boolean isEnabled() {
-        return config.isEnabled();
-    }
-    
+
     @Override
     public AutoClose addFilter(Predicate<Meta> filter) {
         return filters.addFilter(filter);
@@ -61,32 +51,26 @@ final class MetalogImpl implements Metalog, AutoClose {
     }
     
     @Override
-    public AutoClose subscribe(Subscriber config) {
-        final Subscriber validSubscriber = nullCheck(config, "subscriber was null");
-
+    public AutoClose subscribe(Subscriber subscriber) {
+        final Subscriber validSubscriber = nullCheck(subscriber, "Subscriber must be present.");
         subscribers.add(validSubscriber);
         return () -> subscribers.removeIf( x -> x == validSubscriber);
     }
 
     @Override
     public AutoClose open() {
-        if (openState.transitionToOpen()) {
-            ofNullable(repository).ifPresent(Repository::open);
-            dispatcher = config.contracts().claim(Dispatcher.CONTRACT);
-            metaFactory = config.contracts().claim(Meta.Builder.FACTORY_CONTRACT);
-            if (config.systemOutput()) {
-                config.contracts().claim(SystemSubscriber.CONTRACT);
-            }
+        if (openState.transitionToOpened()) {
+            realOpen();
             return this;
+        } else {
+            return () -> {}; // all open calls after the first get a do nothing close
         }
-        return () -> {};
     }
-    
+
     @Override
     public void close() {
         if (openState.transitionToClosed()) {
-            ofNullable(repository).ifPresent(Repository::close);
-            repository = null;
+            realClose();
         }
     }
     
@@ -98,6 +82,22 @@ final class MetalogImpl implements Metalog, AutoClose {
         bindContracts(config, promisors);
     }
     
+    private void realOpen() {
+        ofNullable(repository).ifPresent(Repository::open);
+        dispatcher = config.contracts().claim(Dispatcher.CONTRACT);
+        metaFactory = config.contracts().claim(Meta.Builder.FACTORY_CONTRACT);
+        if (config.systemOutput()) {
+            config.contracts().claim(Console.CONTRACT);
+        }
+    }
+    
+    private void realClose() {
+        ofNullable(repository).ifPresent(close -> {
+            repository = null;
+            close.close();
+        });
+    }
+    
     private void bindContracts(Config config, Promisors promisors) {
         repository.store(Metalog.CONTRACT, () -> this);
         repository.store(MetalogFactory.CONTRACT, promisors.createLifeCyclePromisor(MetalogFactoryImpl::new));
@@ -105,7 +105,7 @@ final class MetalogImpl implements Metalog, AutoClose {
         repository.store(Entities.Builder.FACTORY_CONTRACT, () -> EntitiesImpl::new);
         repository.store(Entity.Builder.FACTORY_CONTRACT, () -> EntityImpl::new);
         repository.store(Meta.Builder.FACTORY_CONTRACT, () -> MetaImpl::new);
-        repository.store(SystemSubscriber.CONTRACT, promisors.createLifeCyclePromisor(() -> new SystemSubscriberImpl(config)));
+        repository.store(Console.CONTRACT, promisors.createLifeCyclePromisor(() -> new ConsoleImpl(config)));
     }
     
     private void dispatch(Log log, Meta meta) {

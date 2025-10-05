@@ -2,11 +2,13 @@ package io.github.jonloucks.metalog.impl;
 
 import io.github.jonloucks.metalog.api.Log;
 
-final class InvokeGetOnlyOnce implements Log {
+import static io.github.jonloucks.metalog.impl.Internal.logCheck;
+
+final class InvokeOnlyOnce implements Log {
     private final Log referent;
     
-    InvokeGetOnlyOnce(Log referent) {
-        this.referent = referent;
+    InvokeOnlyOnce(Log referent) {
+        this.referent = logCheck(referent);
     }
     
     @Override
