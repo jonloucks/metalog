@@ -101,23 +101,20 @@ loadScripts(document, 'script');</script>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Return the global instance of Contracts</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isEnabled()" class="member-name-link">isEnabled</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#publish(io.github.jonloucks.metalog.api.Log)" class="member-name-link">publish</a><wbr>(<a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a>&nbsp;log)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#publish(io.github.jonloucks.metalog.api.Log)" class="member-name-link">publish</a><wbr>(<a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a>&nbsp;log)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#publish(io.github.jonloucks.metalog.api.Log,io.github.jonloucks.metalog.api.Meta)" class="member-name-link">publish</a><wbr>(<a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a>&nbsp;log,
+ <a href="Meta.html" title="interface in io.github.jonloucks.metalog.api">Meta</a>&nbsp;meta)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#publish(io.github.jonloucks.metalog.api.Log,io.github.jonloucks.metalog.api.Meta)" class="member-name-link">publish</a><wbr>(<a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a>&nbsp;log,
- <a href="Meta.html" title="interface in io.github.jonloucks.metalog.api">Meta</a>&nbsp;meta)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#publish(io.github.jonloucks.metalog.api.Log,java.util.function.Consumer)" class="member-name-link">publish</a><wbr>(<a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a>&nbsp;log,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#publish(io.github.jonloucks.metalog.api.Log,java.util.function.Consumer)" class="member-name-link">publish</a><wbr>(<a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a>&nbsp;log,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="Meta.Builder.html" title="interface in io.github.jonloucks.metalog.api">Meta.Builder</a>&lt;?&gt;&gt;&nbsp;metaBuilder)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.github.jonloucks.contracts.api.AutoClose</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#subscribe(io.github.jonloucks.metalog.api.Subscriber)" class="member-name-link">subscribe</a><wbr>(<a href="Subscriber.html" title="interface in io.github.jonloucks.metalog.api">Subscriber</a>&nbsp;subscriber)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.github.jonloucks.contracts.api.AutoClose</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#subscribe(io.github.jonloucks.metalog.api.Subscriber)" class="member-name-link">subscribe</a><wbr>(<a href="Subscriber.html" title="interface in io.github.jonloucks.metalog.api">Subscriber</a>&nbsp;subscriber)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -180,20 +177,6 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="isEnabled()">
-<h3>isEnabled</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isEnabled</span>()</div>
-<dl class="notes">
-<dt>See Also:</dt>
-<dd>
-<ul class="see-list">
-<li><a href="Publisher.html#isEnabled()"><code>Publisher.isEnabled()</code></a></li>
-</ul>
-</dd>
-</dl>
-</section>
-</li>
-<li>
 <section class="detail" id="subscribe(io.github.jonloucks.metalog.api.Subscriber)">
 <h3>subscribe</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">io.github.jonloucks.contracts.api.AutoClose</span>&nbsp;<span class="element-name">subscribe</span><wbr><span class="parameters">(<a href="Subscriber.html" title="interface in io.github.jonloucks.metalog.api">Subscriber</a>&nbsp;subscriber)</span></div>
@@ -224,14 +207,13 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="Metalog.html" title="interface in io.github.jonloucks.metalog.api">Metalog</a></span>&nbsp;<span class="element-name">createMetalog</span><wbr><span class="parameters">(<a href="Metalog.Config.html" title="interface in io.github.jonloucks.metalog.api">Metalog.Config</a>&nbsp;config)</span></div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>config</code> - the service configuration</dd>
+<dd><code>config</code> - the Metalog configuration</dd>
 <dt>Returns:</dt>
-<dd>the new service</dd>
+<dd>the new Metalog</dd>
 <dt>See Also:</dt>
 <dd>
 <ul class="see-list-long">
-<li><a href="MetalogFactory.html#create(io.github.jonloucks.metalog.api.Metalog.Config)"><code>Create a standalone Contracts service.
- Note: Services created from this method are destink any that used internally
+<li><a href="MetalogFactory.html#create(io.github.jonloucks.metalog.api.Metalog.Config)"><code>Note: Services created from this method are destink any that used internally
  <p>
  Caller is responsible for invoking open() before use and close when no longer needed
  </p></code></a></li>

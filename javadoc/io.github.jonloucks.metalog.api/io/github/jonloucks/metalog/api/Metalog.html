@@ -78,7 +78,7 @@ loadScripts(document, 'script');</script>
 </dl>
 <hr>
 <div class="type-signature"><span class="modifiers">public interface </span><span class="element-name type-name-label">Metalog</span><span class="extends-implements">
-extends <a href="Publisher.html" title="interface in io.github.jonloucks.metalog.api">Publisher</a>, <a href="Filterable.html" title="interface in io.github.jonloucks.metalog.api">Filterable</a>, io.github.jonloucks.contracts.api.AutoOpen</span></div>
+extends <a href="Publisher.html" title="interface in io.github.jonloucks.metalog.api">Publisher</a>, io.github.jonloucks.contracts.api.AutoOpen</span></div>
 <div class="block">The Metalog API</div>
 <dl class="notes">
 <dt>See Also:</dt>
@@ -102,7 +102,9 @@ extends <a href="Publisher.html" title="interface in io.github.jonloucks.metalog
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>static interface&nbsp;</code></div>
 <div class="col-second even-row-color"><code><a href="Metalog.Config.html" class="type-name-link" title="interface in io.github.jonloucks.metalog.api">Metalog.Config</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">The configuration used to create a new Metalog instance.</div>
+</div>
 </div>
 </section>
 </li>
@@ -135,9 +137,9 @@ extends <a href="Publisher.html" title="interface in io.github.jonloucks.metalog
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>io.github.jonloucks.contracts.api.AutoClose</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#subscribe(io.github.jonloucks.metalog.api.Subscriber)" class="member-name-link">subscribe</a><wbr>(<a href="Subscriber.html" title="interface in io.github.jonloucks.metalog.api">Subscriber</a>&nbsp;config)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#subscribe(io.github.jonloucks.metalog.api.Subscriber)" class="member-name-link">subscribe</a><wbr>(<a href="Subscriber.html" title="interface in io.github.jonloucks.metalog.api">Subscriber</a>&nbsp;subscriber)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Subscribe</div>
+<div class="block">Add a new log subscription</div>
 </div>
 </div>
 </div>
@@ -153,7 +155,7 @@ extends <a href="Publisher.html" title="interface in io.github.jonloucks.metalog
 <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html#and(java.util.function.Predicate)" title="class or interface in java.util.function" class="external-link">and</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html#negate()" title="class or interface in java.util.function" class="external-link">negate</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html#or(java.util.function.Predicate)" title="class or interface in java.util.function" class="external-link">or</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html#test(T)" title="class or interface in java.util.function" class="external-link">test</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-io.github.jonloucks.metalog.api.Publisher">Methods inherited from interface&nbsp;io.github.jonloucks.metalog.api.<a href="Publisher.html" title="interface in io.github.jonloucks.metalog.api">Publisher</a></h3>
-<code><a href="Publisher.html#isEnabled()">isEnabled</a>, <a href="Publisher.html#publish(io.github.jonloucks.metalog.api.Log)">publish</a>, <a href="Publisher.html#publish(io.github.jonloucks.metalog.api.Log,io.github.jonloucks.metalog.api.Meta)">publish</a>, <a href="Publisher.html#publish(io.github.jonloucks.metalog.api.Log,java.util.function.Consumer)">publish</a></code></div>
+<code><a href="Publisher.html#publish(io.github.jonloucks.metalog.api.Log)">publish</a>, <a href="Publisher.html#publish(io.github.jonloucks.metalog.api.Log,io.github.jonloucks.metalog.api.Meta)">publish</a>, <a href="Publisher.html#publish(io.github.jonloucks.metalog.api.Log,java.util.function.Consumer)">publish</a></code></div>
 </section>
 </li>
 </ul>
@@ -183,12 +185,13 @@ extends <a href="Publisher.html" title="interface in io.github.jonloucks.metalog
 <li>
 <section class="detail" id="subscribe(io.github.jonloucks.metalog.api.Subscriber)">
 <h3>subscribe</h3>
-<div class="member-signature"><span class="return-type">io.github.jonloucks.contracts.api.AutoClose</span>&nbsp;<span class="element-name">subscribe</span><wbr><span class="parameters">(<a href="Subscriber.html" title="interface in io.github.jonloucks.metalog.api">Subscriber</a>&nbsp;config)</span></div>
-<div class="block">Subscribe</div>
+<div class="member-signature"><span class="return-type">io.github.jonloucks.contracts.api.AutoClose</span>&nbsp;<span class="element-name">subscribe</span><wbr><span class="parameters">(<a href="Subscriber.html" title="interface in io.github.jonloucks.metalog.api">Subscriber</a>&nbsp;subscriber)</span></div>
+<div class="block">Add a new log subscription</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>config</code> - </dd>
+<dd><code>subscriber</code> - the subscriber to add</dd>
 <dt>Returns:</dt>
+<dd>calling close removes the subscription</dd>
 </dl>
 </section>
 </li>

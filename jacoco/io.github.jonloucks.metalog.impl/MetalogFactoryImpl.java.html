@@ -4,18 +4,14 @@
 import io.github.jonloucks.metalog.api.Metalog;
 import io.github.jonloucks.metalog.api.MetalogFactory;
 
-import static io.github.jonloucks.metalog.impl.Internal.configCheck;
-
 /**
  * Creates Metalog instances
  * Opt-in construction via reflection or ServiceLoader
  */
-<span class="fc" id="L13">public final class MetalogFactoryImpl implements MetalogFactory {</span>
+<span class="fc" id="L11">public final class MetalogFactoryImpl implements MetalogFactory {</span>
     @Override
     public Metalog create(Metalog.Config config) {
-<span class="fc" id="L16">        final Metalog.Config validConfig = configCheck(config);</span>
-
-<span class="fc" id="L18">        return new MetalogImpl(validConfig);</span>
+<span class="fc" id="L14">        return new MetalogImpl(config);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

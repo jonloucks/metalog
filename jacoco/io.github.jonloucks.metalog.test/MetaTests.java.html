@@ -17,224 +17,302 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static io.github.jonloucks.contracts.api.GlobalContracts.claimContract;
+import static io.github.jonloucks.contracts.test.Tools.assertInstantiateThrows;
+import static io.github.jonloucks.contracts.test.Tools.assertThrown;
 import static io.github.jonloucks.metalog.api.GlobalMetalog.createMetalog;
 import static io.github.jonloucks.metalog.test.MetaTests.MetaTestsTools.newMetaBuilder;
 import static io.github.jonloucks.metalog.test.MetaTests.MetaTestsTools.runWithScenario;
 import static org.junit.jupiter.api.Assertions.*;
 
+@SuppressWarnings(&quot;CodeBlock2Expr&quot;)
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public interface MetaTests {
     
     @Test
     default void meta_InitialValues() {
-<span class="fc" id="L31">        runWithScenario( meta -&gt; {</span>
-<span class="fc" id="L32">            assertFalse(meta.getName().isPresent());</span>
-<span class="fc" id="L33">            assertFalse(meta.getId().isPresent());</span>
-<span class="fc" id="L34">            assertFalse(meta.getValue().isPresent());</span>
-<span class="fc" id="L35">            assertEquals(&quot;info&quot;, meta.getChannel());</span>
-<span class="fc" id="L36">            assertFalse(meta.getSequenceKey().isPresent());</span>
-<span class="fc" id="L37">            assertFalse(meta.getCorrelations().isPresent());</span>
-<span class="fc" id="L38">            assertFalse(meta.isBlocking());</span>
-<span class="fc" id="L39">            assertFalse(meta.getThread().isPresent());</span>
-<span class="fc" id="L40">            assertFalse(meta.getThrown().isPresent());</span>
-<span class="fc" id="L41">            assertFalse(meta.getTimestamp().isPresent());</span>
-<span class="fc" id="L42">            assertNull(meta.get());</span>
-<span class="fc" id="L43">        });</span>
-<span class="fc" id="L44">    }</span>
+<span class="fc" id="L34">        runWithScenario(Tools::assertMetaDefaults);</span>
+<span class="fc" id="L35">    }</span>
     
     @Test
     default void meta_copy_WithMeta1_Works() {
-<span class="fc" id="L48">        runWithScenario(meta -&gt; {</span>
-<span class="fc" id="L49">            final Throwable thrown = new RuntimeException(&quot;Oh no!&quot;);</span>
-<span class="fc" id="L50">            final Thread thread = Thread.currentThread();</span>
-<span class="fc" id="L51">            final Instant timestamp = Instant.now();</span>
-<span class="fc" id="L52">            final Meta.Builder&lt;?&gt; fromBuilder = newMetaBuilder();</span>
-<span class="pc" id="L53">            final Supplier&lt;CharSequence&gt; textSupplier = () -&gt; &quot;Alpha&quot;;</span>
+<span class="fc" id="L39">        runWithScenario(metaBuilder -&gt; {</span>
+<span class="fc" id="L40">            final Throwable thrown = new RuntimeException(&quot;Oh no.&quot;);</span>
+<span class="fc" id="L41">            final Thread thread = Thread.currentThread();</span>
+<span class="fc" id="L42">            final Instant timestamp = Instant.now();</span>
+<span class="fc" id="L43">            final Meta.Builder&lt;?&gt; fromBuilder = newMetaBuilder();</span>
+<span class="pc" id="L44">            final Supplier&lt;CharSequence&gt; textSupplier = () -&gt; &quot;Alpha&quot;;</span>
             
-<span class="fc" id="L55">            fromBuilder</span>
-<span class="fc" id="L56">                .text(textSupplier)</span>
-<span class="fc" id="L57">                .id(&quot;id1&quot;)</span>
-<span class="fc" id="L58">                .name(&quot;name1&quot;)</span>
-<span class="fc" id="L59">                .value(&quot;value1&quot;)</span>
-<span class="fc" id="L60">                .channel(&quot;channel1&quot;)</span>
-<span class="fc" id="L61">                .sequenceKey(&quot;sequenceKey1&quot;)</span>
-<span class="fc" id="L62">                .blocking(true)</span>
-<span class="fc" id="L63">                .thread(thread)</span>
-<span class="fc" id="L64">                .thrown(thrown)</span>
-<span class="fc" id="L65">                .timestamp(timestamp);</span>
+<span class="fc" id="L46">            fromBuilder</span>
+<span class="fc" id="L47">                .text(textSupplier)</span>
+<span class="fc" id="L48">                .id(&quot;id1&quot;)</span>
+<span class="fc" id="L49">                .name(&quot;name1&quot;)</span>
+<span class="fc" id="L50">                .value(&quot;value1&quot;)</span>
+<span class="fc" id="L51">                .channel(&quot;channel1&quot;)</span>
+<span class="fc" id="L52">                .key(&quot;sequenceKey1&quot;)</span>
+<span class="fc" id="L53">                .block(true)</span>
+<span class="fc" id="L54">                .thread(thread)</span>
+<span class="fc" id="L55">                .thrown(thrown)</span>
+<span class="fc" id="L56">                .time(timestamp);</span>
             
-<span class="fc" id="L67">            meta.copy(fromBuilder);</span>
+<span class="fc" id="L58">            metaBuilder.copy(fromBuilder);</span>
             
-<span class="fc" id="L69">            assertEquals(&quot;value1&quot;, meta.get());</span>
-<span class="fc" id="L70">            assertTrue(meta.getName().isPresent());</span>
-<span class="fc" id="L71">            assertEquals(&quot;name1&quot;, meta.getName().get());</span>
-<span class="fc" id="L72">            assertTrue(meta.getId().isPresent());</span>
-<span class="fc" id="L73">            assertEquals(&quot;id1&quot;, meta.getId().get());</span>
-<span class="fc" id="L74">            assertTrue(meta.getValue().isPresent());</span>
-<span class="fc" id="L75">            assertEquals(&quot;value1&quot;, meta.getValue().get());</span>
-<span class="fc" id="L76">            assertEquals(fromBuilder.getChannel(), meta.getChannel());</span>
-<span class="fc" id="L77">            assertTrue(meta.getSequenceKey().isPresent());</span>
-<span class="fc" id="L78">            assertEquals(&quot;sequenceKey1&quot;, meta.getSequenceKey().get());</span>
-<span class="fc" id="L79">            assertTrue(meta.getCorrelations().isPresent());</span>
-<span class="fc" id="L80">            assertTrue(meta.getTimestamp().isPresent());</span>
-<span class="fc" id="L81">            assertEquals(timestamp, meta.getTimestamp().get());</span>
-<span class="fc" id="L82">            assertTrue(meta.getThrown().isPresent());</span>
-<span class="fc" id="L83">            assertEquals(thrown, meta.getThrown().get());</span>
-<span class="fc" id="L84">            assertEquals(fromBuilder.isBlocking(), meta.isBlocking());</span>
-<span class="fc" id="L85">            assertTrue(meta.getThread().isPresent());</span>
-<span class="fc" id="L86">            assertEquals(thread, meta.getThread().get());</span>
-<span class="fc" id="L87">        });</span>
-<span class="fc" id="L88">    }</span>
+<span class="fc" id="L60">            assertEquals(&quot;value1&quot;, metaBuilder.get());</span>
+<span class="fc" id="L61">            assertTrue(metaBuilder.getName().isPresent());</span>
+<span class="fc" id="L62">            assertEquals(&quot;name1&quot;, metaBuilder.getName().get());</span>
+<span class="fc" id="L63">            assertTrue(metaBuilder.getId().isPresent());</span>
+<span class="fc" id="L64">            assertEquals(&quot;id1&quot;, metaBuilder.getId().get());</span>
+<span class="fc" id="L65">            assertTrue(metaBuilder.getValue().isPresent());</span>
+<span class="fc" id="L66">            assertEquals(&quot;value1&quot;, metaBuilder.getValue().get());</span>
+<span class="fc" id="L67">            assertEquals(fromBuilder.getChannel(), metaBuilder.getChannel());</span>
+<span class="fc" id="L68">            assertTrue(metaBuilder.getKey().isPresent());</span>
+<span class="fc" id="L69">            assertEquals(&quot;sequenceKey1&quot;, metaBuilder.getKey().get());</span>
+<span class="fc" id="L70">            assertTrue(metaBuilder.getCorrelations().isPresent());</span>
+<span class="fc" id="L71">            assertTrue(metaBuilder.getTime().isPresent());</span>
+<span class="fc" id="L72">            assertEquals(timestamp, metaBuilder.getTime().get());</span>
+<span class="fc" id="L73">            assertTrue(metaBuilder.getThrown().isPresent());</span>
+<span class="fc" id="L74">            assertEquals(thrown, metaBuilder.getThrown().get());</span>
+<span class="fc" id="L75">            assertEquals(fromBuilder.isBlock(), metaBuilder.isBlock());</span>
+<span class="fc" id="L76">            assertTrue(metaBuilder.getThread().isPresent());</span>
+<span class="fc" id="L77">            assertEquals(thread, metaBuilder.getThread().get());</span>
+<span class="fc" id="L78">        });</span>
+<span class="fc" id="L79">    }</span>
     
     @Test
     default void meta_copy_WithMeta_Works() {
-<span class="fc" id="L92">        runWithScenario(meta -&gt; {</span>
-<span class="fc" id="L93">            final Throwable thrown = new RuntimeException(&quot;Oh no!&quot;);</span>
-<span class="fc" id="L94">            final Thread thread = Thread.currentThread();</span>
-<span class="fc" id="L95">            final Instant timestamp = Instant.now();</span>
-<span class="fc" id="L96">            meta.id(&quot;id1&quot;)</span>
-<span class="fc" id="L97">                .name(&quot;name1&quot;)</span>
-<span class="fc" id="L98">                .value(&quot;value1&quot;)</span>
-<span class="fc" id="L99">                .channel(&quot;channel1&quot;)</span>
-<span class="fc" id="L100">                .sequenceKey(&quot;sequenceKey1&quot;)</span>
-<span class="fc" id="L101">                .blocking(true)</span>
-<span class="fc" id="L102">                .thread(thread)</span>
-<span class="fc" id="L103">                .thrown(thrown)</span>
-<span class="fc" id="L104">                .timestamp(timestamp);</span>
+<span class="fc" id="L83">        runWithScenario(metaBuilder -&gt; {</span>
+<span class="fc" id="L84">            final Throwable thrown = new RuntimeException(&quot;Oh no.&quot;);</span>
+<span class="fc" id="L85">            final Thread thread = Thread.currentThread();</span>
+<span class="fc" id="L86">            final Instant timestamp = Instant.now();</span>
+<span class="fc" id="L87">            metaBuilder.id(&quot;id1&quot;)</span>
+<span class="fc" id="L88">                .name(&quot;name1&quot;)</span>
+<span class="fc" id="L89">                .value(&quot;value1&quot;)</span>
+<span class="fc" id="L90">                .channel(&quot;channel1&quot;)</span>
+<span class="fc" id="L91">                .key(&quot;sequenceKey1&quot;)</span>
+<span class="fc" id="L92">                .block(true)</span>
+<span class="fc" id="L93">                .thread(thread)</span>
+<span class="fc" id="L94">                .thrown(thrown)</span>
+<span class="fc" id="L95">                .time(timestamp);</span>
             
-<span class="fc" id="L106">            final Meta.Builder&lt;?&gt; fromBuilder = newMetaBuilder();</span>
+<span class="fc" id="L97">            final Meta.Builder&lt;?&gt; fromBuilder = newMetaBuilder();</span>
             
-<span class="fc" id="L108">            meta.copy(fromBuilder);</span>
+<span class="fc" id="L99">            metaBuilder.copy(fromBuilder);</span>
             
-<span class="fc" id="L110">            assertTrue(meta.getName().isPresent());</span>
-<span class="fc" id="L111">            assertEquals(&quot;name1&quot;, meta.getName().get());</span>
-<span class="fc" id="L112">            assertTrue(meta.getId().isPresent());</span>
-<span class="fc" id="L113">            assertEquals(&quot;id1&quot;, meta.getId().get());</span>
-<span class="fc" id="L114">            assertTrue(meta.getValue().isPresent());</span>
-<span class="fc" id="L115">            assertEquals(&quot;value1&quot;, meta.getValue().get());</span>
-<span class="fc" id="L116">            assertEquals(fromBuilder.getChannel(), meta.getChannel());</span>
-<span class="fc" id="L117">            assertTrue(meta.getSequenceKey().isPresent());</span>
-<span class="fc" id="L118">            assertEquals(&quot;sequenceKey1&quot;, meta.getSequenceKey().get());</span>
-<span class="fc" id="L119">            assertTrue(meta.getCorrelations().isPresent());</span>
-<span class="fc" id="L120">            assertTrue(meta.getTimestamp().isPresent());</span>
-<span class="fc" id="L121">            assertEquals(timestamp, meta.getTimestamp().get());</span>
-<span class="fc" id="L122">            assertTrue(meta.getThrown().isPresent());</span>
-<span class="fc" id="L123">            assertEquals(thrown, meta.getThrown().get());</span>
-<span class="fc" id="L124">            assertEquals(fromBuilder.isBlocking(), meta.isBlocking());</span>
-<span class="fc" id="L125">            assertTrue(meta.getThread().isPresent());</span>
-<span class="fc" id="L126">            assertEquals(thread, meta.getThread().get());</span>
-<span class="fc" id="L127">        });</span>
-<span class="fc" id="L128">    }</span>
+<span class="fc" id="L101">            assertTrue(metaBuilder.getName().isPresent());</span>
+<span class="fc" id="L102">            assertEquals(&quot;name1&quot;, metaBuilder.getName().get());</span>
+<span class="fc" id="L103">            assertTrue(metaBuilder.getId().isPresent());</span>
+<span class="fc" id="L104">            assertEquals(&quot;id1&quot;, metaBuilder.getId().get());</span>
+<span class="fc" id="L105">            assertTrue(metaBuilder.getValue().isPresent());</span>
+<span class="fc" id="L106">            assertEquals(&quot;value1&quot;, metaBuilder.getValue().get());</span>
+<span class="fc" id="L107">            assertEquals(fromBuilder.getChannel(), metaBuilder.getChannel());</span>
+<span class="fc" id="L108">            assertTrue(metaBuilder.getKey().isPresent());</span>
+<span class="fc" id="L109">            assertEquals(&quot;sequenceKey1&quot;, metaBuilder.getKey().get());</span>
+<span class="fc" id="L110">            assertTrue(metaBuilder.getCorrelations().isPresent());</span>
+<span class="fc" id="L111">            assertTrue(metaBuilder.getTime().isPresent());</span>
+<span class="fc" id="L112">            assertEquals(timestamp, metaBuilder.getTime().get());</span>
+<span class="fc" id="L113">            assertTrue(metaBuilder.getThrown().isPresent());</span>
+<span class="fc" id="L114">            assertEquals(thrown, metaBuilder.getThrown().get());</span>
+<span class="fc" id="L115">            assertEquals(fromBuilder.isBlock(), metaBuilder.isBlock());</span>
+<span class="fc" id="L116">            assertTrue(metaBuilder.getThread().isPresent());</span>
+<span class="fc" id="L117">            assertEquals(thread, metaBuilder.getThread().get());</span>
+<span class="fc" id="L118">        });</span>
+<span class="fc" id="L119">    }</span>
     @Test
     default void meta_copy_WithEntity_Works() {
-<span class="fc" id="L131">        runWithScenario(meta -&gt; {</span>
-<span class="fc" id="L132">            final Throwable thrown = new RuntimeException(&quot;Oh no!&quot;);</span>
-<span class="fc" id="L133">            final Thread thread = Thread.currentThread();</span>
-<span class="fc" id="L134">            final Instant timestamp = Instant.now();</span>
-<span class="fc" id="L135">            final Meta.Builder&lt;?&gt; fromBuilder = newMetaBuilder();</span>
-<span class="pc" id="L136">            final Supplier&lt;CharSequence&gt; textSupplier = () -&gt; &quot;Alpha&quot;;</span>
+<span class="fc" id="L122">        runWithScenario(metaBuilder -&gt; {</span>
+<span class="fc" id="L123">            final Throwable thrown = new RuntimeException(&quot;Oh no.&quot;);</span>
+<span class="fc" id="L124">            final Thread thread = Thread.currentThread();</span>
+<span class="fc" id="L125">            final Instant timestamp = Instant.now();</span>
+<span class="fc" id="L126">            final Meta.Builder&lt;?&gt; fromBuilder = newMetaBuilder();</span>
+<span class="pc" id="L127">            final Supplier&lt;CharSequence&gt; textSupplier = () -&gt; &quot;Alpha&quot;;</span>
             
-<span class="fc" id="L138">            fromBuilder</span>
-<span class="fc" id="L139">                .text(textSupplier)</span>
-<span class="fc" id="L140">                .id(&quot;id1&quot;)</span>
-<span class="fc" id="L141">                .name(&quot;name1&quot;)</span>
-<span class="fc" id="L142">                .value(&quot;value1&quot;)</span>
-<span class="fc" id="L143">                .channel(&quot;channel1&quot;)</span>
-<span class="fc" id="L144">                .sequenceKey(&quot;sequenceKey1&quot;)</span>
-<span class="fc" id="L145">                .blocking(true)</span>
-<span class="fc" id="L146">                .thread(thread)</span>
-<span class="fc" id="L147">                .thrown(thrown)</span>
-<span class="fc" id="L148">                .timestamp(timestamp);</span>
+<span class="fc" id="L129">            fromBuilder</span>
+<span class="fc" id="L130">                .text(textSupplier)</span>
+<span class="fc" id="L131">                .id(&quot;id1&quot;)</span>
+<span class="fc" id="L132">                .name(&quot;name1&quot;)</span>
+<span class="fc" id="L133">                .value(&quot;value1&quot;)</span>
+<span class="fc" id="L134">                .channel(&quot;channel1&quot;)</span>
+<span class="fc" id="L135">                .key(&quot;sequenceKey1&quot;)</span>
+<span class="fc" id="L136">                .block(true)</span>
+<span class="fc" id="L137">                .thread(thread)</span>
+<span class="fc" id="L138">                .thrown(thrown)</span>
+<span class="fc" id="L139">                .time(timestamp);</span>
             
-<span class="fc" id="L150">            meta.copy((Entity.Builder&lt;?&gt;)fromBuilder);</span>
+<span class="fc" id="L141">            metaBuilder.copy((Entity.Builder&lt;?&gt;)fromBuilder);</span>
             
-<span class="fc" id="L152">            assertEquals(&quot;value1&quot;, meta.get());</span>
-<span class="fc" id="L153">            assertTrue(meta.getName().isPresent());</span>
-<span class="fc" id="L154">            assertEquals(&quot;name1&quot;, meta.getName().get());</span>
-<span class="fc" id="L155">            assertTrue(meta.getId().isPresent());</span>
-<span class="fc" id="L156">            assertEquals(&quot;id1&quot;, meta.getId().get());</span>
-<span class="fc" id="L157">            assertTrue(meta.getValue().isPresent());</span>
-<span class="fc" id="L158">            assertEquals(&quot;value1&quot;, meta.getValue().get());</span>
-<span class="fc" id="L159">            assertEquals(&quot;info&quot;, meta.getChannel());</span>
-<span class="fc" id="L160">            assertFalse(meta.getSequenceKey().isPresent());</span>
+<span class="fc" id="L143">            assertEquals(&quot;value1&quot;, metaBuilder.get());</span>
+<span class="fc" id="L144">            assertTrue(metaBuilder.getName().isPresent());</span>
+<span class="fc" id="L145">            assertEquals(&quot;name1&quot;, metaBuilder.getName().get());</span>
+<span class="fc" id="L146">            assertTrue(metaBuilder.getId().isPresent());</span>
+<span class="fc" id="L147">            assertEquals(&quot;id1&quot;, metaBuilder.getId().get());</span>
+<span class="fc" id="L148">            assertTrue(metaBuilder.getValue().isPresent());</span>
+<span class="fc" id="L149">            assertEquals(&quot;value1&quot;, metaBuilder.getValue().get());</span>
+<span class="fc" id="L150">            assertEquals(&quot;info&quot;, metaBuilder.getChannel());</span>
+<span class="fc" id="L151">            assertFalse(metaBuilder.getKey().isPresent());</span>
 //            assertEquals(&quot;sequenceKey1&quot;, meta.getSequenceKey().get());
-<span class="fc" id="L162">            assertTrue(meta.getCorrelations().isPresent());</span>
-<span class="fc" id="L163">            assertTrue(meta.getTimestamp().isPresent());</span>
-<span class="fc" id="L164">            assertEquals(timestamp, meta.getTimestamp().get());</span>
-<span class="fc" id="L165">            assertTrue(meta.getThrown().isPresent());</span>
-<span class="fc" id="L166">            assertEquals(thrown, meta.getThrown().get());</span>
-<span class="fc" id="L167">            assertFalse(meta.isBlocking());</span>
-<span class="fc" id="L168">            assertTrue(meta.getThread().isPresent());</span>
-<span class="fc" id="L169">            assertEquals(thread, meta.getThread().get());</span>
-<span class="fc" id="L170">        });</span>
-<span class="fc" id="L171">    }</span>
-    
+<span class="fc" id="L153">            assertTrue(metaBuilder.getCorrelations().isPresent());</span>
+<span class="fc" id="L154">            assertTrue(metaBuilder.getTime().isPresent());</span>
+<span class="fc" id="L155">            assertEquals(timestamp, metaBuilder.getTime().get());</span>
+<span class="fc" id="L156">            assertTrue(metaBuilder.getThrown().isPresent());</span>
+<span class="fc" id="L157">            assertEquals(thrown, metaBuilder.getThrown().get());</span>
+<span class="fc" id="L158">            assertFalse(metaBuilder.isBlock());</span>
+<span class="fc" id="L159">            assertTrue(metaBuilder.getThread().isPresent());</span>
+<span class="fc" id="L160">            assertEquals(thread, metaBuilder.getThread().get());</span>
+<span class="fc" id="L161">        });</span>
+<span class="fc" id="L162">    }</span>
     
     @Test
     default void meta_Timestamp_Works() {
-<span class="fc" id="L176">        runWithScenario( meta -&gt; {</span>
-<span class="fc" id="L177">            final Instant timestamp = Instant.now();</span>
+<span class="fc" id="L166">        runWithScenario( metaBuilder -&gt; {</span>
+<span class="fc" id="L167">            final Meta.Builder&lt;?&gt; returnBuilder = metaBuilder.time();</span>
             
-<span class="fc" id="L179">            meta.timestamp(timestamp);</span>
+<span class="fc" id="L169">            final Optional&lt;Temporal&gt; optionalTimestamp = metaBuilder.getTime();</span>
             
-<span class="fc" id="L181">            final Optional&lt;Temporal&gt; optionalTimestamp = meta.getTimestamp();</span>
+<span class="fc" id="L171">            assertSame(metaBuilder, returnBuilder );</span>
+<span class="fc" id="L172">            assertTrue(optionalTimestamp.isPresent());</span>
+<span class="fc" id="L173">            assertNotNull(optionalTimestamp.get());</span>
+<span class="fc" id="L174">        });</span>
+<span class="fc" id="L175">    }</span>
+    
+    
+    @Test
+    default void meta_Timestamp_WithTime_Works() {
+<span class="fc" id="L180">        runWithScenario( metaBuilder -&gt; {</span>
+<span class="fc" id="L181">            final Instant timestamp = Instant.now();</span>
             
-<span class="fc" id="L183">            assertTrue(optionalTimestamp.isPresent());</span>
-<span class="fc" id="L184">            assertEquals(timestamp, optionalTimestamp.get());</span>
-<span class="fc" id="L185">        });</span>
-<span class="fc" id="L186">    }</span>
+<span class="fc" id="L183">            final Meta.Builder&lt;?&gt; returnBuilder = metaBuilder.time(timestamp);</span>
+            
+<span class="fc" id="L185">            final Optional&lt;Temporal&gt; optionalTimestamp = metaBuilder.getTime();</span>
+            
+<span class="fc" id="L187">            assertSame(metaBuilder, returnBuilder );</span>
+<span class="fc" id="L188">            assertTrue(optionalTimestamp.isPresent());</span>
+<span class="fc" id="L189">            assertEquals(timestamp, optionalTimestamp.get());</span>
+<span class="fc" id="L190">        });</span>
+<span class="fc" id="L191">    }</span>
     
     @Test
     default void meta_Thread_Works() {
-<span class="fc" id="L190">        runWithScenario( meta -&gt; {</span>
-<span class="fc" id="L191">            final Thread thread = Thread.currentThread();</span>
+<span class="fc" id="L195">        runWithScenario( metaBuilder -&gt; {</span>
+<span class="fc" id="L196">            final Thread thread = Thread.currentThread();</span>
             
-<span class="fc" id="L193">            meta.thread(thread);</span>
+<span class="fc" id="L198">            final Meta.Builder&lt;?&gt; returnBuilder = metaBuilder.thread(thread);</span>
             
-<span class="fc" id="L195">            final Optional&lt;Thread&gt; optionalThread = meta.getThread();</span>
+<span class="fc" id="L200">            final Optional&lt;Thread&gt; optionalThread = metaBuilder.getThread();</span>
             
-<span class="fc" id="L197">            assertTrue(optionalThread.isPresent());</span>
-<span class="fc" id="L198">            assertEquals(thread, optionalThread.get());</span>
-<span class="fc" id="L199">        });</span>
-<span class="fc" id="L200">    }</span>
+<span class="fc" id="L202">            assertSame(metaBuilder, returnBuilder );</span>
+<span class="fc" id="L203">            assertTrue(optionalThread.isPresent());</span>
+<span class="fc" id="L204">            assertEquals(thread, optionalThread.get());</span>
+<span class="fc" id="L205">        });</span>
+<span class="fc" id="L206">    }</span>
     
     @Test
     default void meta_Throwable_Works() {
-<span class="fc" id="L204">        runWithScenario( meta -&gt; {</span>
-<span class="fc" id="L205">            final Throwable thrown = new RuntimeException(&quot;Error&quot;);</span>
+<span class="fc" id="L210">        runWithScenario( metaBuilder -&gt; {</span>
+<span class="fc" id="L211">            final Throwable thrown = new RuntimeException(&quot;Error&quot;);</span>
             
-<span class="fc" id="L207">            meta.thrown(thrown);</span>
+<span class="fc" id="L213">            final Meta.Builder&lt;?&gt; returnBuilder = metaBuilder.thrown(thrown);</span>
             
-<span class="fc" id="L209">            final Optional&lt;Throwable&gt; optionalThrown = meta.getThrown();</span>
+<span class="fc" id="L215">            final Optional&lt;Throwable&gt; optionalThrown = metaBuilder.getThrown();</span>
             
-<span class="fc" id="L211">            assertTrue(optionalThrown.isPresent());</span>
-<span class="fc" id="L212">            assertEquals(thrown, optionalThrown.get());</span>
-<span class="fc" id="L213">        });</span>
-<span class="fc" id="L214">    }</span>
+<span class="fc" id="L217">            assertSame(metaBuilder, returnBuilder );</span>
+<span class="fc" id="L218">            assertTrue(optionalThrown.isPresent());</span>
+<span class="fc" id="L219">            assertEquals(thrown, optionalThrown.get());</span>
+<span class="fc" id="L220">        });</span>
+<span class="fc" id="L221">    }</span>
+    
+    @Test
+    default void meta_thrown_WithNullThrowable_Removes() {
+<span class="fc" id="L225">        runWithScenario( metaBuilder -&gt; {</span>
+<span class="fc" id="L226">            final Throwable thrown = new RuntimeException(&quot;Error&quot;);</span>
+            
+<span class="fc" id="L228">            metaBuilder.thrown(thrown);</span>
+<span class="fc" id="L229">            final Meta.Builder&lt;?&gt; returnBuilder = metaBuilder.thrown(null);</span>
+            
+<span class="fc" id="L231">            final Optional&lt;Throwable&gt; optionalThrown = metaBuilder.getThrown();</span>
+            
+<span class="fc" id="L233">            assertSame(metaBuilder, returnBuilder );</span>
+<span class="fc" id="L234">            assertFalse(optionalThrown.isPresent());</span>
+<span class="fc" id="L235">        });</span>
+<span class="fc" id="L236">    }</span>
+    
+    @Test
+    default void meta_thread_WithNullThrowable_Removes() {
+<span class="fc" id="L240">        runWithScenario( metaBuilder -&gt; {</span>
+<span class="pc" id="L241">            final Thread thread = new Thread(()-&gt;{});</span>
+            
+<span class="fc" id="L243">            metaBuilder.thread(thread);</span>
+<span class="fc" id="L244">            final Meta.Builder&lt;?&gt; returnBuilder = metaBuilder.thread(null);</span>
+            
+<span class="fc" id="L246">            final Optional&lt;Thread&gt; optionalThread = metaBuilder.getThread();</span>
+            
+<span class="fc" id="L248">            assertSame(metaBuilder, returnBuilder );</span>
+<span class="fc" id="L249">            assertFalse(optionalThread.isPresent());</span>
+<span class="fc" id="L250">        });</span>
+<span class="fc" id="L251">    }</span>
+    
+    @Test
+    default void meta_timestamp_WithNullThrowable_Removes() {
+<span class="fc" id="L255">        runWithScenario( metaBuilder -&gt; {</span>
+<span class="fc" id="L256">            final Instant timestamp = Instant.now();</span>
+            
+<span class="fc" id="L258">            metaBuilder.time(timestamp);</span>
+<span class="fc" id="L259">            final Meta.Builder&lt;?&gt; returnBuilder = metaBuilder.time(null);</span>
+            
+<span class="fc" id="L261">            final Optional&lt;Temporal&gt; optionalTemporal = metaBuilder.getTime();</span>
+            
+<span class="fc" id="L263">            assertSame(metaBuilder, returnBuilder );</span>
+<span class="fc" id="L264">            assertFalse(optionalTemporal.isPresent());</span>
+<span class="fc" id="L265">        });</span>
+<span class="fc" id="L266">    }</span>
+    
+    @Test
+    default void meta_correlation_WithNullEntity_Throws() {
+<span class="fc" id="L270">        runWithScenario(builder -&gt; {</span>
+<span class="fc" id="L271">            final IllegalArgumentException thrown = assertThrows( IllegalArgumentException.class, () -&gt; {</span>
+<span class="nc" id="L272">                builder.correlation((Entity) null);</span>
+<span class="nc" id="L273">            });</span>
+<span class="fc" id="L274">            assertThrown(thrown);</span>
+<span class="fc" id="L275">        });</span>
+<span class="fc" id="L276">    }</span>
+    
+    @Test
+    default void meta_correlations_WithNullBuilder_Throws() {
+<span class="fc" id="L280">        runWithScenario(builder -&gt; {</span>
+<span class="fc" id="L281">            final IllegalArgumentException thrown = assertThrows( IllegalArgumentException.class, () -&gt; {</span>
+<span class="nc" id="L282">                builder.correlations( null);</span>
+<span class="nc" id="L283">            });</span>
+<span class="fc" id="L284">            assertThrown(thrown);</span>
+<span class="fc" id="L285">        });</span>
+<span class="fc" id="L286">    }</span>
+    
+    @Test
+    default void meta_InternalCoverage() {
+<span class="fc" id="L290">        assertInstantiateThrows(MetaTestsTools.class);</span>
+<span class="fc" id="L291">    }</span>
     
     final class MetaTestsTools {
-        private MetaTestsTools() {
+<span class="nc" id="L294">        private MetaTestsTools() {</span>
+<span class="nc" id="L295">            throw new AssertionError(&quot;Illegal constructor&quot;);</span>
         }
         
         @FunctionalInterface
         interface ScenarioConfig extends Consumer&lt;Meta.Builder&lt;?&gt;&gt; {
             default Metalog.Config getMetalogConfig() {
-<span class="fc" id="L223">                return Metalog.Config.DEFAULT;</span>
+<span class="fc" id="L301">                return Metalog.Config.DEFAULT;</span>
             }
         }
         
         static Meta.Builder&lt;?&gt; newMetaBuilder() {
-<span class="fc" id="L228">            return claimContract(Meta.Builder.FACTORY_CONTRACT).get();</span>
+<span class="fc" id="L306">            return claimContract(Meta.Builder.FACTORY_CONTRACT).get();</span>
         }
         
         static void runWithScenario(ScenarioConfig scenarioConfig) {
-<span class="fc" id="L232">            final Metalog metalog = createMetalog(scenarioConfig.getMetalogConfig());</span>
-<span class="fc" id="L233">            try (AutoClose closeLogs = metalog.open()) {</span>
-<span class="fc" id="L234">                AutoClose ignoreWarning = closeLogs;</span>
-<span class="fc" id="L235">                scenarioConfig.accept(newMetaBuilder());</span>
+<span class="fc" id="L310">            final Metalog metalog = createMetalog(scenarioConfig.getMetalogConfig());</span>
+<span class="fc" id="L311">            try (AutoClose closeLogs = metalog.open()) {</span>
+<span class="fc" id="L312">                AutoClose ignoreWarning = closeLogs;</span>
+<span class="fc" id="L313">                scenarioConfig.accept(newMetaBuilder());</span>
             }
-<span class="fc" id="L237">        }</span>
+<span class="fc" id="L315">        }</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

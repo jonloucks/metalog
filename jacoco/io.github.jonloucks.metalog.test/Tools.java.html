@@ -3,90 +3,152 @@
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.UUID;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-import io.github.jonloucks.metalog.api.Entity;
-import io.github.jonloucks.metalog.api.Meta;
-import io.github.jonloucks.metalog.api.MetalogFactory;
-import io.github.jonloucks.metalog.api.Metalog;
+import io.github.jonloucks.contracts.api.AutoClose;
+import io.github.jonloucks.contracts.api.Contracts;
+import io.github.jonloucks.contracts.api.GlobalContracts;
+import io.github.jonloucks.metalog.api.*;
 
+import static io.github.jonloucks.contracts.api.Checks.nullCheck;
 import static io.github.jonloucks.contracts.test.Tools.sanitize;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.AdditionalMatchers.and;
 import static org.mockito.ArgumentMatchers.argThat;
 
 public final class Tools {
     
     public static void clean() {
-<span class="fc" id="L19">        io.github.jonloucks.contracts.test.Tools.clean();</span>
-<span class="fc" id="L20">        sanitize(()-&gt; {</span>
-<span class="fc" id="L21">            final Metalog.Config config = new Metalog.Config() {};</span>
-<span class="pc bpc" id="L22" title="1 of 2 branches missed.">            if (config.useServiceLoader()) {</span>
-<span class="nc" id="L23">                final ServiceLoader&lt;? extends MetalogFactory&gt; loader = ServiceLoader.load(config.serviceLoaderClass());</span>
-<span class="nc" id="L24">                loader.reload();</span>
+<span class="fc" id="L23">        io.github.jonloucks.contracts.test.Tools.clean();</span>
+<span class="fc" id="L24">        sanitize(()-&gt; {</span>
+<span class="fc" id="L25">            final Metalog.Config config = new Metalog.Config() {};</span>
+<span class="pc bpc" id="L26" title="1 of 2 branches missed.">            if (config.useServiceLoader()) {</span>
+<span class="nc" id="L27">                final ServiceLoader&lt;? extends MetalogFactory&gt; loader = ServiceLoader.load(config.serviceLoaderClass());</span>
+<span class="nc" id="L28">                loader.reload();</span>
             }
-<span class="nc" id="L26">        });</span>
-<span class="fc" id="L27">    }</span>
+<span class="nc" id="L30">        });</span>
+<span class="fc" id="L31">    }</span>
     
     static String uniqueString() {
-<span class="fc" id="L30">        return UUID.randomUUID().toString();</span>
+<span class="fc" id="L34">        return UUID.randomUUID().toString();</span>
     }
     
     static Meta metaWithId(String id) {
-<span class="pc bpc" id="L34" title="1 of 2 branches missed.">        if (null == id) {</span>
-<span class="nc bnc" id="L35" title="All 2 branches missed.">            return argThat(m -&gt; !m.getId().isPresent());</span>
+<span class="pc bpc" id="L38" title="1 of 2 branches missed.">        if (null == id) {</span>
+<span class="nc bnc" id="L39" title="All 2 branches missed.">            return argThat(m -&gt; !m.getId().isPresent());</span>
         } else {
-<span class="pc bpc" id="L37" title="2 of 4 branches missed.">            return argThat(m -&gt; m.getId().isPresent() &amp;&amp; id.equals(m.getId().get()));</span>
+<span class="pc bpc" id="L41" title="2 of 4 branches missed.">            return argThat(m -&gt; m.getId().isPresent() &amp;&amp; id.equals(m.getId().get()));</span>
         }
     }
     
     static Meta metaWithIdThrown(String id, Throwable thrown) {
-<span class="fc" id="L42">        return and(metaWithId(id), metaWithThrown(thrown));</span>
+<span class="fc" id="L46">        return and(metaWithId(id), metaWithThrown(thrown));</span>
     }
     
     static Meta metaWithThrown(Throwable thrown) {
-<span class="pc bpc" id="L46" title="1 of 2 branches missed.">        if (null == thrown) {</span>
-<span class="nc bnc" id="L47" title="All 2 branches missed.">            return argThat(m -&gt; !m.getThrown().isPresent());</span>
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">        if (null == thrown) {</span>
+<span class="nc bnc" id="L51" title="All 2 branches missed.">            return argThat(m -&gt; !m.getThrown().isPresent());</span>
         } else {
-<span class="fc" id="L49">            return argThat(m -&gt; m.getThrown().map(throwable -&gt; throwable.equals(thrown)).orElse(false));</span>
+<span class="fc" id="L53">            return argThat(m -&gt; m.getThrown().map(throwable -&gt; throwable.equals(thrown)).orElse(false));</span>
         }
     }
     
     static Entity createTestEntity(String name) {
-<span class="fc" id="L54">        return createTestEntity(name, null);</span>
+<span class="fc" id="L58">        return createTestEntity(name, null);</span>
     }
     
     static Entity createTestEntity(String name, Object value) {
-<span class="fc" id="L58">        return createTestEntity(name, value, null);</span>
+<span class="fc" id="L62">        return createTestEntity(name, value, null);</span>
     }
     
     static Entity createTestEntity(String name, Object value, String id) {
-<span class="fc" id="L62">        return new Entity() {</span>
+<span class="fc" id="L66">        return new Entity() {</span>
             @Override
             public CharSequence get() {
-<span class="nc" id="L65">                return &quot;&quot;;</span>
+<span class="nc" id="L69">                return &quot;&quot;;</span>
             }
             
             @Override
             public Optional&lt;String&gt; getId() {
-<span class="fc" id="L70">                return Optional.ofNullable(id);</span>
+<span class="fc" id="L74">                return Optional.ofNullable(id);</span>
             }
             
             @Override
             public Optional&lt;String&gt; getName() {
-<span class="fc" id="L75">                return Optional.ofNullable(name);</span>
+<span class="fc" id="L79">                return Optional.ofNullable(name);</span>
             }
             
             @Override
             public Optional&lt;Object&gt; getValue() {
-<span class="fc" id="L80">                return Optional.ofNullable(value);</span>
+<span class="fc" id="L84">                return Optional.ofNullable(value);</span>
             }
         };
     }
+    
+    public static void assertMetaDefaults(Meta meta) {
+<span class="fc" id="L90">        assertEquals(Meta.DEFAULT.getName().isPresent(), meta.getName().isPresent());</span>
+<span class="fc" id="L91">        assertEquals(Meta.DEFAULT.isBlock(), meta.isBlock());</span>
+<span class="fc" id="L92">        assertEquals(Meta.DEFAULT.getValue().isPresent(), meta.getValue().isPresent());</span>
+<span class="fc" id="L93">        assertEquals(Meta.DEFAULT.getId().isPresent(), meta.getId().isPresent());</span>
+<span class="fc" id="L94">        assertEquals(Meta.DEFAULT.getThrown().isPresent(), meta.getThrown().isPresent());</span>
+<span class="fc" id="L95">        assertEquals(Meta.DEFAULT.getThread().isPresent(), meta.getThread().isPresent());</span>
+<span class="fc" id="L96">        assertEquals(Meta.DEFAULT.getTime().isPresent(), meta.getTime().isPresent());</span>
+<span class="fc" id="L97">        assertEquals(Meta.DEFAULT.getKey().isPresent(), meta.getKey().isPresent());</span>
+<span class="fc" id="L98">        assertEquals(Meta.DEFAULT.getCorrelations().isPresent(), meta.getCorrelations().isPresent());</span>
+<span class="fc" id="L99">        assertEquals(Meta.DEFAULT.get(), meta.get());</span>
+<span class="fc" id="L100">    }</span>
+    
+    public static void withContracts(Consumer&lt;Contracts&gt; block) {
+<span class="fc" id="L103">        final Contracts.Config config = new Contracts.Config() {</span>
+            @Override
+            public boolean useShutdownHooks() {
+<span class="fc" id="L106">                return false;</span>
+            }
+        };
+<span class="fc" id="L109">        withContracts(config, block);</span>
+<span class="fc" id="L110">    }</span>
+    
+    public static void withContracts(Contracts.Config config, Consumer&lt;Contracts&gt; block) {
+<span class="fc" id="L113">        final Contracts.Config validConfig = nullCheck(config, &quot;Config must be present.&quot;);</span>
+<span class="fc" id="L114">        final Consumer&lt;Contracts&gt; validBlock = nullCheck(block, &quot;Block must be present.&quot;);</span>
+<span class="fc" id="L115">        final Contracts contracts = GlobalContracts.createContracts(validConfig);</span>
+        
+<span class="fc" id="L117">        try (AutoClose closeContracts = contracts.open()) {</span>
+<span class="fc" id="L118">            final AutoClose ignored = closeContracts;</span>
+<span class="fc" id="L119">            validBlock.accept(contracts);</span>
+        }
+<span class="fc" id="L121">    }</span>
+    
+    public static void withMetalog(BiConsumer&lt;Contracts,Metalog&gt; block) {
+<span class="fc" id="L124">        withContracts(contracts -&gt; {</span>
+<span class="fc" id="L125">            final Metalog.Config config = new Metalog.Config() {</span>
+                @Override
+                public Contracts contracts() {
+<span class="fc" id="L128">                    return contracts;</span>
+                }
+            };
+<span class="fc" id="L131">            withMetalog(config, block);</span>
+<span class="fc" id="L132">        });</span>
+
+<span class="fc" id="L134">    }</span>
+    
+    public static void withMetalog(Metalog.Config config, BiConsumer&lt;Contracts,Metalog&gt; block) {
+<span class="fc" id="L137">        final Metalog.Config validConfig = nullCheck(config, &quot;Config must be present.&quot;);</span>
+<span class="fc" id="L138">        final BiConsumer&lt;Contracts, Metalog&gt; validBlock = nullCheck(block, &quot;Block must be present.&quot;);</span>
+<span class="fc" id="L139">        final Metalog metalog = GlobalMetalog.createMetalog(validConfig);</span>
+        
+<span class="fc" id="L141">        try (AutoClose closeMetalog = metalog.open()) {</span>
+<span class="fc" id="L142">            final AutoClose ignored = closeMetalog;</span>
+<span class="fc" id="L143">            validBlock.accept(config.contracts(), metalog);</span>
+        }
+<span class="fc" id="L145">    }</span>
 
     /**
      * Utility class instantiation protection
      */
-<span class="nc" id="L88">    private Tools() {</span>
-<span class="nc" id="L89">        throw new AssertionError(&quot;Illegal constructor&quot;);</span>
+<span class="nc" id="L150">    private Tools() {</span>
+<span class="nc" id="L151">        throw new AssertionError(&quot;Illegal constructor call.&quot;);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

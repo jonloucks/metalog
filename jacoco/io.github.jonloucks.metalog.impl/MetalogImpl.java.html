@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import static io.github.jonloucks.contracts.api.Checks.nullCheck;
+import static io.github.jonloucks.contracts.api.Checks.*;
 import static io.github.jonloucks.metalog.impl.Internal.*;
 import static java.util.Optional.ofNullable;
 
@@ -18,15 +18,15 @@ final class MetalogImpl implements Metalog, AutoClose {
     @Override
     public void publish(Log log, Meta meta) {
 <span class="pc bpc" id="L20" title="1 of 2 branches missed.">        if (!openState.isOpen()) {</span>
-<span class="nc" id="L21">            throw new IllegalStateException(&quot;Metalog is not open&quot;);</span>
+<span class="nc" id="L21">            throw new IllegalStateException(&quot;Metalog must be open.&quot;);</span>
         }
         
-<span class="fc" id="L24">        final Log validLog = new InvokeGetOnlyOnce(logCheck(log));</span>
+<span class="fc" id="L24">        final Log validLog = new InvokeOnlyOnce(log);</span>
 <span class="pc bpc" id="L25" title="1 of 2 branches missed.">        final Meta validMeta = null == meta ? Meta.DEFAULT : meta;</span>
         
-<span class="pc bpc" id="L27" title="2 of 6 branches missed.">        if (!subscribers.isEmpty() &amp;&amp; isEnabled() &amp;&amp; test(validMeta)) {</span>
-<span class="pc bpc" id="L28" title="1 of 2 branches missed.">            if (validMeta.isBlocking()) {</span>
-<span class="nc" id="L29">                dispatch(validLog, validMeta);</span>
+<span class="pc bpc" id="L27" title="1 of 4 branches missed.">        if (!subscribers.isEmpty() &amp;&amp; test(validMeta)) {</span>
+<span class="fc bfc" id="L28" title="All 2 branches covered.">            if (validMeta.isBlock()) {</span>
+<span class="fc" id="L29">                dispatch(validLog, validMeta);</span>
             } else {
 <span class="fc" id="L31">                dispatcher.execute(() -&gt; dispatch(validLog, validMeta));</span>
             }
@@ -35,67 +35,67 @@ final class MetalogImpl implements Metalog, AutoClose {
   
     @Override
     public void publish(Log log, Consumer&lt;Meta.Builder&lt;?&gt;&gt; builderConsumer) {
-<span class="fc" id="L38">        final Log validLog = logCheck(log);</span>
-<span class="fc" id="L39">        final Consumer&lt;Meta.Builder&lt;?&gt;&gt; validBuilderConsumer = nullCheck(builderConsumer, &quot;builderConsumer was null&quot;);</span>
-        
-<span class="fc" id="L41">        final Meta.Builder&lt;?&gt; metaBuilder = metaFactory.get();</span>
-        
-<span class="fc" id="L43">        validBuilderConsumer.accept(metaBuilder);</span>
-        
-<span class="fc" id="L45">        publish(validLog, metaBuilder);</span>
-<span class="fc" id="L46">    }</span>
- 
-    @Override
-    public boolean isEnabled() {
-<span class="fc" id="L50">        return config.isEnabled();</span>
-    }
-    
+<span class="fc" id="L38">        final Meta.Builder&lt;?&gt; metaBuilder = metaFactory.get();</span>
+<span class="fc" id="L39">        builderConsumerCheck(builderConsumer).accept(metaBuilder);</span>
+<span class="fc" id="L40">        publish(logCheck(log), metaBuilder);</span>
+<span class="fc" id="L41">    }</span>
+
     @Override
     public AutoClose addFilter(Predicate&lt;Meta&gt; filter) {
-<span class="nc" id="L55">        return filters.addFilter(filter);</span>
+<span class="nc" id="L45">        return filters.addFilter(filter);</span>
     }
     
     @Override
     public boolean test(Meta meta) {
-<span class="fc" id="L60">        return filters.test(meta);</span>
+<span class="fc" id="L50">        return filters.test(meta);</span>
     }
     
     @Override
-    public AutoClose subscribe(Subscriber config) {
-<span class="fc" id="L65">        final Subscriber validSubscriber = nullCheck(config, &quot;subscriber was null&quot;);</span>
-
-<span class="fc" id="L67">        subscribers.add(validSubscriber);</span>
-<span class="pc bpc" id="L68" title="1 of 2 branches missed.">        return () -&gt; subscribers.removeIf( x -&gt; x == validSubscriber);</span>
+    public AutoClose subscribe(Subscriber subscriber) {
+<span class="fc" id="L55">        final Subscriber validSubscriber = nullCheck(subscriber, &quot;Subscriber must be present.&quot;);</span>
+<span class="fc" id="L56">        subscribers.add(validSubscriber);</span>
+<span class="pc bpc" id="L57" title="1 of 2 branches missed.">        return () -&gt; subscribers.removeIf( x -&gt; x == validSubscriber);</span>
     }
 
     @Override
     public AutoClose open() {
-<span class="pc bpc" id="L73" title="1 of 2 branches missed.">        if (openState.transitionToOpen()) {</span>
-<span class="fc" id="L74">            ofNullable(repository).ifPresent(Repository::open);</span>
-<span class="fc" id="L75">            dispatcher = config.contracts().claim(Dispatcher.CONTRACT);</span>
-<span class="fc" id="L76">            metaFactory = config.contracts().claim(Meta.Builder.FACTORY_CONTRACT);</span>
-<span class="pc bpc" id="L77" title="1 of 2 branches missed.">            if (config.systemOutput()) {</span>
-<span class="fc" id="L78">                config.contracts().claim(SystemSubscriber.CONTRACT);</span>
-            }
-<span class="fc" id="L80">            return this;</span>
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">        if (openState.transitionToOpened()) {</span>
+<span class="fc" id="L63">            realOpen();</span>
+<span class="fc" id="L64">            return this;</span>
+        } else {
+<span class="nc" id="L66">            return () -&gt; {}; // all open calls after the first get a do nothing close</span>
         }
-<span class="nc" id="L82">        return () -&gt; {};</span>
     }
-    
+
     @Override
     public void close() {
-<span class="pc bpc" id="L87" title="1 of 2 branches missed.">        if (openState.transitionToClosed()) {</span>
-<span class="fc" id="L88">            ofNullable(repository).ifPresent(Repository::close);</span>
-<span class="fc" id="L89">            repository = null;</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">        if (openState.transitionToClosed()) {</span>
+<span class="fc" id="L73">            realClose();</span>
         }
-<span class="fc" id="L91">    }</span>
+<span class="fc" id="L75">    }</span>
     
-<span class="fc" id="L93">    MetalogImpl(Config config) {</span>
-<span class="fc" id="L94">        this.config = configCheck(config);</span>
-<span class="fc" id="L95">        final Promisors promisors = config.contracts().claim(Promisors.CONTRACT);</span>
-<span class="fc" id="L96">        this.repository = config.contracts().claim(Repository.FACTORY).get();</span>
+<span class="fc" id="L77">    MetalogImpl(Config config) {</span>
+<span class="fc" id="L78">        this.config = configCheck(config);</span>
+<span class="fc" id="L79">        final Promisors promisors = config.contracts().claim(Promisors.CONTRACT);</span>
+<span class="fc" id="L80">        this.repository = config.contracts().claim(Repository.FACTORY).get();</span>
         
-<span class="fc" id="L98">        bindContracts(config, promisors);</span>
+<span class="fc" id="L82">        bindContracts(config, promisors);</span>
+<span class="fc" id="L83">    }</span>
+    
+    private void realOpen() {
+<span class="fc" id="L86">        ofNullable(repository).ifPresent(Repository::open);</span>
+<span class="fc" id="L87">        dispatcher = config.contracts().claim(Dispatcher.CONTRACT);</span>
+<span class="fc" id="L88">        metaFactory = config.contracts().claim(Meta.Builder.FACTORY_CONTRACT);</span>
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">        if (config.systemOutput()) {</span>
+<span class="fc" id="L90">            config.contracts().claim(Console.CONTRACT);</span>
+        }
+<span class="fc" id="L92">    }</span>
+    
+    private void realClose() {
+<span class="fc" id="L95">        ofNullable(repository).ifPresent(close -&gt; {</span>
+<span class="fc" id="L96">            repository = null;</span>
+<span class="fc" id="L97">            close.close();</span>
+<span class="fc" id="L98">        });</span>
 <span class="fc" id="L99">    }</span>
     
     private void bindContracts(Config config, Promisors promisors) {
@@ -105,7 +105,7 @@ final class MetalogImpl implements Metalog, AutoClose {
 <span class="fc" id="L105">        repository.store(Entities.Builder.FACTORY_CONTRACT, () -&gt; EntitiesImpl::new);</span>
 <span class="fc" id="L106">        repository.store(Entity.Builder.FACTORY_CONTRACT, () -&gt; EntityImpl::new);</span>
 <span class="fc" id="L107">        repository.store(Meta.Builder.FACTORY_CONTRACT, () -&gt; MetaImpl::new);</span>
-<span class="fc" id="L108">        repository.store(SystemSubscriber.CONTRACT, promisors.createLifeCyclePromisor(() -&gt; new SystemSubscriberImpl(config)));</span>
+<span class="fc" id="L108">        repository.store(Console.CONTRACT, promisors.createLifeCyclePromisor(() -&gt; new ConsoleImpl(config)));</span>
 <span class="fc" id="L109">    }</span>
     
     private void dispatch(Log log, Meta meta) {

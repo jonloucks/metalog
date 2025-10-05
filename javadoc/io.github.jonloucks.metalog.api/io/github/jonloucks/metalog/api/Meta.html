@@ -83,6 +83,7 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="type-signature"><span class="modifiers">public interface </span><span class="element-name type-name-label">Meta</span><span class="extends-implements">
 extends <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a></span></div>
+<div class="block">The meta information for a log message</div>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -97,7 +98,9 @@ extends <a href="Entity.html" title="interface in io.github.jonloucks.metalog.ap
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>static interface&nbsp;</code></div>
 <div class="col-second even-row-color"><code><a href="Meta.Builder.html" class="type-name-link" title="interface in io.github.jonloucks.metalog.api">Meta.Builder</a>&lt;<a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a> extends <a href="Meta.Builder.html" title="interface in io.github.jonloucks.metalog.api">Meta.Builder</a>&lt;<a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a>&gt; &amp; <a href="Entity.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entity.Builder</a>&lt;<a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a>&gt;&gt;</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">Responsible for providing an easy way to build a meta instance used when logging</div>
+</div>
 </div>
 </section>
 </li>
@@ -112,7 +115,9 @@ extends <a href="Entity.html" title="interface in io.github.jonloucks.metalog.ap
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>static final <a href="Meta.html" title="interface in io.github.jonloucks.metalog.api">Meta</a></code></div>
 <div class="col-second even-row-color"><code><a href="#DEFAULT" class="member-name-link">DEFAULT</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">Can be used when logging without any meta information</div>
+</div>
 </div>
 </section>
 </li>
@@ -129,22 +134,36 @@ extends <a href="Entity.html" title="interface in io.github.jonloucks.metalog.ap
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#getChannel()" class="member-name-link">getChannel</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">User defined value to help subscribers determine how to process a log message
+ Common values would be "info", "warn", "error", "trace", "debug"
+ In addition System.err and System.out get redirected to System</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#getSequenceKey()" class="member-name-link">getSequenceKey</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#getKey()" class="member-name-link">getKey</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">Optional key to ensure ordering of messages.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Thread.html" title="class or interface in java.lang" class="external-link">Thread</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#getThread()" class="member-name-link">getThread</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">The optional thread correlated to a log message</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Throwable.html" title="class or interface in java.lang" class="external-link">Throwable</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#getThrown()" class="member-name-link">getThrown</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">The optional exception correlated to a log message</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/temporal/Temporal.html" title="class or interface in java.time.temporal" class="external-link">Temporal</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#getTimestamp()" class="member-name-link">getTimestamp</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#getTime()" class="member-name-link">getTime</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">The optional time the log message was published</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#isBlocking()" class="member-name-link">isBlocking</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#isBlock()" class="member-name-link">isBlock</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">if true the <a href="Log.html#get()"><code>Log.get()</code></a> will be invoked immediately (if needed).</div>
+</div>
 </div>
 </div>
 </div>
@@ -169,6 +188,7 @@ extends <a href="Entity.html" title="interface in io.github.jonloucks.metalog.ap
 <section class="detail" id="DEFAULT">
 <h3>DEFAULT</h3>
 <div class="member-signature"><span class="modifiers">static final</span>&nbsp;<span class="return-type"><a href="Meta.html" title="interface in io.github.jonloucks.metalog.api">Meta</a></span>&nbsp;<span class="element-name">DEFAULT</span></div>
+<div class="block">Can be used when logging without any meta information</div>
 </section>
 </li>
 </ul>
@@ -183,36 +203,90 @@ extends <a href="Entity.html" title="interface in io.github.jonloucks.metalog.ap
 <section class="detail" id="getChannel()">
 <h3>getChannel</h3>
 <div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getChannel</span>()</div>
+<div class="block">User defined value to help subscribers determine how to process a log message
+ Common values would be "info", "warn", "error", "trace", "debug"
+ In addition System.err and System.out get redirected to System</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the channel</dd>
+</dl>
 </section>
 </li>
 <li>
-<section class="detail" id="getSequenceKey()">
-<h3>getSequenceKey</h3>
-<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</span>&nbsp;<span class="element-name">getSequenceKey</span>()</div>
+<section class="detail" id="getKey()">
+<h3>getKey</h3>
+<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</span>&nbsp;<span class="element-name">getKey</span>()</div>
+<div class="block">Optional key to ensure ordering of messages.
+ If provided, all received messages will be consumed on the same thread.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the optional key</dd>
+</dl>
 </section>
 </li>
 <li>
-<section class="detail" id="isBlocking()">
-<h3>isBlocking</h3>
-<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isBlocking</span>()</div>
+<section class="detail" id="isBlock()">
+<h3>isBlock</h3>
+<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isBlock</span>()</div>
+<div class="block">if true the <a href="Log.html#get()"><code>Log.get()</code></a> will be invoked immediately (if needed). The Metalog implementation
+ may choose to still dispatch the log on worker threads, but <a href="Log.html#get()"><code>Log.get()</code></a> will never
+ be invoked again.
+ <p>
+ Note: This is useful for contextual stateful information that may not be available
+ in the future.  For example thread local data or database sessions
+ </p></div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>true if blocking, the default is false</dd>
+</dl>
 </section>
 </li>
 <li>
-<section class="detail" id="getTimestamp()">
-<h3>getTimestamp</h3>
-<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/temporal/Temporal.html" title="class or interface in java.time.temporal" class="external-link">Temporal</a>&gt;</span>&nbsp;<span class="element-name">getTimestamp</span>()</div>
+<section class="detail" id="getTime()">
+<h3>getTime</h3>
+<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/temporal/Temporal.html" title="class or interface in java.time.temporal" class="external-link">Temporal</a>&gt;</span>&nbsp;<span class="element-name">getTime</span>()</div>
+<div class="block">The optional time the log message was published
+ <p>
+ Note: Although the default provided here does not return a value,
+ the value will likely will be stored in the entity tree structure.
+ Locating this value is a common use case and promoted to explicit method for convenience.
+ </p></div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the optional time</dd>
+</dl>
 </section>
 </li>
 <li>
 <section class="detail" id="getThrown()">
 <h3>getThrown</h3>
 <div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Throwable.html" title="class or interface in java.lang" class="external-link">Throwable</a>&gt;</span>&nbsp;<span class="element-name">getThrown</span>()</div>
+<div class="block">The optional exception correlated to a log message
+ <p>
+ Note: Although the default provided here does not return a value,
+ the value will likely will be stored in the entity tree structure.
+ Locating this value is a common use case and promoted to explicit method for convenience.
+ </p></div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the optional time</dd>
+</dl>
 </section>
 </li>
 <li>
 <section class="detail" id="getThread()">
 <h3>getThread</h3>
 <div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Thread.html" title="class or interface in java.lang" class="external-link">Thread</a>&gt;</span>&nbsp;<span class="element-name">getThread</span>()</div>
+<div class="block">The optional thread correlated to a log message
+<p>
+ Note: Although the default provided here does not return a value,
+ the value will likely will be stored in the entity tree structure.
+ Locating this value is a common use case and promoted to explicit method for convenience.
+ </p></div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the optional time</dd>
+</dl>
 </section>
 </li>
 </ul>

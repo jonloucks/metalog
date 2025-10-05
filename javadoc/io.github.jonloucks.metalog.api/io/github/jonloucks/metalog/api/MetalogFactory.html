@@ -74,6 +74,7 @@ loadScripts(document, 'script');</script>
 <section class="class-description" id="class-description">
 <hr>
 <div class="type-signature"><span class="modifiers">public interface </span><span class="element-name type-name-label">MetalogFactory</span></div>
+<div class="block">Responsible for creating new instances of Metalog</div>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -88,7 +89,9 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>static final io.github.jonloucks.contracts.api.Contract&lt;<a href="MetalogFactory.html" title="interface in io.github.jonloucks.metalog.api">MetalogFactory</a>&gt;</code></div>
 <div class="col-second even-row-color"><code><a href="#CONTRACT" class="member-name-link">CONTRACT</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">Used to promise and claim the MetalogFactory implementation</div>
+</div>
 </div>
 </section>
 </li>
@@ -105,7 +108,9 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Metalog.html" title="interface in io.github.jonloucks.metalog.api">Metalog</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#create(io.github.jonloucks.metalog.api.Metalog.Config)" class="member-name-link">create</a><wbr>(<a href="Metalog.Config.html" title="interface in io.github.jonloucks.metalog.api">Metalog.Config</a>&nbsp;config)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Create a new instance of Metalog</div>
+</div>
 </div>
 </div>
 </div>
@@ -124,6 +129,7 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="CONTRACT">
 <h3>CONTRACT</h3>
 <div class="member-signature"><span class="modifiers">static final</span>&nbsp;<span class="return-type">io.github.jonloucks.contracts.api.Contract&lt;<a href="MetalogFactory.html" title="interface in io.github.jonloucks.metalog.api">MetalogFactory</a>&gt;</span>&nbsp;<span class="element-name">CONTRACT</span></div>
+<div class="block">Used to promise and claim the MetalogFactory implementation</div>
 </section>
 </li>
 </ul>
@@ -138,6 +144,17 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="create(io.github.jonloucks.metalog.api.Metalog.Config)">
 <h3>create</h3>
 <div class="member-signature"><span class="return-type"><a href="Metalog.html" title="interface in io.github.jonloucks.metalog.api">Metalog</a></span>&nbsp;<span class="element-name">create</span><wbr><span class="parameters">(<a href="Metalog.Config.html" title="interface in io.github.jonloucks.metalog.api">Metalog.Config</a>&nbsp;config)</span></div>
+<div class="block">Create a new instance of Metalog
+ <p>
+     Note: caller is responsible for calling <code>AutoOpen.open()</code> and calling
+     the <code>when done</code>
+ </p></div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>config</code> - the Metalog configuration for the new instance</dd>
+<dt>Returns:</dt>
+<dd>the new Metalog instance</dd>
+</dl>
 </section>
 </li>
 </ul>

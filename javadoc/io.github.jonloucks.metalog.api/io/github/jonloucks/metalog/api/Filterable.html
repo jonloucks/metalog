@@ -78,11 +78,12 @@ loadScripts(document, 'script');</script>
 </dl>
 <dl class="notes">
 <dt>All Known Subinterfaces:</dt>
-<dd><code><a href="Metalog.html" title="interface in io.github.jonloucks.metalog.api">Metalog</a></code></dd>
+<dd><code><a href="Console.html" title="interface in io.github.jonloucks.metalog.api">Console</a></code>, <code><a href="Metalog.html" title="interface in io.github.jonloucks.metalog.api">Metalog</a></code>, <code><a href="Publisher.html" title="interface in io.github.jonloucks.metalog.api">Publisher</a></code></dd>
 </dl>
 <hr>
 <div class="type-signature"><span class="modifiers">public interface </span><span class="element-name type-name-label">Filterable</span><span class="extends-implements">
 extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;<a href="Meta.html" title="interface in io.github.jonloucks.metalog.api">Meta</a>&gt;</span></div>
+<div class="block">Responsible for combining many predicates into one</div>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -99,7 +100,9 @@ extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/ja
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>io.github.jonloucks.contracts.api.AutoClose</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#addFilter(java.util.function.Predicate)" class="member-name-link">addFilter</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;<a href="Meta.html" title="interface in io.github.jonloucks.metalog.api">Meta</a>&gt;&nbsp;filter)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Add a new filter</div>
+</div>
 </div>
 </div>
 </div>
@@ -121,6 +124,13 @@ extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/ja
 <section class="detail" id="addFilter(java.util.function.Predicate)">
 <h3>addFilter</h3>
 <div class="member-signature"><span class="return-type">io.github.jonloucks.contracts.api.AutoClose</span>&nbsp;<span class="element-name">addFilter</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;<a href="Meta.html" title="interface in io.github.jonloucks.metalog.api">Meta</a>&gt;&nbsp;filter)</span></div>
+<div class="block">Add a new filter</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>filter</code> - the filter to add</dd>
+<dt>Returns:</dt>
+<dd>close will remove the filter</dd>
+</dl>
 </section>
 </li>
 </ul>

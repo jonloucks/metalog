@@ -19,17 +19,17 @@ final class DispatcherImpl implements Dispatcher, AutoOpen, AutoClose {
     
     @Override
     public AutoClose open() {
-<span class="pc bpc" id="L22" title="1 of 2 branches missed.">        if (openState.transitionToOpen()) {</span>
+<span class="pc bpc" id="L22" title="1 of 2 branches missed.">        if (openState.transitionToOpened()) {</span>
 <span class="pc bpc" id="L23" title="1 of 2 branches missed.">            if (config.backlogThreadCount() &lt;= 0) {</span>
 <span class="nc" id="L24">                executor = Runnable::run;</span>
 <span class="pc bpc" id="L25" title="1 of 2 branches missed.">            } else if (config.backlogThreadCount() &gt; 1) {</span>
-<span class="nc" id="L26">                executor = Executors.newFixedThreadPool(config.backlogThreadCount());</span>
+<span class="fc" id="L26">                executor = Executors.newFixedThreadPool(config.backlogThreadCount());</span>
             } else {
-<span class="fc" id="L28">                executor = Executors.newSingleThreadExecutor();</span>
+<span class="nc" id="L28">                executor = Executors.newSingleThreadExecutor();</span>
             }
 <span class="fc" id="L30">            return this;</span>
         } else {
-<span class="nc" id="L32">            return () -&gt; {};</span>
+<span class="nc" id="L32">            return () -&gt; {}; // all open calls after the first get a do nothing close</span>
         }
     }
     
@@ -45,7 +45,7 @@ final class DispatcherImpl implements Dispatcher, AutoOpen, AutoClose {
 <span class="pc bpc" id="L45" title="1 of 2 branches missed.">                        if (!executorService.awaitTermination(millis, MILLISECONDS)) {</span>
 <span class="nc" id="L46">                            executorService.shutdownNow();</span>
 <span class="nc bnc" id="L47" title="All 2 branches missed.">                            if (!executorService.awaitTermination(millis, MILLISECONDS)) {</span>
-<span class="nc" id="L48">                                System.err.println(&quot;Metalog dispatcher failed to shutdown&quot;);</span>
+<span class="nc" id="L48">                                System.err.println(&quot;Metalog dispatcher failed to shutdown.&quot;);</span>
                             }
                         }
 <span class="nc" id="L51">                    } catch (InterruptedException ex) {</span>

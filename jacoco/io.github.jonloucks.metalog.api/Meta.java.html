@@ -2,58 +2,191 @@
 
 import io.github.jonloucks.contracts.api.Contract;
 
+import java.time.Instant;
 import java.time.temporal.Temporal;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 import static java.util.Optional.empty;
 
+/**
+ * The meta information for a log message
+ */
 public interface Meta extends Entity {
-<span class="pc" id="L12">    Meta DEFAULT = () -&gt; &quot;&quot;;</span>
     
+    /**
+     * Can be used when logging without any meta information
+     */
+<span class="fc" id="L20">    Meta DEFAULT = () -&gt; &quot;&quot;;</span>
+    
+    /**
+     * User defined value to help subscribers determine how to process a log message
+     * Common values would be &quot;info&quot;, &quot;warn&quot;, &quot;error&quot;, &quot;trace&quot;, &quot;debug&quot;
+     * In addition System.err and System.out get redirected to System
+     * @return the channel
+     */
     default String getChannel() {
-<span class="nc" id="L15">        return &quot;info&quot;;</span>
+<span class="fc" id="L29">        return &quot;info&quot;;</span>
     }
     
-    default Optional&lt;String&gt; getSequenceKey() {
-<span class="nc" id="L19">        return empty();</span>
+    /**
+     * Optional key to ensure ordering of messages.
+     * If provided, all received messages will be consumed on the same thread.
+     * @return the optional key
+     */
+    default Optional&lt;String&gt; getKey() {
+<span class="fc" id="L38">        return empty();</span>
     }
     
-    default boolean isBlocking() {
-<span class="nc" id="L23">        return false;</span>
+    /**
+     * if true the {@link Log#get()} will be invoked immediately (if needed). The Metalog implementation
+     * may choose to still dispatch the log on worker threads, but {@link Log#get()} will never
+     * be invoked again.
+     * &lt;p&gt;
+     * Note: This is useful for contextual stateful information that may not be available
+     * in the future.  For example thread local data or database sessions
+     * &lt;/p&gt;
+     * @return true if blocking, the default is false
+     */
+    default boolean isBlock() {
+<span class="fc" id="L52">        return false;</span>
     }
     
-    default Optional&lt;Temporal&gt; getTimestamp() {
-<span class="nc" id="L27">        return empty();</span>
+    /**
+     * The optional time the log message was published
+     * &lt;p&gt;
+     * Note: Although the default provided here does not return a value,
+     * the value will likely will be stored in the entity tree structure.
+     * Locating this value is a common use case and promoted to explicit method for convenience.
+     * &lt;/p&gt;
+     * @return the optional time
+     */
+    default Optional&lt;Temporal&gt; getTime() {
+<span class="fc" id="L65">        return empty();</span>
     }
     
+    /**
+     * The optional exception correlated to a log message
+     * &lt;p&gt;
+     * Note: Although the default provided here does not return a value,
+     * the value will likely will be stored in the entity tree structure.
+     * Locating this value is a common use case and promoted to explicit method for convenience.
+     * &lt;/p&gt;
+     * @return the optional time
+     */
     default Optional&lt;Throwable&gt; getThrown() {
-<span class="nc" id="L31">        return empty();</span>
+<span class="fc" id="L78">        return empty();</span>
     }
     
+    /**
+     * The optional thread correlated to a log message
+     *&lt;p&gt;
+     * Note: Although the default provided here does not return a value,
+     * the value will likely will be stored in the entity tree structure.
+     * Locating this value is a common use case and promoted to explicit method for convenience.
+     * &lt;/p&gt;
+     * @return the optional time
+     */
     default Optional&lt;Thread&gt; getThread() {
-<span class="nc" id="L35">        return empty();</span>
+<span class="fc" id="L91">        return empty();</span>
     }
     
+    /**
+     * Responsible for providing an easy way to build a meta instance used when logging
+     * @param &lt;B&gt; the builder type
+     */
     interface Builder&lt;B extends Builder&lt;B&gt; &amp; Entity.Builder&lt;B&gt;&gt; extends Meta, Entity.Builder&lt;B&gt; {
-<span class="fc" id="L39">        Contract&lt;Supplier&lt;Meta.Builder&lt;?&gt;&gt;&gt; FACTORY_CONTRACT = Contract.create(&quot;Meta Builder Factory&quot;);</span>
         
+        /**
+         * Used to promise and claim the Meta.Builder implementation
+         */
+<span class="fc" id="L103">        Contract&lt;Supplier&lt;Meta.Builder&lt;?&gt;&gt;&gt; FACTORY_CONTRACT = Contract.create(&quot;Meta Builder Factory&quot;);</span>
+        
+        /**
+         * Set the name for the Meta
+         * @param name the name for the Meta
+         * @return this builder
+         */
         B name(String name);
-
+        
+        /**
+         * Set the id for the Meta
+         * @param id the id for the Meta
+         * @return this builder
+         */
         B id(String id);
         
+        /**
+         * Set the channel for the Meta
+         * @param channel the channel for the Meta
+         * @return this builder
+         */
         B channel(String channel);
         
-        B sequenceKey(String sequenceKey);
+        /**
+         * Set the key for the Meta
+         * @param key the key for the Meta
+         * @return this builder
+         */
+        B key(String key);
         
-        B blocking(boolean temporal);
+        /**
+         * Set the block mode for the Meta
+         * @param block true will enable {@link Meta#isBlock()}
+         * @return this builder
+         */
+        B block(boolean block);
         
+        /**
+         * Enables block mode. Shortcut for calling {@link #block(boolean)} with true
+         * @return this builder
+         */
+        default B block() {
+<span class="fc" id="L145">            return block(true);</span>
+        }
+        
+        /**
+         * Set the throwable for the Meta
+         * @param thrown the thrown exception
+         * @return this builder
+         */
         B thrown(Throwable thrown);
         
-        B timestamp(Temporal timestamp);
-  
+        /**
+         * Set the timestamp for the Meta
+         * @param timestamp the timestamp
+         * @return this builder
+         */
+        B time(Temporal timestamp);
+        
+        /**
+         * Set the timestamp to the current time
+         * @return this builder
+         */
+        default B time() {
+<span class="fc" id="L167">            return time(Instant.now());</span>
+        }
+        
+        /**
+         * Set the thread for the Meta
+         * @param thread the Thread
+         * @return this builder
+         */
         B thread(Thread thread);
         
+        /**
+         * Set the thread to the current runtime thread
+         * @return this builder
+         */
+        default B thread() {
+<span class="nc" id="L182">            return thread(Thread.currentThread());</span>
+        }
+        
+        /**
+         * Copy the non-empty values from the given Meta
+         * @param meta the Meta to copy
+         * @return this builder
+         */
         B copy(Meta meta);
     }
 }

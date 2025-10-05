@@ -3,63 +3,71 @@
 import io.github.jonloucks.contracts.api.ContractException;
 import io.github.jonloucks.contracts.api.Contracts;
 
-import java.lang.reflect.Constructor;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
+import static io.github.jonloucks.contracts.api.Checks.configCheck;
 import static io.github.jonloucks.contracts.api.Checks.nullCheck;
+import static java.util.Optional.ofNullable;
 
+/**
+ * Responsible for locating and creating the MetalogFactory for a deployment.
+ */
 final class MetalogFactoryFinder {
-    private final Metalog.Config config;
-    private final Contracts contracts;
-    
-<span class="fc" id="L16">    MetalogFactoryFinder(Metalog.Config config) {</span>
-<span class="fc" id="L17">        this.config = nullCheck(config, &quot;config was null&quot;);</span>
-<span class="fc" id="L18">        this.contracts = config.contracts();</span>
-<span class="fc" id="L19">    }</span>
+<span class="fc" id="L17">    MetalogFactoryFinder(Metalog.Config config) {</span>
+<span class="fc" id="L18">        this.config = configCheck(config);</span>
+<span class="fc" id="L19">        this.contracts = config.contracts();</span>
+<span class="fc" id="L20">    }</span>
     
     MetalogFactory find() {
-<span class="fc bfc" id="L22" title="All 2 branches covered.">        if (contracts.isBound(MetalogFactory.CONTRACT)) {</span>
-<span class="fc" id="L23">            return contracts.claim(MetalogFactory.CONTRACT);</span>
+<span class="fc bfc" id="L23" title="All 2 branches covered.">        if (contracts.isBound(MetalogFactory.CONTRACT)) {</span>
+<span class="fc" id="L24">            return contracts.claim(MetalogFactory.CONTRACT);</span>
         }
         
-<span class="fc" id="L26">        return createByReflection()</span>
-<span class="fc" id="L27">            .or(this::createByServiceLoader)</span>
-<span class="fc" id="L28">            .orElseThrow(this::newNotFoundException);</span>
+<span class="fc" id="L27">        return createByReflection()</span>
+<span class="fc" id="L28">            .or(this::createByServiceLoader)</span>
+<span class="fc" id="L29">            .orElseThrow(this::newNotFoundException);</span>
     }
     
     private Optional&lt;? extends MetalogFactory&gt; createByServiceLoader() {
-<span class="pc bpc" id="L32" title="1 of 2 branches missed.">        if (config.useServiceLoader()) {</span>
+<span class="pc bpc" id="L33" title="1 of 2 branches missed.">        if (config.useServiceLoader()) {</span>
             try {
-<span class="fc" id="L34">                final Class&lt;? extends MetalogFactory&gt; servicFactoryClass = nullCheck(config.serviceLoaderClass(), &quot;config.serviceLoaderClass() was null&quot;);</span>
-<span class="fc" id="L35">                final ServiceLoader&lt;? extends MetalogFactory&gt; serviceLoader = ServiceLoader.load(servicFactoryClass);</span>
-<span class="fc" id="L36">                return serviceLoader.findFirst();</span>
-<span class="nc" id="L37">            } catch (Throwable thrown) {</span>
-<span class="nc" id="L38">                return Optional.empty();</span>
+<span class="fc" id="L35">                return ServiceLoader.load(getServiceFactoryClass()).findFirst();</span>
+<span class="nc" id="L36">            } catch (Throwable thrown) {</span>
+<span class="nc" id="L37">                return Optional.empty();</span>
             }
         }
-<span class="nc" id="L41">        return Optional.empty();</span>
+<span class="nc" id="L40">        return Optional.empty();</span>
+    }
+    
+    private Class&lt;? extends MetalogFactory&gt; getServiceFactoryClass() {
+<span class="fc" id="L44">        return nullCheck(config.serviceLoaderClass(), &quot;Metalog Service Loader class must be present.&quot;);</span>
     }
     
     private Optional&lt;MetalogFactory&gt; createByReflection() {
-<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        if (config.useReflection()) {</span>
-<span class="fc" id="L46">            final String className = nullCheck(config.reflectionClassName(), &quot;config.reflectionClassName() was null&quot;);</span>
-<span class="pc bpc" id="L47" title="1 of 2 branches missed.">            if (className.isEmpty()) {</span>
-<span class="nc" id="L48">                return Optional.empty();</span>
-            }
-            try {
-<span class="nc" id="L51">                final Class&lt;?&gt; bootstrapClass = Class.forName(className);</span>
-<span class="nc" id="L52">                final Constructor&lt;?&gt; bootstrapConstructor = bootstrapClass.getConstructor();</span>
-<span class="nc" id="L53">                return Optional.of((MetalogFactory) bootstrapConstructor.newInstance());</span>
-<span class="fc" id="L54">            } catch (Throwable thrown) {</span>
-<span class="fc" id="L55">                return Optional.empty();</span>
-            }
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">        if (config.useReflection()) {</span>
+<span class="fc" id="L49">            return getReflectionClassName().map(this::createNewInstance);</span>
         }
-<span class="nc" id="L58">        return Optional.empty();</span>
+<span class="nc" id="L51">        return Optional.empty();</span>
+    }
+    
+    private MetalogFactory createNewInstance(String className) {
+        try {
+<span class="nc" id="L56">            return (MetalogFactory)Class.forName(className).getConstructor().newInstance();</span>
+<span class="fc" id="L57">        } catch (Throwable thrown) {</span>
+<span class="fc" id="L58">            return null;</span>
+        }
+    }
+
+    private Optional&lt;String&gt; getReflectionClassName() {
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">        return ofNullable(config.reflectionClassName()).filter(x -&gt; !x.isEmpty());</span>
     }
     
     private ContractException newNotFoundException() {
-<span class="nc" id="L62">        return new ContractException(&quot;Unable to find GlobalMetalog MetalogFactory&quot;);</span>
+<span class="nc" id="L67">        return new ContractException(&quot;Unable to find Metalog factory.&quot;);</span>
     }
+    
+    private final Metalog.Config config;
+    private final Contracts contracts;
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

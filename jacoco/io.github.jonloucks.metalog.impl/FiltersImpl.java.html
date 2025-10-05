@@ -14,19 +14,19 @@ import static io.github.jonloucks.metalog.impl.Internal.filterCheck;
     
     @Override
     public AutoClose addFilter(Predicate&lt;Meta&gt; filter) {
-<span class="nc" id="L17">        final Predicate&lt;Meta&gt; validFilter = filterCheck(filter);</span>
+<span class="fc" id="L17">        final Predicate&lt;Meta&gt; validFilter = filterCheck(filter);</span>
         
-<span class="nc" id="L19">        filters.add(validFilter);</span>
+<span class="fc" id="L19">        filters.add(validFilter);</span>
         
-<span class="nc bnc" id="L21" title="All 2 branches missed.">        return ()-&gt; filters.removeIf(x -&gt; x == validFilter);</span>
+<span class="pc bpc" id="L21" title="1 of 2 branches missed.">        return ()-&gt; filters.removeIf(x -&gt; x == validFilter);</span>
     }
     
     @Override
     public boolean test(Meta meta) {
-<span class="pc bpc" id="L26" title="1 of 2 branches missed.">        if (filters.isEmpty()) {</span>
+<span class="fc bfc" id="L26" title="All 2 branches covered.">        if (filters.isEmpty()) {</span>
 <span class="fc" id="L27">            return true;</span>
         }
-<span class="nc" id="L29">        return filters.stream().allMatch(filter -&gt; filter.test(meta));</span>
+<span class="fc" id="L29">        return filters.stream().allMatch(filter -&gt; filter.test(meta));</span>
     }
     
 <span class="fc" id="L32">    private final List&lt;Predicate&lt;Meta&gt;&gt; filters = new CopyOnWriteArrayList&lt;&gt;();</span>

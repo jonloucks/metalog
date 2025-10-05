@@ -73,6 +73,10 @@ loadScripts(document, 'script');</script>
 </div>
 <section class="class-description" id="class-description">
 <dl class="notes">
+<dt>Type Parameters:</dt>
+<dd><code>B</code> - the builder type</dd>
+</dl>
+<dl class="notes">
 <dt>All Superinterfaces:</dt>
 <dd><code><a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a></code>, <code><a href="Entity.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entity.Builder</a>&lt;B&gt;</code>, <code><a href="Meta.html" title="interface in io.github.jonloucks.metalog.api">Meta</a></code>, <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html" title="class or interface in java.util.function" class="external-link">Supplier</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/CharSequence.html" title="class or interface in java.lang" class="external-link">CharSequence</a>&gt;</code></dd>
 </dl>
@@ -83,6 +87,7 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="type-signature"><span class="modifiers">public static interface </span><span class="element-name type-name-label">Meta.Builder&lt;B extends Meta.Builder&lt;B&gt; &amp; <a href="Entity.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entity.Builder</a>&lt;B&gt;&gt;</span><span class="extends-implements">
 extends <a href="Meta.html" title="interface in io.github.jonloucks.metalog.api">Meta</a>, <a href="Entity.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entity.Builder</a>&lt;B&gt;</span></div>
+<div class="block">Responsible for providing an easy way to build a meta instance used when logging</div>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -109,7 +114,9 @@ extends <a href="Meta.html" title="interface in io.github.jonloucks.metalog.api"
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>static final io.github.jonloucks.contracts.api.Contract&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html" title="class or interface in java.util.function" class="external-link">Supplier</a>&lt;<a href="Meta.Builder.html" title="interface in io.github.jonloucks.metalog.api">Meta.Builder</a>&lt;?&gt;&gt;&gt;</code></div>
 <div class="col-second even-row-color"><code><a href="#FACTORY_CONTRACT" class="member-name-link">FACTORY_CONTRACT</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">Used to promise and claim the Meta.Builder implementation</div>
+</div>
 </div>
 <div class="inherited-list">
 <h3 id="fields-inherited-from-class-io.github.jonloucks.metalog.api.Meta">Fields inherited from interface&nbsp;io.github.jonloucks.metalog.api.<a href="Meta.html" title="interface in io.github.jonloucks.metalog.api">Meta</a></h3>
@@ -121,39 +128,72 @@ extends <a href="Meta.html" title="interface in io.github.jonloucks.metalog.api"
 <section class="method-summary" id="method-summary">
 <h2>Method Summary</h2>
 <div id="method-summary-table">
-<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab3" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab3', 3)" class="table-tab">Abstract Methods</button></div>
+<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab3" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab3', 3)" class="table-tab">Abstract Methods</button><button id="method-summary-table-tab5" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab5', 3)" class="table-tab">Default Methods</button></div>
 <div id="method-summary-table.tabpanel" role="tabpanel" aria-labelledby="method-summary-table-tab0">
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#blocking(boolean)" class="member-name-link">blocking</a><wbr>(boolean&nbsp;temporal)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#block()" class="member-name-link">block</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">Enables block mode.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#channel(java.lang.String)" class="member-name-link">channel</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;channel)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#block(boolean)" class="member-name-link">block</a><wbr>(boolean&nbsp;block)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Set the block mode for the Meta</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#copy(io.github.jonloucks.metalog.api.Meta)" class="member-name-link">copy</a><wbr>(<a href="Meta.html" title="interface in io.github.jonloucks.metalog.api">Meta</a>&nbsp;meta)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#channel(java.lang.String)" class="member-name-link">channel</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;channel)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Set the channel for the Meta</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#id(java.lang.String)" class="member-name-link">id</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#copy(io.github.jonloucks.metalog.api.Meta)" class="member-name-link">copy</a><wbr>(<a href="Meta.html" title="interface in io.github.jonloucks.metalog.api">Meta</a>&nbsp;meta)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Copy the non-empty values from the given Meta</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#id(java.lang.String)" class="member-name-link">id</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Set the id for the Meta</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#key(java.lang.String)" class="member-name-link">key</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Set the key for the Meta</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#name(java.lang.String)" class="member-name-link">name</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#sequenceKey(java.lang.String)" class="member-name-link">sequenceKey</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;sequenceKey)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Set the name for the Meta</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#thread()" class="member-name-link">thread</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">Set the thread to the current runtime thread</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#thread(java.lang.Thread)" class="member-name-link">thread</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Thread.html" title="class or interface in java.lang" class="external-link">Thread</a>&nbsp;thread)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Set the thread for the Meta</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#thrown(java.lang.Throwable)" class="member-name-link">thrown</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Throwable.html" title="class or interface in java.lang" class="external-link">Throwable</a>&nbsp;thrown)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#timestamp(java.time.temporal.Temporal)" class="member-name-link">timestamp</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/temporal/Temporal.html" title="class or interface in java.time.temporal" class="external-link">Temporal</a>&nbsp;timestamp)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Set the throwable for the Meta</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#time()" class="member-name-link">time</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">Set the timestamp to the current time</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#time(java.time.temporal.Temporal)" class="member-name-link">time</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/temporal/Temporal.html" title="class or interface in java.time.temporal" class="external-link">Temporal</a>&nbsp;timestamp)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Set the timestamp for the Meta</div>
+</div>
 </div>
 </div>
 </div>
@@ -165,7 +205,7 @@ extends <a href="Meta.html" title="interface in io.github.jonloucks.metalog.api"
 <code><a href="Entity.Builder.html#copy(io.github.jonloucks.metalog.api.Entity)">copy</a>, <a href="Entity.Builder.html#correlation(io.github.jonloucks.metalog.api.Entity)">correlation</a>, <a href="Entity.Builder.html#correlation(java.util.function.Consumer)">correlation</a>, <a href="Entity.Builder.html#correlations(java.util.function.Consumer)">correlations</a>, <a href="Entity.Builder.html#text(java.util.function.Supplier)">text</a>, <a href="Entity.Builder.html#value(java.lang.Object)">value</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-io.github.jonloucks.metalog.api.Meta">Methods inherited from interface&nbsp;io.github.jonloucks.metalog.api.<a href="Meta.html" title="interface in io.github.jonloucks.metalog.api">Meta</a></h3>
-<code><a href="Meta.html#getChannel()">getChannel</a>, <a href="Meta.html#getSequenceKey()">getSequenceKey</a>, <a href="Meta.html#getThread()">getThread</a>, <a href="Meta.html#getThrown()">getThrown</a>, <a href="Meta.html#getTimestamp()">getTimestamp</a>, <a href="Meta.html#isBlocking()">isBlocking</a></code></div>
+<code><a href="Meta.html#getChannel()">getChannel</a>, <a href="Meta.html#getKey()">getKey</a>, <a href="Meta.html#getThread()">getThread</a>, <a href="Meta.html#getThrown()">getThrown</a>, <a href="Meta.html#getTime()">getTime</a>, <a href="Meta.html#isBlock()">isBlock</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-java.util.function.Supplier">Methods inherited from interface&nbsp;java.util.function.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html" title="class or interface in java.util.function" class="external-link">Supplier</a></h3>
 <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html#get()" title="class or interface in java.util.function" class="external-link">get</a></code></div>
@@ -184,6 +224,7 @@ extends <a href="Meta.html" title="interface in io.github.jonloucks.metalog.api"
 <section class="detail" id="FACTORY_CONTRACT">
 <h3>FACTORY_CONTRACT</h3>
 <div class="member-signature"><span class="modifiers">static final</span>&nbsp;<span class="return-type">io.github.jonloucks.contracts.api.Contract&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html" title="class or interface in java.util.function" class="external-link">Supplier</a>&lt;<a href="Meta.Builder.html" title="interface in io.github.jonloucks.metalog.api">Meta.Builder</a>&lt;?&gt;&gt;&gt;</span>&nbsp;<span class="element-name">FACTORY_CONTRACT</span></div>
+<div class="block">Used to promise and claim the Meta.Builder implementation</div>
 </section>
 </li>
 </ul>
@@ -198,9 +239,14 @@ extends <a href="Meta.html" title="interface in io.github.jonloucks.metalog.api"
 <section class="detail" id="name(java.lang.String)">
 <h3>name</h3>
 <div class="member-signature"><span class="return-type"><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></span>&nbsp;<span class="element-name">name</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</span></div>
+<div class="block">Set the name for the Meta</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="Entity.Builder.html#name(java.lang.String)">name</a></code>&nbsp;in interface&nbsp;<code><a href="Entity.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entity.Builder</a>&lt;<a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a> extends <a href="Meta.Builder.html" title="interface in io.github.jonloucks.metalog.api">Meta.Builder</a>&lt;<a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a>&gt; &amp; <a href="Entity.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entity.Builder</a>&lt;<a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a>&gt;&gt;</code></dd>
+<dt>Parameters:</dt>
+<dd><code>name</code> - the name for the Meta</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
 </dl>
 </section>
 </li>
@@ -208,9 +254,14 @@ extends <a href="Meta.html" title="interface in io.github.jonloucks.metalog.api"
 <section class="detail" id="id(java.lang.String)">
 <h3>id</h3>
 <div class="member-signature"><span class="return-type"><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></span>&nbsp;<span class="element-name">id</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id)</span></div>
+<div class="block">Set the id for the Meta</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="Entity.Builder.html#id(java.lang.String)">id</a></code>&nbsp;in interface&nbsp;<code><a href="Entity.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entity.Builder</a>&lt;<a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a> extends <a href="Meta.Builder.html" title="interface in io.github.jonloucks.metalog.api">Meta.Builder</a>&lt;<a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a>&gt; &amp; <a href="Entity.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entity.Builder</a>&lt;<a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a>&gt;&gt;</code></dd>
+<dt>Parameters:</dt>
+<dd><code>id</code> - the id for the Meta</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
 </dl>
 </section>
 </li>
@@ -218,42 +269,124 @@ extends <a href="Meta.html" title="interface in io.github.jonloucks.metalog.api"
 <section class="detail" id="channel(java.lang.String)">
 <h3>channel</h3>
 <div class="member-signature"><span class="return-type"><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></span>&nbsp;<span class="element-name">channel</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;channel)</span></div>
+<div class="block">Set the channel for the Meta</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>channel</code> - the channel for the Meta</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
 </section>
 </li>
 <li>
-<section class="detail" id="sequenceKey(java.lang.String)">
-<h3>sequenceKey</h3>
-<div class="member-signature"><span class="return-type"><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></span>&nbsp;<span class="element-name">sequenceKey</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;sequenceKey)</span></div>
+<section class="detail" id="key(java.lang.String)">
+<h3>key</h3>
+<div class="member-signature"><span class="return-type"><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></span>&nbsp;<span class="element-name">key</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</span></div>
+<div class="block">Set the key for the Meta</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>key</code> - the key for the Meta</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
 </section>
 </li>
 <li>
-<section class="detail" id="blocking(boolean)">
-<h3>blocking</h3>
-<div class="member-signature"><span class="return-type"><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></span>&nbsp;<span class="element-name">blocking</span><wbr><span class="parameters">(boolean&nbsp;temporal)</span></div>
+<section class="detail" id="block(boolean)">
+<h3>block</h3>
+<div class="member-signature"><span class="return-type"><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></span>&nbsp;<span class="element-name">block</span><wbr><span class="parameters">(boolean&nbsp;block)</span></div>
+<div class="block">Set the block mode for the Meta</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>block</code> - true will enable <a href="Meta.html#isBlock()"><code>Meta.isBlock()</code></a></dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="block()">
+<h3>block</h3>
+<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type"><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></span>&nbsp;<span class="element-name">block</span>()</div>
+<div class="block">Enables block mode. Shortcut for calling <a href="#block(boolean)"><code>block(boolean)</code></a> with true</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
 </section>
 </li>
 <li>
 <section class="detail" id="thrown(java.lang.Throwable)">
 <h3>thrown</h3>
 <div class="member-signature"><span class="return-type"><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></span>&nbsp;<span class="element-name">thrown</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Throwable.html" title="class or interface in java.lang" class="external-link">Throwable</a>&nbsp;thrown)</span></div>
+<div class="block">Set the throwable for the Meta</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>thrown</code> - the thrown exception</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
 </section>
 </li>
 <li>
-<section class="detail" id="timestamp(java.time.temporal.Temporal)">
-<h3>timestamp</h3>
-<div class="member-signature"><span class="return-type"><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></span>&nbsp;<span class="element-name">timestamp</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/temporal/Temporal.html" title="class or interface in java.time.temporal" class="external-link">Temporal</a>&nbsp;timestamp)</span></div>
+<section class="detail" id="time(java.time.temporal.Temporal)">
+<h3>time</h3>
+<div class="member-signature"><span class="return-type"><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></span>&nbsp;<span class="element-name">time</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/temporal/Temporal.html" title="class or interface in java.time.temporal" class="external-link">Temporal</a>&nbsp;timestamp)</span></div>
+<div class="block">Set the timestamp for the Meta</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>timestamp</code> - the timestamp</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="time()">
+<h3>time</h3>
+<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type"><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></span>&nbsp;<span class="element-name">time</span>()</div>
+<div class="block">Set the timestamp to the current time</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
 </section>
 </li>
 <li>
 <section class="detail" id="thread(java.lang.Thread)">
 <h3>thread</h3>
 <div class="member-signature"><span class="return-type"><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></span>&nbsp;<span class="element-name">thread</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Thread.html" title="class or interface in java.lang" class="external-link">Thread</a>&nbsp;thread)</span></div>
+<div class="block">Set the thread for the Meta</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>thread</code> - the Thread</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="thread()">
+<h3>thread</h3>
+<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type"><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></span>&nbsp;<span class="element-name">thread</span>()</div>
+<div class="block">Set the thread to the current runtime thread</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
 </section>
 </li>
 <li>
 <section class="detail" id="copy(io.github.jonloucks.metalog.api.Meta)">
 <h3>copy</h3>
 <div class="member-signature"><span class="return-type"><a href="Meta.Builder.html" title="type parameter in Meta.Builder">B</a></span>&nbsp;<span class="element-name">copy</span><wbr><span class="parameters">(<a href="Meta.html" title="interface in io.github.jonloucks.metalog.api">Meta</a>&nbsp;meta)</span></div>
+<div class="block">Copy the non-empty values from the given Meta</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>meta</code> - the Meta to copy</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
 </section>
 </li>
 </ul>

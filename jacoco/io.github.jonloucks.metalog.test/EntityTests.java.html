@@ -12,6 +12,7 @@ import org.mockito.quality.Strictness;
 import java.util.function.Consumer;
 
 import static io.github.jonloucks.contracts.api.GlobalContracts.claimContract;
+import static io.github.jonloucks.contracts.test.Tools.assertInstantiateThrows;
 import static io.github.jonloucks.contracts.test.Tools.assertThrown;
 import static io.github.jonloucks.metalog.api.GlobalMetalog.createMetalog;
 import static io.github.jonloucks.metalog.test.EntityTests.EntityTestsTools.newEntityBuilder;
@@ -26,222 +27,229 @@ public interface EntityTests {
     
     @Test
     default void entity_InitialValues() {
-<span class="fc" id="L29">        runWithScenario( builder -&gt; {</span>
-<span class="fc" id="L30">            assertFalse(builder.getId().isPresent());</span>
-<span class="fc" id="L31">            assertFalse(builder.getName().isPresent());</span>
-<span class="fc" id="L32">            assertFalse(builder.getValue().isPresent());</span>
-<span class="fc" id="L33">            assertFalse(builder.getCorrelations().isPresent());</span>
-<span class="fc" id="L34">            assertNull(builder.get());</span>
-<span class="fc" id="L35">        });</span>
-<span class="fc" id="L36">    }</span>
+<span class="fc" id="L30">        runWithScenario( builder -&gt; {</span>
+<span class="fc" id="L31">            assertFalse(builder.getId().isPresent());</span>
+<span class="fc" id="L32">            assertFalse(builder.getName().isPresent());</span>
+<span class="fc" id="L33">            assertFalse(builder.getValue().isPresent());</span>
+<span class="fc" id="L34">            assertFalse(builder.getCorrelations().isPresent());</span>
+<span class="fc" id="L35">            assertNotNull(builder.get());</span>
+<span class="fc" id="L36">        });</span>
+<span class="fc" id="L37">    }</span>
     
     @Test
     default void entity_text_ValueChanges_TextChanges() {
-<span class="fc" id="L40">        runWithScenario( builder -&gt; {</span>
-<span class="fc" id="L41">            builder.value(2);</span>
-<span class="fc" id="L42">            builder.get();</span>
-<span class="fc" id="L43">            builder.value(3);</span>
+<span class="fc" id="L41">        runWithScenario( builder -&gt; {</span>
+<span class="fc" id="L42">            builder.value(2);</span>
+<span class="fc" id="L43">            builder.get();</span>
+<span class="fc" id="L44">            builder.value(3);</span>
             
-<span class="fc" id="L45">            assertEquals(&quot;3&quot;, builder.get());</span>
-<span class="fc" id="L46">        });</span>
-<span class="fc" id="L47">    }</span>
+<span class="fc" id="L46">            assertEquals(&quot;3&quot;, builder.get());</span>
+<span class="fc" id="L47">        });</span>
+<span class="fc" id="L48">    }</span>
     
     @Test
     default void entity_text_Works() {
-<span class="fc" id="L51">        runWithScenario( builder -&gt; {</span>
-<span class="fc" id="L52">            builder.text(() -&gt; &quot;abc&quot;);</span>
+<span class="fc" id="L52">        runWithScenario( builder -&gt; {</span>
+<span class="fc" id="L53">            builder.text(() -&gt; &quot;abc&quot;);</span>
      
-<span class="fc" id="L54">            assertEquals(&quot;abc&quot;, builder.get());</span>
-<span class="fc" id="L55">        });</span>
-<span class="fc" id="L56">    }</span>
+<span class="fc" id="L55">            assertEquals(&quot;abc&quot;, builder.get());</span>
+<span class="fc" id="L56">        });</span>
+<span class="fc" id="L57">    }</span>
     
     @Test
     default void entity_text_Twice_Works() {
-<span class="fc" id="L60">        runWithScenario( builder -&gt; {</span>
-<span class="fc" id="L61">            builder.text(() -&gt; &quot;abc&quot;);</span>
+<span class="fc" id="L61">        runWithScenario( builder -&gt; {</span>
+<span class="fc" id="L62">            builder.text(() -&gt; &quot;abc&quot;);</span>
             
-<span class="fc" id="L63">            assertEquals(&quot;abc&quot;, builder.get());</span>
 <span class="fc" id="L64">            assertEquals(&quot;abc&quot;, builder.get());</span>
-<span class="fc" id="L65">        });</span>
-<span class="fc" id="L66">    }</span>
+<span class="fc" id="L65">            assertEquals(&quot;abc&quot;, builder.get());</span>
+<span class="fc" id="L66">        });</span>
+<span class="fc" id="L67">    }</span>
     
     @Test
     default void entity_text_WithNull_Removes() {
-<span class="fc" id="L70">        runWithScenario( builder -&gt; {</span>
-<span class="pc" id="L71">            builder.text(() -&gt; &quot;abc&quot;);</span>
-<span class="fc" id="L72">            builder.text(null);</span>
-<span class="fc" id="L73">            builder.value(3);</span>
+<span class="fc" id="L71">        runWithScenario( builder -&gt; {</span>
+<span class="pc" id="L72">            builder.text(() -&gt; &quot;abc&quot;);</span>
+<span class="fc" id="L73">            builder.text(null);</span>
+<span class="fc" id="L74">            builder.value(3);</span>
             
-<span class="fc" id="L75">            assertEquals(&quot;3&quot;, builder.get());</span>
-<span class="fc" id="L76">        });</span>
-<span class="fc" id="L77">    }</span>
+<span class="fc" id="L76">            assertEquals(&quot;3&quot;, builder.get());</span>
+<span class="fc" id="L77">        });</span>
+<span class="fc" id="L78">    }</span>
     
     @Test
     default void entity_id_WithNull_RemovesValue() {
-<span class="fc" id="L81">        runWithScenario( builder -&gt; {</span>
-<span class="fc" id="L82">            builder.id(&quot;a&quot;);</span>
-<span class="fc" id="L83">            builder.id(null);</span>
+<span class="fc" id="L82">        runWithScenario( builder -&gt; {</span>
+<span class="fc" id="L83">            builder.id(&quot;a&quot;);</span>
+<span class="fc" id="L84">            builder.id(null);</span>
         
-<span class="fc" id="L85">            assertFalse(builder.getId().isPresent());</span>
-<span class="fc" id="L86">        });</span>
-<span class="fc" id="L87">    }</span>
+<span class="fc" id="L86">            assertFalse(builder.getId().isPresent());</span>
+<span class="fc" id="L87">        });</span>
+<span class="fc" id="L88">    }</span>
     
     @Test
     default void entity_correlation_WithNullEntity_Throws() {
-<span class="fc" id="L91">        runWithScenario( builder -&gt; {</span>
-<span class="fc" id="L92">            final IllegalArgumentException thrown = assertThrows( IllegalArgumentException.class, () -&gt; {</span>
-<span class="nc" id="L93">                builder.correlation((Entity) null);</span>
-<span class="nc" id="L94">            });</span>
-<span class="fc" id="L95">            assertThrown(thrown);</span>
-<span class="fc" id="L96">        });</span>
-<span class="fc" id="L97">    }</span>
+<span class="fc" id="L92">        runWithScenario( builder -&gt; {</span>
+<span class="fc" id="L93">            final IllegalArgumentException thrown = assertThrows( IllegalArgumentException.class, () -&gt; {</span>
+<span class="nc" id="L94">                builder.correlation((Entity) null);</span>
+<span class="nc" id="L95">            });</span>
+<span class="fc" id="L96">            assertThrown(thrown);</span>
+<span class="fc" id="L97">        });</span>
+<span class="fc" id="L98">    }</span>
     
     @Test
     default void entity_copy_WithNullEntity_Throws() {
-<span class="fc" id="L101">        runWithScenario( builder -&gt; {</span>
-<span class="fc" id="L102">            final IllegalArgumentException thrown = assertThrows( IllegalArgumentException.class, () -&gt; {</span>
-<span class="nc" id="L103">                builder.copy( null);</span>
-<span class="nc" id="L104">            });</span>
-<span class="fc" id="L105">            assertThrown(thrown);</span>
-<span class="fc" id="L106">        });</span>
-<span class="fc" id="L107">    }</span>
+<span class="fc" id="L102">        runWithScenario( builder -&gt; {</span>
+<span class="fc" id="L103">            final IllegalArgumentException thrown = assertThrows( IllegalArgumentException.class, () -&gt; {</span>
+<span class="nc" id="L104">                builder.copy( null);</span>
+<span class="nc" id="L105">            });</span>
+<span class="fc" id="L106">            assertThrown(thrown);</span>
+<span class="fc" id="L107">        });</span>
+<span class="fc" id="L108">    }</span>
     
     @Test
     default void entity_copy_OverwritesWhenPresent() {
-<span class="fc" id="L111">        final Entity fromEntity = createTestEntity(&quot;from name&quot;, &quot;from value&quot;, &quot;from id&quot;);</span>
-<span class="fc" id="L112">        runWithScenario( builder -&gt; {</span>
-<span class="fc" id="L113">            builder.id(&quot;original id&quot;).name(&quot;original name&quot;).value(&quot;original value&quot;);</span>
-<span class="fc" id="L114">            final Entity.Builder&lt;?&gt; result = builder.copy(fromEntity);</span>
+<span class="fc" id="L112">        final Entity fromEntity = createTestEntity(&quot;from name&quot;, &quot;from value&quot;, &quot;from id&quot;);</span>
+<span class="fc" id="L113">        runWithScenario( builder -&gt; {</span>
+<span class="fc" id="L114">            builder.id(&quot;original id&quot;).name(&quot;original name&quot;).value(&quot;original value&quot;);</span>
+<span class="fc" id="L115">            final Entity.Builder&lt;?&gt; result = builder.copy(fromEntity);</span>
             
-<span class="fc" id="L116">            assertNotNull(result);</span>
-<span class="fc" id="L117">            assertTrue(builder.getId().isPresent());</span>
-<span class="fc" id="L118">            assertEquals(&quot;from id&quot;, builder.getId().get());</span>
-<span class="fc" id="L119">            assertTrue(builder.getName().isPresent());</span>
-<span class="fc" id="L120">            assertEquals(&quot;from name&quot;, builder.getName().get());</span>
-<span class="fc" id="L121">            assertTrue(builder.getValue().isPresent());</span>
-<span class="fc" id="L122">            assertEquals(&quot;from value&quot;, builder.getValue().get());</span>
-<span class="fc" id="L123">        });</span>
-<span class="fc" id="L124">    }</span>
+<span class="fc" id="L117">            assertNotNull(result);</span>
+<span class="fc" id="L118">            assertTrue(builder.getId().isPresent());</span>
+<span class="fc" id="L119">            assertEquals(&quot;from id&quot;, builder.getId().get());</span>
+<span class="fc" id="L120">            assertTrue(builder.getName().isPresent());</span>
+<span class="fc" id="L121">            assertEquals(&quot;from name&quot;, builder.getName().get());</span>
+<span class="fc" id="L122">            assertTrue(builder.getValue().isPresent());</span>
+<span class="fc" id="L123">            assertEquals(&quot;from value&quot;, builder.getValue().get());</span>
+<span class="fc" id="L124">        });</span>
+<span class="fc" id="L125">    }</span>
     
     @Test
     default void entity_copy_DiscardsWhenNotPresent() {
-<span class="fc" id="L128">        final Entity fromEntity = createTestEntity(null, null, null);</span>
-<span class="fc" id="L129">        runWithScenario( builder -&gt; {</span>
-<span class="fc" id="L130">            builder.id(&quot;original id&quot;).name(&quot;original name&quot;).value(&quot;original value&quot;);</span>
-<span class="fc" id="L131">            final Entity.Builder&lt;?&gt; result = builder.copy(fromEntity);</span>
+<span class="fc" id="L129">        final Entity fromEntity = createTestEntity(null, null, null);</span>
+<span class="fc" id="L130">        runWithScenario( builder -&gt; {</span>
+<span class="fc" id="L131">            builder.id(&quot;original id&quot;).name(&quot;original name&quot;).value(&quot;original value&quot;);</span>
+<span class="fc" id="L132">            final Entity.Builder&lt;?&gt; result = builder.copy(fromEntity);</span>
             
-<span class="fc" id="L133">            assertNotNull(result);</span>
-<span class="fc" id="L134">            assertTrue(builder.getId().isPresent());</span>
-<span class="fc" id="L135">            assertEquals(&quot;original id&quot;, builder.getId().get());</span>
-<span class="fc" id="L136">            assertTrue(builder.getName().isPresent());</span>
-<span class="fc" id="L137">            assertEquals(&quot;original name&quot;, builder.getName().get());</span>
-<span class="fc" id="L138">            assertTrue(builder.getValue().isPresent());</span>
-<span class="fc" id="L139">            assertEquals(&quot;original value&quot;, builder.getValue().get());</span>
-<span class="fc" id="L140">        });</span>
-<span class="fc" id="L141">    }</span>
+<span class="fc" id="L134">            assertNotNull(result);</span>
+<span class="fc" id="L135">            assertTrue(builder.getId().isPresent());</span>
+<span class="fc" id="L136">            assertEquals(&quot;original id&quot;, builder.getId().get());</span>
+<span class="fc" id="L137">            assertTrue(builder.getName().isPresent());</span>
+<span class="fc" id="L138">            assertEquals(&quot;original name&quot;, builder.getName().get());</span>
+<span class="fc" id="L139">            assertTrue(builder.getValue().isPresent());</span>
+<span class="fc" id="L140">            assertEquals(&quot;original value&quot;, builder.getValue().get());</span>
+<span class="fc" id="L141">        });</span>
+<span class="fc" id="L142">    }</span>
     
     @Test
     default void entity_copy_SetsNotPresent() {
-<span class="fc" id="L145">        final Entity fromEntity = createTestEntity(&quot;from name&quot;, &quot;from value&quot;, &quot;from id&quot;);</span>
-<span class="fc" id="L146">        runWithScenario( builder -&gt; {</span>
-<span class="fc" id="L147">            final Entity.Builder&lt;?&gt; result = builder.copy(fromEntity);</span>
+<span class="fc" id="L146">        final Entity fromEntity = createTestEntity(&quot;from name&quot;, &quot;from value&quot;, &quot;from id&quot;);</span>
+<span class="fc" id="L147">        runWithScenario( builder -&gt; {</span>
+<span class="fc" id="L148">            final Entity.Builder&lt;?&gt; result = builder.copy(fromEntity);</span>
             
-<span class="fc" id="L149">            assertNotNull(result);</span>
-<span class="fc" id="L150">            assertTrue(builder.getId().isPresent());</span>
-<span class="fc" id="L151">            assertEquals(&quot;from id&quot;, builder.getId().get());</span>
-<span class="fc" id="L152">            assertTrue(builder.getName().isPresent());</span>
-<span class="fc" id="L153">            assertEquals(&quot;from name&quot;, builder.getName().get());</span>
-<span class="fc" id="L154">            assertTrue(builder.getValue().isPresent());</span>
-<span class="fc" id="L155">            assertEquals(&quot;from value&quot;, builder.getValue().get());</span>
-<span class="fc" id="L156">        });</span>
-<span class="fc" id="L157">    }</span>
+<span class="fc" id="L150">            assertNotNull(result);</span>
+<span class="fc" id="L151">            assertTrue(builder.getId().isPresent());</span>
+<span class="fc" id="L152">            assertEquals(&quot;from id&quot;, builder.getId().get());</span>
+<span class="fc" id="L153">            assertTrue(builder.getName().isPresent());</span>
+<span class="fc" id="L154">            assertEquals(&quot;from name&quot;, builder.getName().get());</span>
+<span class="fc" id="L155">            assertTrue(builder.getValue().isPresent());</span>
+<span class="fc" id="L156">            assertEquals(&quot;from value&quot;, builder.getValue().get());</span>
+<span class="fc" id="L157">        });</span>
+<span class="fc" id="L158">    }</span>
     
     @Test
     default void entity_copy_WithCorrelations() {
-<span class="fc" id="L161">        runWithScenario( builder -&gt; {</span>
-<span class="fc" id="L162">            final Entity.Builder&lt;?&gt; fromEntity = newEntityBuilder();</span>
-<span class="fc" id="L163">            fromEntity.correlation(b -&gt; b.name(&quot;c1&quot;).value(&quot;v1&quot;));</span>
-<span class="fc" id="L164">            fromEntity.correlation(b -&gt; b.name(&quot;c2&quot;).value(&quot;v2&quot;));</span>
-<span class="fc" id="L165">            final Entity.Builder&lt;?&gt; result = builder.copy(fromEntity);</span>
+<span class="fc" id="L162">        runWithScenario( builder -&gt; {</span>
+<span class="fc" id="L163">            final Entity.Builder&lt;?&gt; fromEntity = newEntityBuilder();</span>
+<span class="fc" id="L164">            fromEntity.correlation(b -&gt; b.name(&quot;c1&quot;).value(&quot;v1&quot;));</span>
+<span class="fc" id="L165">            fromEntity.correlation(b -&gt; b.name(&quot;c2&quot;).value(&quot;v2&quot;));</span>
+<span class="fc" id="L166">            final Entity.Builder&lt;?&gt; result = builder.copy(fromEntity);</span>
             
-<span class="fc" id="L167">            assertNotNull(result);</span>
-<span class="fc" id="L168">            assertTrue(builder.getCorrelations().isPresent());</span>
-<span class="fc" id="L169">            assertFalse(builder.getCorrelations().get().isEmpty());</span>
-<span class="fc" id="L170">            assertEquals(2, builder.getCorrelations().get().size());</span>
-<span class="fc" id="L171">        });</span>
-<span class="fc" id="L172">    }</span>
+<span class="fc" id="L168">            assertNotNull(result);</span>
+<span class="fc" id="L169">            assertTrue(builder.getCorrelations().isPresent());</span>
+<span class="fc" id="L170">            assertFalse(builder.getCorrelations().get().isEmpty());</span>
+<span class="fc" id="L171">            assertEquals(2, builder.getCorrelations().get().size());</span>
+<span class="fc" id="L172">        });</span>
+<span class="fc" id="L173">    }</span>
     
     @Test
     default void entity_correlation_WithNullAction_Throws() {
-<span class="fc" id="L176">        runWithScenario( builder -&gt; {</span>
-<span class="fc" id="L177">            final IllegalArgumentException thrown = assertThrows( IllegalArgumentException.class, () -&gt; {</span>
-<span class="nc" id="L178">                builder.correlation((Consumer&lt;Entity.Builder&lt;?&gt;&gt;) null);</span>
-<span class="nc" id="L179">            });</span>
-<span class="fc" id="L180">            assertThrown(thrown);</span>
-<span class="fc" id="L181">        });</span>
-<span class="fc" id="L182">    }</span>
+<span class="fc" id="L177">        runWithScenario( builder -&gt; {</span>
+<span class="fc" id="L178">            final IllegalArgumentException thrown = assertThrows( IllegalArgumentException.class, () -&gt; {</span>
+<span class="nc" id="L179">                builder.correlation((Consumer&lt;Entity.Builder&lt;?&gt;&gt;) null);</span>
+<span class="nc" id="L180">            });</span>
+<span class="fc" id="L181">            assertThrown(thrown);</span>
+<span class="fc" id="L182">        });</span>
+<span class="fc" id="L183">    }</span>
     
     @Test
     default void entity_correlation_WithEntity() {
-<span class="fc" id="L186">        runWithScenario( builder -&gt; {</span>
-<span class="fc" id="L187">            final Entity entity = createTestEntity(&quot;hello&quot;);</span>
+<span class="fc" id="L187">        runWithScenario( builder -&gt; {</span>
+<span class="fc" id="L188">            final Entity entity = createTestEntity(&quot;hello&quot;);</span>
             
-<span class="fc" id="L189">            builder.correlation(entity);</span>
+<span class="fc" id="L190">            final Entity.Builder&lt;?&gt; returnBuilder = builder.correlation(entity);</span>
             
-<span class="fc" id="L191">            assertTrue(builder.getCorrelations().isPresent());</span>
-<span class="fc" id="L192">            assertFalse(builder.getCorrelations().get().isEmpty());</span>
-<span class="fc" id="L193">            assertEquals(1, builder.getCorrelations().get().size());</span>
-<span class="pc bpc" id="L194" title="1 of 2 branches missed.">            assertTrue(builder.getCorrelations().get().findFirstIf(p -&gt; p == entity).isPresent());</span>
-<span class="fc" id="L195">        });</span>
-<span class="fc" id="L196">    }</span>
+<span class="fc" id="L192">            assertNotNull(returnBuilder);</span>
+<span class="fc" id="L193">            assertTrue(builder.getCorrelations().isPresent());</span>
+<span class="fc" id="L194">            assertFalse(builder.getCorrelations().get().isEmpty());</span>
+<span class="fc" id="L195">            assertEquals(1, builder.getCorrelations().get().size());</span>
+<span class="pc bpc" id="L196" title="1 of 2 branches missed.">            assertTrue(builder.getCorrelations().get().findFirstIf(p -&gt; p == entity).isPresent());</span>
+<span class="fc" id="L197">        });</span>
+<span class="fc" id="L198">    }</span>
     
     @Test
     default void entity_correlations_WithNullAction_Throws() {
-<span class="fc" id="L200">        runWithScenario( builder -&gt; {</span>
-<span class="fc" id="L201">            final IllegalArgumentException thrown = assertThrows( IllegalArgumentException.class, () -&gt; {</span>
-<span class="nc" id="L202">                builder.correlations(null);</span>
-<span class="nc" id="L203">            });</span>
-<span class="fc" id="L204">            assertThrown(thrown);</span>
-<span class="fc" id="L205">        });</span>
-<span class="fc" id="L206">    }</span>
+<span class="fc" id="L202">        runWithScenario( builder -&gt; {</span>
+<span class="fc" id="L203">            final IllegalArgumentException thrown = assertThrows( IllegalArgumentException.class, () -&gt; {</span>
+<span class="nc" id="L204">                builder.correlations(null);</span>
+<span class="nc" id="L205">            });</span>
+<span class="fc" id="L206">            assertThrown(thrown);</span>
+<span class="fc" id="L207">        });</span>
+<span class="fc" id="L208">    }</span>
     
     @Test
     default void entity_correlations_Action() {
-<span class="fc" id="L210">        runWithScenario( builder -&gt; {</span>
-<span class="fc" id="L211">            final Entity.Builder&lt;?&gt; resultBuilder = builder.correlations(list -&gt; {</span>
-<span class="fc" id="L212">                list.entity(e -&gt; {</span>
-<span class="fc" id="L213">                    e.name(&quot;hello&quot;);</span>
-<span class="fc" id="L214">                });</span>
-<span class="fc" id="L215">            });</span>
+<span class="fc" id="L212">        runWithScenario( builder -&gt; {</span>
+<span class="fc" id="L213">            final Entity.Builder&lt;?&gt; resultBuilder = builder.correlations(list -&gt; {</span>
+<span class="fc" id="L214">                list.entity(e -&gt; {</span>
+<span class="fc" id="L215">                    e.name(&quot;hello&quot;);</span>
+<span class="fc" id="L216">                });</span>
+<span class="fc" id="L217">            });</span>
             
-<span class="fc" id="L217">            assertTrue(builder.getCorrelations().isPresent());</span>
-<span class="fc" id="L218">            assertEquals(1, builder.getCorrelations().get().size());</span>
-<span class="fc" id="L219">            assertNotNull(resultBuilder);</span>
-<span class="fc" id="L220">        });</span>
-<span class="fc" id="L221">    }</span>
+<span class="fc" id="L219">            assertTrue(builder.getCorrelations().isPresent());</span>
+<span class="fc" id="L220">            assertEquals(1, builder.getCorrelations().get().size());</span>
+<span class="fc" id="L221">            assertNotNull(resultBuilder);</span>
+<span class="fc" id="L222">        });</span>
+<span class="fc" id="L223">    }</span>
+    
+    @Test
+    default void entity_InternalCoverage() {
+<span class="fc" id="L227">        assertInstantiateThrows(EntityTestsTools.class);</span>
+<span class="fc" id="L228">    }</span>
     
     final class EntityTestsTools {
-        private EntityTestsTools() {
+<span class="nc" id="L231">        private EntityTestsTools() {</span>
+<span class="nc" id="L232">            throw new AssertionError(&quot;Illegal constructor&quot;);</span>
         }
         
         @FunctionalInterface
         interface ScenarioConfig extends Consumer&lt;Entity.Builder&lt;?&gt;&gt; {
             default Metalog.Config getMetalogConfig() {
-<span class="fc" id="L230">                return Metalog.Config.DEFAULT;</span>
+<span class="fc" id="L238">                return Metalog.Config.DEFAULT;</span>
             }
         }
         
         static Entity.Builder&lt;?&gt; newEntityBuilder() {
-<span class="fc" id="L235">            return claimContract(Entity.Builder.FACTORY_CONTRACT).get();</span>
+<span class="fc" id="L243">            return claimContract(Entity.Builder.FACTORY_CONTRACT).get();</span>
         }
         
         static void runWithScenario(ScenarioConfig scenarioConfig) {
-<span class="fc" id="L239">            final Metalog metalog = createMetalog(scenarioConfig.getMetalogConfig());</span>
-<span class="fc" id="L240">            try (AutoClose closeLogs = metalog.open()) {</span>
-<span class="fc" id="L241">                AutoClose ignoreWarning = closeLogs;</span>
-<span class="fc" id="L242">                scenarioConfig.accept(newEntityBuilder());</span>
+<span class="fc" id="L247">            final Metalog metalog = createMetalog(scenarioConfig.getMetalogConfig());</span>
+<span class="fc" id="L248">            try (AutoClose closeLogs = metalog.open()) {</span>
+<span class="fc" id="L249">                AutoClose ignoreWarning = closeLogs;</span>
+<span class="fc" id="L250">                scenarioConfig.accept(newEntityBuilder());</span>
             }
-<span class="fc" id="L244">        }</span>
+<span class="fc" id="L252">        }</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -9,72 +9,88 @@ import java.time.Duration;
  *
  * @see io.github.jonloucks.metalog.api.Publisher
  */
-public interface Metalog extends Publisher, Filterable, AutoOpen {
+public interface Metalog extends Publisher, AutoOpen {
     /**
      * Access the current Metalog implementation
      */
 <span class="fc" id="L16">    Contract&lt;Metalog&gt; CONTRACT = Contract.create(Metalog.class);</span>
     
     /**
-     * Subscribe
-     * @param config
-     * @return
+     * Add a new log subscription
+     * @param subscriber the subscriber to add
+     * @return calling close removes the subscription
      */
-    AutoClose subscribe(Subscriber config);
+    AutoClose subscribe(Subscriber subscriber);
     
+    /**
+     * The configuration used to create a new Metalog instance.
+     */
     interface Config {
-<span class="fc" id="L26">        Config DEFAULT = new Config() {</span>
-        };
+        
+        /**
+         * The default configuration used when creating a new Metalog instance
+         */
+<span class="fc" id="L33">        Config DEFAULT = new Config() {};</span>
         
         /**
          * @return if true, reflection might be used to locate the MetalogFactory
          */
         default boolean useReflection() {
-<span class="fc" id="L33">            return true;</span>
+<span class="fc" id="L39">            return true;</span>
         }
         
         /**
          * @return the class name to use if reflection is used to find the MetalogFactory
          */
         default String reflectionClassName() {
-<span class="fc" id="L40">            return &quot;io.github.jonloucks.metalog.impl.ServiceFactoryImpl&quot;;</span>
+<span class="fc" id="L46">            return &quot;io.github.jonloucks.metalog.impl.ServiceFactoryImpl&quot;;</span>
         }
         
         /**
          * @return if true, the ServiceLoader might be used to locate the MetalogFactory
          */
         default boolean useServiceLoader() {
-<span class="fc" id="L47">            return true;</span>
+<span class="fc" id="L53">            return true;</span>
         }
         
         /**
          * @return the class name to load from the ServiceLoader to find the MetalogFactory
          */
         default Class&lt;? extends MetalogFactory&gt; serviceLoaderClass() {
-<span class="fc" id="L54">            return MetalogFactory.class;</span>
+<span class="fc" id="L60">            return MetalogFactory.class;</span>
         }
         
         /**
-         * @return the contracts service
+         * @return the contracts, custom deployments may choose to not use the {@link GlobalContracts#getInstance()}
          */
         default Contracts contracts() {
-<span class="fc" id="L61">            return GlobalContracts.getInstance();</span>
+<span class="fc" id="L67">            return GlobalContracts.getInstance();</span>
         }
         
-        default boolean isEnabled() {
-<span class="fc" id="L65">            return true;</span>
-        }
-        
+        /**
+         * The maximum number of background threads dispatching log messages to subscribers.
+         * @return the maximum number of background threads
+         */
         default int backlogThreadCount() {
-<span class="fc" id="L69">            return 1; // until sequenceKey</span>
+<span class="fc" id="L75">            return 5;</span>
         }
         
+        /**
+         * How long to wait for logging to shut down before giving up
+         * @return the timeout duration
+         */
         default Duration shutdownTimeout() {
-<span class="fc" id="L73">            return Duration.ofSeconds(60);</span>
+<span class="fc" id="L83">            return Duration.ofSeconds(60);</span>
         }
         
+        /**
+         * When true, the default, the system output subscriber is activated and
+         * log messages with channels targeting the system will be published and consumed
+         * For example channels &quot;System.err&quot;, &quot;System.out&quot; and &quot;Console&quot;
+         * @return true to activate system output.
+         */
         default boolean systemOutput() {
-<span class="fc" id="L77">            return true;</span>
+<span class="fc" id="L93">            return true;</span>
         }
     }
 }

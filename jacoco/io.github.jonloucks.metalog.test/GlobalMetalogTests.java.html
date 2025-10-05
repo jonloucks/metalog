@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GlobalMetalogTests.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">metalog</a> &gt; <a href="index.source.html" class="el_package">io.github.jonloucks.metalog.test</a> &gt; <span class="el_source">GlobalMetalogTests.java</span></div><h1>GlobalMetalogTests.java</h1><pre class="source lang-java linenums">package io.github.jonloucks.metalog.test;
+
+import io.github.jonloucks.contracts.api.AutoClose;
+import io.github.jonloucks.metalog.api.*;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+
+import static io.github.jonloucks.contracts.test.Tools.assertInstantiateThrows;
+import static io.github.jonloucks.contracts.test.Tools.assertObject;
+import static io.github.jonloucks.metalog.test.Tools.metaWithId;
+import static io.github.jonloucks.metalog.test.Tools.uniqueString;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+public interface GlobalMetalogTests {
+    
+    @Test
+    default void globalMetalog_Instantiate_Throws() {
+<span class="fc" id="L26">        assertInstantiateThrows(GlobalMetalog.class);</span>
+<span class="fc" id="L27">    }</span>
+    
+    @Test
+    default void globalMetalog_getInstance_Works() {
+<span class="fc" id="L31">        assertObject(GlobalMetalog.getInstance());</span>
+<span class="fc" id="L32">    }</span>
+ 
+    @Test
+    default void globalMetalog_LogWithBuild_RoundTrip(@Mock Subscriber subscriber, @Mock Log log) {
+<span class="fc" id="L36">        final String text = uniqueString();</span>
+<span class="fc" id="L37">        when(log.get()).thenReturn(text);</span>
+<span class="fc" id="L38">        final String id = uniqueString();</span>
+        
+<span class="fc" id="L40">        try (AutoClose closeSubscriber = GlobalMetalog.subscribe(subscriber)) {</span>
+<span class="fc" id="L41">            final AutoClose ignored = closeSubscriber;</span>
+<span class="fc" id="L42">            GlobalMetalog.publish(log, b -&gt; b.id(id).block());</span>
+<span class="fc" id="L43">            verify(subscriber, times(1)).receive(any(), metaWithId(id));</span>
+        }
+<span class="fc" id="L45">        GlobalMetalog.publish(log, b -&gt; b.id(id).block());</span>
+<span class="fc" id="L46">        verify(subscriber, times(1)).receive(any(), metaWithId(id));</span>
+<span class="fc" id="L47">    }</span>
+    
+    @Test
+    default void globalMetalog_Log_DoesNotThrow() {
+<span class="pc" id="L51">        assertDoesNotThrow(() -&gt; GlobalMetalog.publish((() -&gt; &quot;hi&quot;)));</span>
+<span class="fc" id="L52">    }</span>
+    
+    @Test
+    default void globalMetalog_LogAndMeta_DoesNotThrow() {
+<span class="pc" id="L56">        assertDoesNotThrow(() -&gt; GlobalMetalog.publish((() -&gt; &quot;hi&quot;), Meta.DEFAULT));</span>
+<span class="fc" id="L57">    }</span>
+    
+    @Test
+    default void globalMetalog_LogAndBuilder_DoesNotThrow() {
+<span class="pc" id="L61">        assertDoesNotThrow(() -&gt; GlobalMetalog.publish((() -&gt; &quot;hi&quot;), b -&gt; b.name(&quot;x&quot;)));</span>
+<span class="fc" id="L62">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

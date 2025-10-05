@@ -6,7 +6,7 @@ final class IdempotentImpl {
 <span class="fc" id="L6">    IdempotentImpl() {</span>
 <span class="fc" id="L7">    }</span>
     
-    boolean transitionToOpen() {
+    boolean transitionToOpened() {
 <span class="fc" id="L10">        return state.compareAndSet(IS_CLOSED, IS_OPEN);</span>
     }
     

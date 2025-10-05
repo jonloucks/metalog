@@ -78,6 +78,7 @@ loadScripts(document, 'script');</script>
 </dl>
 <hr>
 <div class="type-signature"><span class="modifiers">public static interface </span><span class="element-name type-name-label">Metalog.Config</span></div>
+<div class="block">The configuration used to create a new Metalog instance.</div>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -92,7 +93,9 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>static final <a href="Metalog.Config.html" title="interface in io.github.jonloucks.metalog.api">Metalog.Config</a></code></div>
 <div class="col-second even-row-color"><code><a href="#DEFAULT" class="member-name-link">DEFAULT</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">The default configuration used when creating a new Metalog instance</div>
+</div>
 </div>
 </section>
 </li>
@@ -109,31 +112,36 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default int</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#backlogThreadCount()" class="member-name-link">backlogThreadCount</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">The maximum number of background threads dispatching log messages to subscribers.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default io.github.jonloucks.contracts.api.Contracts</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#contracts()" class="member-name-link">contracts</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#isEnabled()" class="member-name-link">isEnabled</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#reflectionClassName()" class="member-name-link">reflectionClassName</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#reflectionClassName()" class="member-name-link">reflectionClassName</a>()</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;? extends <a href="MetalogFactory.html" title="interface in io.github.jonloucks.metalog.api">MetalogFactory</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#serviceLoaderClass()" class="member-name-link">serviceLoaderClass</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;? extends <a href="MetalogFactory.html" title="interface in io.github.jonloucks.metalog.api">MetalogFactory</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#serviceLoaderClass()" class="member-name-link">serviceLoaderClass</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#shutdownTimeout()" class="member-name-link">shutdownTimeout</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#shutdownTimeout()" class="member-name-link">shutdownTimeout</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">How long to wait for logging to shut down before giving up</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#systemOutput()" class="member-name-link">systemOutput</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">When true, the default, the system output subscriber is activated and
+ log messages with channels targeting the system will be published and consumed
+ For example channels "System.err", "System.out" and "Console"</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#systemOutput()" class="member-name-link">systemOutput</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#useReflection()" class="member-name-link">useReflection</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#useReflection()" class="member-name-link">useReflection</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#useServiceLoader()" class="member-name-link">useServiceLoader</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#useServiceLoader()" class="member-name-link">useServiceLoader</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -152,6 +160,7 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="DEFAULT">
 <h3>DEFAULT</h3>
 <div class="member-signature"><span class="modifiers">static final</span>&nbsp;<span class="return-type"><a href="Metalog.Config.html" title="interface in io.github.jonloucks.metalog.api">Metalog.Config</a></span>&nbsp;<span class="element-name">DEFAULT</span></div>
+<div class="block">The default configuration used when creating a new Metalog instance</div>
 </section>
 </li>
 </ul>
@@ -208,32 +217,43 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type">io.github.jonloucks.contracts.api.Contracts</span>&nbsp;<span class="element-name">contracts</span>()</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>the contracts service</dd>
+<dd>the contracts, custom deployments may choose to not use the <code>GlobalContracts.getInstance()</code></dd>
 </dl>
-</section>
-</li>
-<li>
-<section class="detail" id="isEnabled()">
-<h3>isEnabled</h3>
-<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isEnabled</span>()</div>
 </section>
 </li>
 <li>
 <section class="detail" id="backlogThreadCount()">
 <h3>backlogThreadCount</h3>
 <div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">backlogThreadCount</span>()</div>
+<div class="block">The maximum number of background threads dispatching log messages to subscribers.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the maximum number of background threads</dd>
+</dl>
 </section>
 </li>
 <li>
 <section class="detail" id="shutdownTimeout()">
 <h3>shutdownTimeout</h3>
 <div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a></span>&nbsp;<span class="element-name">shutdownTimeout</span>()</div>
+<div class="block">How long to wait for logging to shut down before giving up</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the timeout duration</dd>
+</dl>
 </section>
 </li>
 <li>
 <section class="detail" id="systemOutput()">
 <h3>systemOutput</h3>
 <div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">systemOutput</span>()</div>
+<div class="block">When true, the default, the system output subscriber is activated and
+ log messages with channels targeting the system will be published and consumed
+ For example channels "System.err", "System.out" and "Console"</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>true to activate system output.</dd>
+</dl>
 </section>
 </li>
 </ul>
