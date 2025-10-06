@@ -13,12 +13,13 @@ import static io.github.jonloucks.contracts.api.Checks.*;
 import static io.github.jonloucks.metalog.impl.Internal.*;
 import static java.util.Optional.ofNullable;
 
-final class MetalogImpl implements Metalog, AutoClose {
+final class MetalogImpl implements Metalog {
     
     @Override
     public void publish(Log log, Meta meta) {
-        if (!openState.isOpen()) {
+        if (!openState.isActive()) {
             throw new IllegalStateException("Metalog must be open.");
+            // or maybe just ignore, do no harm
         }
         
         final Log validLog = new InvokeOnlyOnce(log);
@@ -26,9 +27,9 @@ final class MetalogImpl implements Metalog, AutoClose {
         
         if (!subscribers.isEmpty() && test(validMeta)) {
             if (validMeta.isBlock()) {
-                dispatch(validLog, validMeta);
+                broadcast(validLog, validMeta);
             } else {
-                dispatcher.execute(() -> dispatch(validLog, validMeta));
+                dispatcher.dispatch(validMeta, () -> broadcast(validLog, validMeta));
             }
         }
     }
@@ -61,16 +62,9 @@ final class MetalogImpl implements Metalog, AutoClose {
     public AutoClose open() {
         if (openState.transitionToOpened()) {
             realOpen();
-            return this;
+            return this::close;
         } else {
             return () -> {}; // all open calls after the first get a do nothing close
-        }
-    }
-
-    @Override
-    public void close() {
-        if (openState.transitionToClosed()) {
-            realClose();
         }
     }
     
@@ -91,6 +85,13 @@ final class MetalogImpl implements Metalog, AutoClose {
         }
     }
     
+    
+    private void close() {
+        if (openState.transitionToClosed()) {
+            realClose();
+        }
+    }
+    
     private void realClose() {
         ofNullable(repository).ifPresent(close -> {
             repository = null;
@@ -108,7 +109,7 @@ final class MetalogImpl implements Metalog, AutoClose {
         repository.store(Console.CONTRACT, promisors.createLifeCyclePromisor(() -> new ConsoleImpl(config)));
     }
     
-    private void dispatch(Log log, Meta meta) {
+    private void broadcast(Log log, Meta meta) {
         subscribers.forEach(s -> s.receive(log, meta));
     }
     

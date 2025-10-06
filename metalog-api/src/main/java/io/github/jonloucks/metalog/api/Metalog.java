@@ -71,7 +71,15 @@ public interface Metalog extends Publisher, AutoOpen {
          * The maximum number of background threads dispatching log messages to subscribers.
          * @return the maximum number of background threads
          */
-        default int backlogThreadCount() {
+        default int keyedThreadCount() {
+            return 3;
+        }
+        
+        /**
+         * The maximum number of background threads dispatching log messages to subscribers.
+         * @return the maximum number of background threads
+         */
+        default int unkeyedThreadCount() {
             return 5;
         }
         

@@ -12,7 +12,7 @@ import static io.github.jonloucks.contracts.api.Checks.builderConsumerCheck;
 import static io.github.jonloucks.metalog.impl.Internal.logCheck;
 import static java.util.Optional.ofNullable;
 
-final class ConsoleImpl implements Console, AutoOpen, AutoClose {
+final class ConsoleImpl implements Console, AutoOpen {
 
     @Override
     public void publish(Log log, Meta meta) {
@@ -58,24 +58,23 @@ final class ConsoleImpl implements Console, AutoOpen, AutoClose {
         if (openState.transitionToOpened()) {
             metaFactory = config.contracts().claim(Meta.Builder.FACTORY_CONTRACT);
             closeSubscription = config.contracts().claim(Metalog.CONTRACT).subscribe(this);
-            return this;
+            return this::close;
         } else {
             return () -> {}; // all open calls after the first get a do nothing close
         }
     }
     
-    @Override
-    public void close() {
+    ConsoleImpl(Metalog.Config config) {
+        this.config = config;
+    }
+    
+    private void close() {
         if (openState.transitionToClosed()) {
             ofNullable(closeSubscription).ifPresent(close -> {
                 closeSubscription = null;
                 close.close();
             });
         }
-    }
-    
-    ConsoleImpl(Metalog.Config config) {
-        this.config = config;
     }
     
     private final Filterable filters = new FiltersImpl();
