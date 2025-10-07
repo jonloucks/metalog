@@ -26,6 +26,10 @@ final class IdempotentImpl {
         return stateReference.get().isActive();
     }
     
+    boolean isRejecting() {
+        return !isActive();
+    }
+    
     boolean transitionTo(State state) {
         final State stateNow = stateReference.get();
         if (stateNow.canTransitionTo(state)) {
@@ -93,5 +97,5 @@ final class IdempotentImpl {
         
         State() {
         }
-    };
+    }
 }

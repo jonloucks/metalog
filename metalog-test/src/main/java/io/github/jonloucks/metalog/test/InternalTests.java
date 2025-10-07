@@ -1,5 +1,5 @@
 package io.github.jonloucks.metalog.test;
 
-public interface TestTests extends
+public interface InternalTests extends
     ToolsTests {
 }

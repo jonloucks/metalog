@@ -41,6 +41,7 @@ public interface MetalogTests {
     default void metalog_WithThrown_Works(@Mock Subscriber subscriber, @Mock Log log) {
         final String text = uniqueString();
         when(log.get()).thenReturn(text);
+        when(subscriber.test(any())).thenReturn(true);
         final String id = uniqueString();
         
         doAnswer((Answer<Void>) invocation -> {
@@ -67,6 +68,7 @@ public interface MetalogTests {
     default void metalog_subscribe_close_while_queued_Works(@Mock Subscriber subscriber, @Mock Log log) {
         final String text = uniqueString();
         when(log.get()).thenReturn(text);
+        when(subscriber.test(any())).thenReturn(true);
         final String id = uniqueString();
         
         runWithScenario(metalog -> {
@@ -86,6 +88,7 @@ public interface MetalogTests {
     default void metalog_subscribe_close_Works(@Mock Subscriber subscriber, @Mock Log log) {
         final String text = uniqueString();
         when(log.get()).thenReturn(text);
+        when(subscriber.test(any())).thenReturn(true);
         final String id = uniqueString();
         
         runWithScenario(metalog -> {

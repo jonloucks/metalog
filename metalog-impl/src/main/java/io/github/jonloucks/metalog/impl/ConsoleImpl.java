@@ -16,7 +16,9 @@ final class ConsoleImpl implements Console, AutoOpen {
 
     @Override
     public void publish(Log log, Meta meta) {
-        receive(log, meta);
+        if (test(meta)) {
+            receive(log, meta);
+        }
     }
     
     @Override
@@ -50,7 +52,7 @@ final class ConsoleImpl implements Console, AutoOpen {
     
     @Override
     public boolean test(Meta meta) {
-        return filters.test(meta);
+        return isConsoleChannel(meta) && filters.test(meta);
     }
     
     @Override
@@ -74,6 +76,17 @@ final class ConsoleImpl implements Console, AutoOpen {
                 closeSubscription = null;
                 close.close();
             });
+        }
+    }
+    
+    private boolean isConsoleChannel(Meta meta) {
+        switch (meta.getChannel()) {
+            case "System.out":
+            case "Console":
+            case "System.err":
+                return true;
+            default:
+                return false;
         }
     }
     

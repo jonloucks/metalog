@@ -162,36 +162,49 @@ public interface MetaTests {
     }
     
     @Test
-    default void meta_Timestamp_Works() {
+    default void meta_time_NoArgs_Works() {
         runWithScenario( metaBuilder -> {
             final Meta.Builder<?> returnBuilder = metaBuilder.time();
             
-            final Optional<Temporal> optionalTimestamp = metaBuilder.getTime();
+            final Optional<Temporal> optionalTime = metaBuilder.getTime();
             
             assertSame(metaBuilder, returnBuilder );
-            assertTrue(optionalTimestamp.isPresent());
-            assertNotNull(optionalTimestamp.get());
+            assertTrue(optionalTime.isPresent());
+            assertNotNull(optionalTime.get());
+        });
+    }
+    
+    @Test
+    default void meta_thread_NoArgs_Works() {
+        runWithScenario( metaBuilder -> {
+            final Meta.Builder<?> returnBuilder = metaBuilder.thread();
+            
+            final Optional<Thread> optionalThread = metaBuilder.getThread();
+            
+            assertSame(metaBuilder, returnBuilder );
+            assertTrue(optionalThread.isPresent());
+            assertEquals(Thread.currentThread(), optionalThread.get());
         });
     }
     
     
     @Test
-    default void meta_Timestamp_WithTime_Works() {
+    default void meta_time_WithTime_Works() {
         runWithScenario( metaBuilder -> {
             final Instant timestamp = Instant.now();
             
             final Meta.Builder<?> returnBuilder = metaBuilder.time(timestamp);
             
-            final Optional<Temporal> optionalTimestamp = metaBuilder.getTime();
+            final Optional<Temporal> optionalTime = metaBuilder.getTime();
             
             assertSame(metaBuilder, returnBuilder );
-            assertTrue(optionalTimestamp.isPresent());
-            assertEquals(timestamp, optionalTimestamp.get());
+            assertTrue(optionalTime.isPresent());
+            assertEquals(timestamp, optionalTime.get());
         });
     }
     
     @Test
-    default void meta_Thread_Works() {
+    default void meta_thread_WithThreadWorks() {
         runWithScenario( metaBuilder -> {
             final Thread thread = Thread.currentThread();
             
@@ -206,7 +219,7 @@ public interface MetaTests {
     }
     
     @Test
-    default void meta_Throwable_Works() {
+    default void meta_thrown_Works() {
         runWithScenario( metaBuilder -> {
             final Throwable thrown = new RuntimeException("Error");
             
@@ -236,11 +249,11 @@ public interface MetaTests {
     }
     
     @Test
-    default void meta_thread_WithNullThrowable_Removes() {
+    default void meta_thread_WithNullThread_Removes() {
         runWithScenario( metaBuilder -> {
             final Thread thread = new Thread(()->{});
-            
             metaBuilder.thread(thread);
+            
             final Meta.Builder<?> returnBuilder = metaBuilder.thread(null);
             
             final Optional<Thread> optionalThread = metaBuilder.getThread();
@@ -251,7 +264,7 @@ public interface MetaTests {
     }
     
     @Test
-    default void meta_timestamp_WithNullThrowable_Removes() {
+    default void meta_time_WithNullTime_Removes() {
         runWithScenario( metaBuilder -> {
             final Instant timestamp = Instant.now();
             

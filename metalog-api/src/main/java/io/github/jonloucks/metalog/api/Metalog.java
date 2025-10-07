@@ -68,11 +68,15 @@ public interface Metalog extends Publisher, AutoOpen {
         }
         
         /**
-         * The maximum number of background threads dispatching log messages to subscribers.
-         * @return the maximum number of background threads
+         * The limit on how many log messages can be queued for processing
+         * If the subscribers get behind.
+         * Note: It is possible to run out of memory if this value is too large.
+         * If the value is too small, for example 1, then every keyed log message will block
+         * until the previous message has been consumed.
+         * @return the limit.
          */
-        default int keyedThreadCount() {
-            return 3;
+        default int keyedQueueLimit() {
+            return 1_000;
         }
         
         /**
@@ -80,7 +84,15 @@ public interface Metalog extends Publisher, AutoOpen {
          * @return the maximum number of background threads
          */
         default int unkeyedThreadCount() {
-            return 5;
+            return 10;
+        }
+        
+        /**
+         * true if all thread log messages are processed in FIFO order
+         * @return true if all thread log messages are processed in FIFO order
+         */
+        default boolean unkeyedFairness() {
+            return false;
         }
         
         /**

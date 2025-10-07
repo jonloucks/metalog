@@ -35,6 +35,7 @@ public interface GlobalMetalogTests {
     default void globalMetalog_LogWithBuild_RoundTrip(@Mock Subscriber subscriber, @Mock Log log) {
         final String text = uniqueString();
         when(log.get()).thenReturn(text);
+        when(subscriber.test(any())).thenReturn(true);
         final String id = uniqueString();
         
         try (AutoClose closeSubscriber = GlobalMetalog.subscribe(subscriber)) {
