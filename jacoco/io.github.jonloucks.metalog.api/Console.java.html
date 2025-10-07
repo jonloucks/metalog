@@ -14,5 +14,7 @@ public interface Console extends Subscriber, Publisher {
      * from System.err and System.out
      */
 <span class="fc" id="L16">    Contract&lt;Console&gt; CONTRACT = Contract.create(Console.class, b -&gt; b.replaceable(true));</span>
+    
+    boolean test(Meta meta);
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

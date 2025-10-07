@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TorrentTests.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">metalog</a> &gt; <a href="index.source.html" class="el_package">io.github.jonloucks.metalog.test</a> &gt; <span class="el_source">TorrentTests.java</span></div><h1>TorrentTests.java</h1><pre class="source lang-java linenums">package io.github.jonloucks.metalog.test;
+
+import io.github.jonloucks.contracts.api.AutoClose;
+import io.github.jonloucks.metalog.api.Log;
+import io.github.jonloucks.metalog.api.Meta;
+import io.github.jonloucks.metalog.api.Metalog;
+import io.github.jonloucks.metalog.api.Subscriber;
+import org.junit.jupiter.api.Test;
+
+import java.time.Duration;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import static io.github.jonloucks.contracts.test.Tools.sleep;
+import static io.github.jonloucks.metalog.test.Tools.withMetalog;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
+public interface TorrentTests {
+    
+    @Test
+    default void torrent_keyed() {
+<span class="fc" id="L23">        final Metalog.Config config = new Metalog.Config(){};</span>
+<span class="fc" id="L24">        withMetalog(config,(contracts, metalog) -&gt; {</span>
+<span class="fc" id="L25">            final int producerThreads = 12;</span>
+<span class="fc" id="L26">            final int messagesPerThread = 1_000;</span>
+<span class="fc" id="L27">            final CountDownLatch messagesCompletedLatch = new CountDownLatch(producerThreads * messagesPerThread);</span>
+<span class="fc" id="L28">            final SequencerTracker sequencer = new SequencerTracker();</span>
+    
+<span class="fc" id="L30">            final Subscriber subscriber = (l, m) -&gt; {</span>
+                try {
+<span class="fc" id="L32">                    sequencer.receive(l,m);</span>
+                } finally {
+<span class="fc" id="L34">                    messagesCompletedLatch.countDown();</span>
+                }
+<span class="fc" id="L36">            };</span>
+            
+<span class="fc" id="L38">            metalog.subscribe(new Subscriber() {</span>
+                @Override
+                public boolean test(Meta meta) {
+<span class="fc" id="L41">                    return true;</span>
+                }
+                
+                @Override
+                public void receive(Log log, Meta meta) {
+<span class="fc" id="L46">                    sleep(Duration.ofMillis(5));</span>
+<span class="fc" id="L47">                }</span>
+            });
+            
+<span class="fc" id="L50">            try (AutoClose closeSubscription = metalog.subscribe(subscriber)) {</span>
+<span class="fc" id="L51">                final AutoClose ignored = closeSubscription;</span>
+                
+<span class="fc bfc" id="L53" title="All 2 branches covered.">                for (int i = 1; i &lt;= producerThreads; i++) {</span>
+<span class="fc" id="L54">                    final String name = &quot;Thread-&quot; + i;</span>
+<span class="fc" id="L55">                    final SequencerTracker.Sequence sequence = sequencer.getSequence(name);</span>
+                    
+<span class="fc" id="L57">                    final Thread thread = new Thread(() -&gt; {</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">                        for (int j = 0; j &lt; messagesPerThread; j++) {</span>
+<span class="pc" id="L59">                            metalog.publish(() -&gt; name, b -&gt; b.value(sequence.incrementCounter()).key(sequence.key()));</span>
+                        }
+<span class="fc" id="L61">                    });</span>
+<span class="fc" id="L62">                    thread.setName(name);</span>
+<span class="fc" id="L63">                    thread.start();</span>
+                }
+    
+                try {
+<span class="pc bpc" id="L67" title="1 of 2 branches missed.">                    if (!messagesCompletedLatch.await(5, TimeUnit.MINUTES)) {</span>
+<span class="nc" id="L68">                        fail(&quot;Torrent consumers took too long.&quot;);</span>
+                    }
+<span class="nc" id="L70">                } catch (InterruptedException e) {</span>
+<span class="nc" id="L71">                    fail(&quot;Torrent consumers took too long.&quot;);</span>
+<span class="fc" id="L72">                }</span>
+                
+<span class="fc" id="L74">                assertEquals(0, sequencer.getFailureCount(), &quot;Failures&quot;);</span>
+            }
+<span class="fc" id="L76">        });</span>
+<span class="fc" id="L77">    }</span>
+    
+    @Test
+    default void torrent_unkeyed() {
+<span class="fc" id="L81">        final Metalog.Config config = new Metalog.Config(){};</span>
+<span class="fc" id="L82">        withMetalog(config,(contracts, metalog) -&gt; {</span>
+<span class="fc" id="L83">            final int producerThreads = 12;</span>
+<span class="fc" id="L84">            final int messagesPerThread = 1_000;</span>
+<span class="fc" id="L85">            final CountDownLatch messagesCompletedLatch = new CountDownLatch(producerThreads * messagesPerThread);</span>
+            
+<span class="fc" id="L87">            final Subscriber subscriber = (l, m) -&gt; {</span>
+<span class="fc" id="L88">                messagesCompletedLatch.countDown();</span>
+<span class="fc" id="L89">            };</span>
+            
+<span class="fc" id="L91">            metalog.subscribe(new Subscriber() {</span>
+                @Override
+                public boolean test(Meta meta) {
+<span class="fc" id="L94">                    return true;</span>
+                }
+                
+                @Override
+                public void receive(Log log, Meta meta) {
+<span class="fc" id="L99">                    sleep(Duration.ofMillis(5));</span>
+<span class="fc" id="L100">                }</span>
+            });
+            
+<span class="fc" id="L103">            try (AutoClose closeSubscription = metalog.subscribe(subscriber)) {</span>
+<span class="fc" id="L104">                final AutoClose ignored = closeSubscription;</span>
+                
+<span class="fc bfc" id="L106" title="All 2 branches covered.">                for (int i = 1; i &lt;= producerThreads; i++) {</span>
+<span class="fc" id="L107">                    final String name = &quot;Thread-&quot; + i;</span>
+          
+<span class="fc" id="L109">                    final Thread thread = new Thread(() -&gt; {</span>
+<span class="fc bfc" id="L110" title="All 2 branches covered.">                        for (int j = 0; j &lt; messagesPerThread; j++) {</span>
+<span class="pc" id="L111">                            metalog.publish(() -&gt; name);</span>
+                        }
+<span class="fc" id="L113">                    });</span>
+<span class="fc" id="L114">                    thread.setName(name);</span>
+<span class="fc" id="L115">                    thread.start();</span>
+                }
+                
+                try {
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">                    if (!messagesCompletedLatch.await(5, TimeUnit.MINUTES)) {</span>
+<span class="nc" id="L120">                        fail(&quot;Torrent consumers took too long.&quot;);</span>
+                    }
+<span class="nc" id="L122">                } catch (InterruptedException e) {</span>
+<span class="nc" id="L123">                    fail(&quot;Torrent consumers took too long.&quot;);</span>
+<span class="fc" id="L124">                }</span>
+            }
+<span class="fc" id="L126">        });</span>
+<span class="fc" id="L127">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

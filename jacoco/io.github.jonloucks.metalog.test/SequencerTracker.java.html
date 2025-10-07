@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SequencerTracker.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">metalog</a> &gt; <a href="index.source.html" class="el_package">io.github.jonloucks.metalog.test</a> &gt; <span class="el_source">SequencerTracker.java</span></div><h1>SequencerTracker.java</h1><pre class="source lang-java linenums">package io.github.jonloucks.metalog.test;
+
+import io.github.jonloucks.metalog.api.Log;
+import io.github.jonloucks.metalog.api.Meta;
+import io.github.jonloucks.metalog.api.Subscriber;
+
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+
+final class SequencerTracker implements Subscriber {
+
+    @Override
+    public void receive(Log log, Meta meta) {
+<span class="fc" id="L14">        final Optional&lt;String&gt; optionalKey = meta.getKey();</span>
+        // storing the sequence number directly in the meta value for tests.
+<span class="fc" id="L16">        final Optional&lt;Object&gt; optionalValue = meta.getValue();</span>
+<span class="pc bpc" id="L17" title="2 of 4 branches missed.">        if (optionalKey.isPresent() &amp;&amp; optionalValue.isPresent()) {</span>
+<span class="fc" id="L18">            final Sequence sequence = getSequence(optionalKey.get());</span>
+<span class="fc" id="L19">            synchronized (sequence) {</span>
+<span class="fc" id="L20">                final int actual = (Integer) optionalValue.get();</span>
+<span class="fc" id="L21">                final int expected = sequence.expected();</span>
+<span class="pc bpc" id="L22" title="1 of 2 branches missed.">                if (actual != expected) {</span>
+<span class="nc" id="L23">                    failures++;</span>
+                } else {
+<span class="fc" id="L25">                    sequence.incrementExpected();</span>
+                }
+<span class="fc" id="L27">            }</span>
+        }
+<span class="fc" id="L29">    }</span>
+    
+<span class="fc" id="L31">    SequencerTracker() {}</span>
+    
+    Sequence getSequence(String key)  {
+<span class="fc" id="L34">        return keySequences.computeIfAbsent(key, Sequence::new);</span>
+    }
+    
+    int getFailureCount() {
+<span class="fc" id="L38">        return failures;</span>
+    }
+    
+    static class Sequence {
+        String key() {
+<span class="fc" id="L43">            return key;</span>
+        }
+        synchronized int incrementCounter() {
+<span class="fc" id="L46">            return ++counter;</span>
+        }
+        synchronized void incrementExpected() {
+<span class="fc" id="L49">            ++expected;</span>
+<span class="fc" id="L50">        }</span>
+        synchronized int expected() {
+<span class="fc" id="L52">            return expected;</span>
+        }
+<span class="fc" id="L54">        private Sequence(String key) {</span>
+<span class="fc" id="L55">            this.key = key;</span>
+<span class="fc" id="L56">        }</span>
+        private final String key;
+<span class="fc" id="L58">        private int counter = 0;</span>
+<span class="fc" id="L59">        private int expected = 1;</span>
+    }
+    
+<span class="fc" id="L62">    private final ConcurrentHashMap&lt;String, Sequence&gt; keySequences = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="fc" id="L63">    private int failures = 0;</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

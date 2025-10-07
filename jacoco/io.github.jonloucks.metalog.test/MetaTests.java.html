@@ -162,157 +162,170 @@ public interface MetaTests {
 <span class="fc" id="L162">    }</span>
     
     @Test
-    default void meta_Timestamp_Works() {
+    default void meta_time_NoArgs_Works() {
 <span class="fc" id="L166">        runWithScenario( metaBuilder -&gt; {</span>
 <span class="fc" id="L167">            final Meta.Builder&lt;?&gt; returnBuilder = metaBuilder.time();</span>
             
-<span class="fc" id="L169">            final Optional&lt;Temporal&gt; optionalTimestamp = metaBuilder.getTime();</span>
+<span class="fc" id="L169">            final Optional&lt;Temporal&gt; optionalTime = metaBuilder.getTime();</span>
             
 <span class="fc" id="L171">            assertSame(metaBuilder, returnBuilder );</span>
-<span class="fc" id="L172">            assertTrue(optionalTimestamp.isPresent());</span>
-<span class="fc" id="L173">            assertNotNull(optionalTimestamp.get());</span>
+<span class="fc" id="L172">            assertTrue(optionalTime.isPresent());</span>
+<span class="fc" id="L173">            assertNotNull(optionalTime.get());</span>
 <span class="fc" id="L174">        });</span>
 <span class="fc" id="L175">    }</span>
     
+    @Test
+    default void meta_thread_NoArgs_Works() {
+<span class="fc" id="L179">        runWithScenario( metaBuilder -&gt; {</span>
+<span class="fc" id="L180">            final Meta.Builder&lt;?&gt; returnBuilder = metaBuilder.thread();</span>
+            
+<span class="fc" id="L182">            final Optional&lt;Thread&gt; optionalThread = metaBuilder.getThread();</span>
+            
+<span class="fc" id="L184">            assertSame(metaBuilder, returnBuilder );</span>
+<span class="fc" id="L185">            assertTrue(optionalThread.isPresent());</span>
+<span class="fc" id="L186">            assertEquals(Thread.currentThread(), optionalThread.get());</span>
+<span class="fc" id="L187">        });</span>
+<span class="fc" id="L188">    }</span>
+    
     
     @Test
-    default void meta_Timestamp_WithTime_Works() {
-<span class="fc" id="L180">        runWithScenario( metaBuilder -&gt; {</span>
-<span class="fc" id="L181">            final Instant timestamp = Instant.now();</span>
+    default void meta_time_WithTime_Works() {
+<span class="fc" id="L193">        runWithScenario( metaBuilder -&gt; {</span>
+<span class="fc" id="L194">            final Instant timestamp = Instant.now();</span>
             
-<span class="fc" id="L183">            final Meta.Builder&lt;?&gt; returnBuilder = metaBuilder.time(timestamp);</span>
+<span class="fc" id="L196">            final Meta.Builder&lt;?&gt; returnBuilder = metaBuilder.time(timestamp);</span>
             
-<span class="fc" id="L185">            final Optional&lt;Temporal&gt; optionalTimestamp = metaBuilder.getTime();</span>
+<span class="fc" id="L198">            final Optional&lt;Temporal&gt; optionalTime = metaBuilder.getTime();</span>
             
-<span class="fc" id="L187">            assertSame(metaBuilder, returnBuilder );</span>
-<span class="fc" id="L188">            assertTrue(optionalTimestamp.isPresent());</span>
-<span class="fc" id="L189">            assertEquals(timestamp, optionalTimestamp.get());</span>
-<span class="fc" id="L190">        });</span>
-<span class="fc" id="L191">    }</span>
+<span class="fc" id="L200">            assertSame(metaBuilder, returnBuilder );</span>
+<span class="fc" id="L201">            assertTrue(optionalTime.isPresent());</span>
+<span class="fc" id="L202">            assertEquals(timestamp, optionalTime.get());</span>
+<span class="fc" id="L203">        });</span>
+<span class="fc" id="L204">    }</span>
     
     @Test
-    default void meta_Thread_Works() {
-<span class="fc" id="L195">        runWithScenario( metaBuilder -&gt; {</span>
-<span class="fc" id="L196">            final Thread thread = Thread.currentThread();</span>
+    default void meta_thread_WithThreadWorks() {
+<span class="fc" id="L208">        runWithScenario( metaBuilder -&gt; {</span>
+<span class="fc" id="L209">            final Thread thread = Thread.currentThread();</span>
             
-<span class="fc" id="L198">            final Meta.Builder&lt;?&gt; returnBuilder = metaBuilder.thread(thread);</span>
+<span class="fc" id="L211">            final Meta.Builder&lt;?&gt; returnBuilder = metaBuilder.thread(thread);</span>
             
-<span class="fc" id="L200">            final Optional&lt;Thread&gt; optionalThread = metaBuilder.getThread();</span>
+<span class="fc" id="L213">            final Optional&lt;Thread&gt; optionalThread = metaBuilder.getThread();</span>
             
-<span class="fc" id="L202">            assertSame(metaBuilder, returnBuilder );</span>
-<span class="fc" id="L203">            assertTrue(optionalThread.isPresent());</span>
-<span class="fc" id="L204">            assertEquals(thread, optionalThread.get());</span>
-<span class="fc" id="L205">        });</span>
-<span class="fc" id="L206">    }</span>
+<span class="fc" id="L215">            assertSame(metaBuilder, returnBuilder );</span>
+<span class="fc" id="L216">            assertTrue(optionalThread.isPresent());</span>
+<span class="fc" id="L217">            assertEquals(thread, optionalThread.get());</span>
+<span class="fc" id="L218">        });</span>
+<span class="fc" id="L219">    }</span>
     
     @Test
-    default void meta_Throwable_Works() {
-<span class="fc" id="L210">        runWithScenario( metaBuilder -&gt; {</span>
-<span class="fc" id="L211">            final Throwable thrown = new RuntimeException(&quot;Error&quot;);</span>
+    default void meta_thrown_Works() {
+<span class="fc" id="L223">        runWithScenario( metaBuilder -&gt; {</span>
+<span class="fc" id="L224">            final Throwable thrown = new RuntimeException(&quot;Error&quot;);</span>
             
-<span class="fc" id="L213">            final Meta.Builder&lt;?&gt; returnBuilder = metaBuilder.thrown(thrown);</span>
+<span class="fc" id="L226">            final Meta.Builder&lt;?&gt; returnBuilder = metaBuilder.thrown(thrown);</span>
             
-<span class="fc" id="L215">            final Optional&lt;Throwable&gt; optionalThrown = metaBuilder.getThrown();</span>
+<span class="fc" id="L228">            final Optional&lt;Throwable&gt; optionalThrown = metaBuilder.getThrown();</span>
             
-<span class="fc" id="L217">            assertSame(metaBuilder, returnBuilder );</span>
-<span class="fc" id="L218">            assertTrue(optionalThrown.isPresent());</span>
-<span class="fc" id="L219">            assertEquals(thrown, optionalThrown.get());</span>
-<span class="fc" id="L220">        });</span>
-<span class="fc" id="L221">    }</span>
+<span class="fc" id="L230">            assertSame(metaBuilder, returnBuilder );</span>
+<span class="fc" id="L231">            assertTrue(optionalThrown.isPresent());</span>
+<span class="fc" id="L232">            assertEquals(thrown, optionalThrown.get());</span>
+<span class="fc" id="L233">        });</span>
+<span class="fc" id="L234">    }</span>
     
     @Test
     default void meta_thrown_WithNullThrowable_Removes() {
-<span class="fc" id="L225">        runWithScenario( metaBuilder -&gt; {</span>
-<span class="fc" id="L226">            final Throwable thrown = new RuntimeException(&quot;Error&quot;);</span>
+<span class="fc" id="L238">        runWithScenario( metaBuilder -&gt; {</span>
+<span class="fc" id="L239">            final Throwable thrown = new RuntimeException(&quot;Error&quot;);</span>
             
-<span class="fc" id="L228">            metaBuilder.thrown(thrown);</span>
-<span class="fc" id="L229">            final Meta.Builder&lt;?&gt; returnBuilder = metaBuilder.thrown(null);</span>
+<span class="fc" id="L241">            metaBuilder.thrown(thrown);</span>
+<span class="fc" id="L242">            final Meta.Builder&lt;?&gt; returnBuilder = metaBuilder.thrown(null);</span>
             
-<span class="fc" id="L231">            final Optional&lt;Throwable&gt; optionalThrown = metaBuilder.getThrown();</span>
+<span class="fc" id="L244">            final Optional&lt;Throwable&gt; optionalThrown = metaBuilder.getThrown();</span>
             
-<span class="fc" id="L233">            assertSame(metaBuilder, returnBuilder );</span>
-<span class="fc" id="L234">            assertFalse(optionalThrown.isPresent());</span>
-<span class="fc" id="L235">        });</span>
-<span class="fc" id="L236">    }</span>
+<span class="fc" id="L246">            assertSame(metaBuilder, returnBuilder );</span>
+<span class="fc" id="L247">            assertFalse(optionalThrown.isPresent());</span>
+<span class="fc" id="L248">        });</span>
+<span class="fc" id="L249">    }</span>
     
     @Test
-    default void meta_thread_WithNullThrowable_Removes() {
-<span class="fc" id="L240">        runWithScenario( metaBuilder -&gt; {</span>
-<span class="pc" id="L241">            final Thread thread = new Thread(()-&gt;{});</span>
+    default void meta_thread_WithNullThread_Removes() {
+<span class="fc" id="L253">        runWithScenario( metaBuilder -&gt; {</span>
+<span class="pc" id="L254">            final Thread thread = new Thread(()-&gt;{});</span>
+<span class="fc" id="L255">            metaBuilder.thread(thread);</span>
             
-<span class="fc" id="L243">            metaBuilder.thread(thread);</span>
-<span class="fc" id="L244">            final Meta.Builder&lt;?&gt; returnBuilder = metaBuilder.thread(null);</span>
+<span class="fc" id="L257">            final Meta.Builder&lt;?&gt; returnBuilder = metaBuilder.thread(null);</span>
             
-<span class="fc" id="L246">            final Optional&lt;Thread&gt; optionalThread = metaBuilder.getThread();</span>
+<span class="fc" id="L259">            final Optional&lt;Thread&gt; optionalThread = metaBuilder.getThread();</span>
             
-<span class="fc" id="L248">            assertSame(metaBuilder, returnBuilder );</span>
-<span class="fc" id="L249">            assertFalse(optionalThread.isPresent());</span>
-<span class="fc" id="L250">        });</span>
-<span class="fc" id="L251">    }</span>
+<span class="fc" id="L261">            assertSame(metaBuilder, returnBuilder );</span>
+<span class="fc" id="L262">            assertFalse(optionalThread.isPresent());</span>
+<span class="fc" id="L263">        });</span>
+<span class="fc" id="L264">    }</span>
     
     @Test
-    default void meta_timestamp_WithNullThrowable_Removes() {
-<span class="fc" id="L255">        runWithScenario( metaBuilder -&gt; {</span>
-<span class="fc" id="L256">            final Instant timestamp = Instant.now();</span>
+    default void meta_time_WithNullTime_Removes() {
+<span class="fc" id="L268">        runWithScenario( metaBuilder -&gt; {</span>
+<span class="fc" id="L269">            final Instant timestamp = Instant.now();</span>
             
-<span class="fc" id="L258">            metaBuilder.time(timestamp);</span>
-<span class="fc" id="L259">            final Meta.Builder&lt;?&gt; returnBuilder = metaBuilder.time(null);</span>
+<span class="fc" id="L271">            metaBuilder.time(timestamp);</span>
+<span class="fc" id="L272">            final Meta.Builder&lt;?&gt; returnBuilder = metaBuilder.time(null);</span>
             
-<span class="fc" id="L261">            final Optional&lt;Temporal&gt; optionalTemporal = metaBuilder.getTime();</span>
+<span class="fc" id="L274">            final Optional&lt;Temporal&gt; optionalTemporal = metaBuilder.getTime();</span>
             
-<span class="fc" id="L263">            assertSame(metaBuilder, returnBuilder );</span>
-<span class="fc" id="L264">            assertFalse(optionalTemporal.isPresent());</span>
-<span class="fc" id="L265">        });</span>
-<span class="fc" id="L266">    }</span>
+<span class="fc" id="L276">            assertSame(metaBuilder, returnBuilder );</span>
+<span class="fc" id="L277">            assertFalse(optionalTemporal.isPresent());</span>
+<span class="fc" id="L278">        });</span>
+<span class="fc" id="L279">    }</span>
     
     @Test
     default void meta_correlation_WithNullEntity_Throws() {
-<span class="fc" id="L270">        runWithScenario(builder -&gt; {</span>
-<span class="fc" id="L271">            final IllegalArgumentException thrown = assertThrows( IllegalArgumentException.class, () -&gt; {</span>
-<span class="nc" id="L272">                builder.correlation((Entity) null);</span>
-<span class="nc" id="L273">            });</span>
-<span class="fc" id="L274">            assertThrown(thrown);</span>
-<span class="fc" id="L275">        });</span>
-<span class="fc" id="L276">    }</span>
+<span class="fc" id="L283">        runWithScenario(builder -&gt; {</span>
+<span class="fc" id="L284">            final IllegalArgumentException thrown = assertThrows( IllegalArgumentException.class, () -&gt; {</span>
+<span class="nc" id="L285">                builder.correlation((Entity) null);</span>
+<span class="nc" id="L286">            });</span>
+<span class="fc" id="L287">            assertThrown(thrown);</span>
+<span class="fc" id="L288">        });</span>
+<span class="fc" id="L289">    }</span>
     
     @Test
     default void meta_correlations_WithNullBuilder_Throws() {
-<span class="fc" id="L280">        runWithScenario(builder -&gt; {</span>
-<span class="fc" id="L281">            final IllegalArgumentException thrown = assertThrows( IllegalArgumentException.class, () -&gt; {</span>
-<span class="nc" id="L282">                builder.correlations( null);</span>
-<span class="nc" id="L283">            });</span>
-<span class="fc" id="L284">            assertThrown(thrown);</span>
-<span class="fc" id="L285">        });</span>
-<span class="fc" id="L286">    }</span>
+<span class="fc" id="L293">        runWithScenario(builder -&gt; {</span>
+<span class="fc" id="L294">            final IllegalArgumentException thrown = assertThrows( IllegalArgumentException.class, () -&gt; {</span>
+<span class="nc" id="L295">                builder.correlations( null);</span>
+<span class="nc" id="L296">            });</span>
+<span class="fc" id="L297">            assertThrown(thrown);</span>
+<span class="fc" id="L298">        });</span>
+<span class="fc" id="L299">    }</span>
     
     @Test
     default void meta_InternalCoverage() {
-<span class="fc" id="L290">        assertInstantiateThrows(MetaTestsTools.class);</span>
-<span class="fc" id="L291">    }</span>
+<span class="fc" id="L303">        assertInstantiateThrows(MetaTestsTools.class);</span>
+<span class="fc" id="L304">    }</span>
     
     final class MetaTestsTools {
-<span class="nc" id="L294">        private MetaTestsTools() {</span>
-<span class="nc" id="L295">            throw new AssertionError(&quot;Illegal constructor&quot;);</span>
+<span class="nc" id="L307">        private MetaTestsTools() {</span>
+<span class="nc" id="L308">            throw new AssertionError(&quot;Illegal constructor&quot;);</span>
         }
         
         @FunctionalInterface
         interface ScenarioConfig extends Consumer&lt;Meta.Builder&lt;?&gt;&gt; {
             default Metalog.Config getMetalogConfig() {
-<span class="fc" id="L301">                return Metalog.Config.DEFAULT;</span>
+<span class="fc" id="L314">                return Metalog.Config.DEFAULT;</span>
             }
         }
         
         static Meta.Builder&lt;?&gt; newMetaBuilder() {
-<span class="fc" id="L306">            return claimContract(Meta.Builder.FACTORY_CONTRACT).get();</span>
+<span class="fc" id="L319">            return claimContract(Meta.Builder.FACTORY_CONTRACT).get();</span>
         }
         
         static void runWithScenario(ScenarioConfig scenarioConfig) {
-<span class="fc" id="L310">            final Metalog metalog = createMetalog(scenarioConfig.getMetalogConfig());</span>
-<span class="fc" id="L311">            try (AutoClose closeLogs = metalog.open()) {</span>
-<span class="fc" id="L312">                AutoClose ignoreWarning = closeLogs;</span>
-<span class="fc" id="L313">                scenarioConfig.accept(newMetaBuilder());</span>
+<span class="fc" id="L323">            final Metalog metalog = createMetalog(scenarioConfig.getMetalogConfig());</span>
+<span class="fc" id="L324">            try (AutoClose closeLogs = metalog.open()) {</span>
+<span class="fc" id="L325">                AutoClose ignoreWarning = closeLogs;</span>
+<span class="fc" id="L326">                scenarioConfig.accept(newMetaBuilder());</span>
             }
-<span class="fc" id="L315">        }</span>
+<span class="fc" id="L328">        }</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

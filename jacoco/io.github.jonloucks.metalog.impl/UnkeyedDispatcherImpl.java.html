@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UnkeyedDispatcherImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">metalog</a> &gt; <a href="index.source.html" class="el_package">io.github.jonloucks.metalog.impl</a> &gt; <span class="el_source">UnkeyedDispatcherImpl.java</span></div><h1>UnkeyedDispatcherImpl.java</h1><pre class="source lang-java linenums">package io.github.jonloucks.metalog.impl;
+
+import io.github.jonloucks.contracts.api.AutoClose;
+import io.github.jonloucks.contracts.api.AutoOpen;
+import io.github.jonloucks.metalog.api.Meta;
+import io.github.jonloucks.metalog.api.Metalog;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.concurrent.*;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
+
+final class UnkeyedDispatcherImpl implements Dispatcher, AutoOpen {
+
+    @Override
+    public AutoClose open() {
+<span class="pc bpc" id="L18" title="1 of 2 branches missed.">        if (idempotent.transitionToOpened()) {</span>
+<span class="fc" id="L19">            return this::close;</span>
+        } else {
+<span class="nc" id="L21">            return ()-&gt;{};</span>
+        }
+    }
+    
+    @Override
+    public void dispatch(Meta meta, Runnable command) {
+<span class="fc" id="L27">        command.run();</span>
+<span class="fc" id="L28">    }</span>
+    
+<span class="fc" id="L30">    UnkeyedDispatcherImpl(Metalog.Config config) {</span>
+<span class="fc" id="L31">        this.config = config;</span>
+<span class="fc" id="L32">        this.executor = new ThreadPoolExecutor(</span>
+            1,
+<span class="fc" id="L34">            config.unkeyedThreadCount(),</span>
+            60L,
+            TimeUnit.SECONDS,
+<span class="fc" id="L37">            new SynchronousQueue&lt;&gt;(config.unkeyedFairness())</span>
+        );
+<span class="fc" id="L39">        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());</span>
+<span class="fc" id="L40">    }</span>
+    
+    private void close() {
+<span class="pc bpc" id="L43" title="1 of 2 branches missed.">        if (idempotent.transitionToClosing()) {</span>
+<span class="fc" id="L44">            realClosing();</span>
+        }
+<span class="fc" id="L46">    }</span>
+    
+    private void realClosing() {
+<span class="fc" id="L49">        final Instant start = Instant.now();</span>
+        try {
+<span class="fc" id="L51">            boolean hasForcedShutdown = false;</span>
+            
+<span class="fc" id="L53">            initiateShutdown();</span>
+            
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">            while (!checkIfShutdown()) {</span>
+<span class="nc" id="L56">                final Duration duration = Duration.between(start, Instant.now());</span>
+<span class="nc bnc" id="L57" title="All 2 branches missed.">                if (hasForcedShutdown) {</span>
+<span class="nc bnc" id="L58" title="All 2 branches missed.">                    if (isTimeToGiveUp(duration)) {</span>
+<span class="nc" id="L59">                        System.err.println(&quot;Metalog unkeyed dispatcher failed to shutdown.&quot;);</span>
+<span class="nc" id="L60">                        return;</span>
+                    }
+<span class="nc bnc" id="L62" title="All 2 branches missed.">                } else if (isTimeToForceShutdown(duration)) {</span>
+<span class="nc" id="L63">                    forceShutdown();</span>
+<span class="nc" id="L64">                    hasForcedShutdown = true;</span>
+                }
+<span class="nc" id="L66">            }</span>
+        } finally {
+<span class="fc" id="L68">            idempotent.transitionToClosed();</span>
+        }
+<span class="fc" id="L70">    }</span>
+    
+    private boolean isTimeToGiveUp(Duration duration) {
+<span class="nc bnc" id="L73" title="All 2 branches missed.">        return duration.compareTo(config.shutdownTimeout()) &gt; 0;</span>
+    }
+    
+    private boolean isTimeToForceShutdown(Duration duration) {
+<span class="nc bnc" id="L77" title="All 2 branches missed.">        return duration.compareTo(config.shutdownTimeout().dividedBy(2)) &gt; 0;</span>
+    }
+    
+    private void initiateShutdown() {
+<span class="fc" id="L81">        executor.shutdown();</span>
+<span class="fc" id="L82">    }</span>
+    
+    private boolean checkIfShutdown() {
+        try {
+<span class="fc" id="L86">            return executor.awaitTermination(1, SECONDS);</span>
+<span class="nc" id="L87">        } catch (InterruptedException thrown) {</span>
+<span class="nc" id="L88">            return executor.isShutdown();</span>
+        }
+    }
+    
+    private void forceShutdown() {
+<span class="nc" id="L93">        executor.shutdownNow();</span>
+<span class="nc" id="L94">    }</span>
+
+<span class="fc" id="L96">    private final IdempotentImpl idempotent = new IdempotentImpl();</span>
+    private final Metalog.Config config;
+    private final ThreadPoolExecutor executor;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
