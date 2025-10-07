@@ -14,4 +14,6 @@ public interface Console extends Subscriber, Publisher {
      * from System.err and System.out
      */
     Contract<Console> CONTRACT = Contract.create(Console.class, b -> b.replaceable(true));
+    
+    boolean test(Meta meta);
 }

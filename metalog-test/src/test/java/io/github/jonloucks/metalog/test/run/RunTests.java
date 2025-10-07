@@ -1,6 +1,6 @@
 package io.github.jonloucks.metalog.test.run;
 
-import io.github.jonloucks.metalog.test.TestTests;
+import io.github.jonloucks.metalog.test.InternalTests;
 import io.github.jonloucks.metalog.test.Tools;
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
@@ -10,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(RunTests.RunExtension.class)
-public final class RunTests implements TestTests {
+public final class RunTests implements InternalTests {
 
     public static final class RunExtension implements BeforeTestExecutionCallback, AfterTestExecutionCallback {
         public RunExtension() {

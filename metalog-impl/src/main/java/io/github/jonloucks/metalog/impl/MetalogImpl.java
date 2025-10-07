@@ -3,6 +3,8 @@ package io.github.jonloucks.metalog.impl;
 import io.github.jonloucks.contracts.api.*;
 import io.github.jonloucks.metalog.api.*;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
@@ -13,11 +15,11 @@ import static io.github.jonloucks.contracts.api.Checks.*;
 import static io.github.jonloucks.metalog.impl.Internal.*;
 import static java.util.Optional.ofNullable;
 
-final class MetalogImpl implements Metalog, AutoClose {
+final class MetalogImpl implements Metalog {
     
     @Override
     public void publish(Log log, Meta meta) {
-        if (!openState.isOpen()) {
+        if (openState.isRejecting()) {
             throw new IllegalStateException("Metalog must be open.");
         }
         
@@ -26,11 +28,28 @@ final class MetalogImpl implements Metalog, AutoClose {
         
         if (!subscribers.isEmpty() && test(validMeta)) {
             if (validMeta.isBlock()) {
-                dispatch(validLog, validMeta);
+                transmitToAll(validLog, validMeta);
             } else {
-                dispatcher.execute(() -> dispatch(validLog, validMeta));
+                final Dispatcher dispatcher = chooseDispatcher(validMeta);
+                subscribers.forEach(subscriber -> {
+                    if (subscriber.test(validMeta)) {
+                        dispatcher.dispatch(validMeta, () -> transmitToSubscriber(subscriber, validLog, validMeta));
+                    }
+                });
             }
         }
+    }
+    
+    private Dispatcher chooseDispatcher(Meta meta) {
+        final String key = meta.getKey().orElse("");
+        return dispatchers.computeIfAbsent(key, this::createKeyedDispatcher);
+    }
+    
+    private Dispatcher createKeyedDispatcher(String key) {
+        final Promisors promisors = config.contracts().claim(Promisors.CONTRACT);
+        final Contract<Dispatcher> contract = Contract.create(Dispatcher.class, n -> n.name("Keyed Dispatcher " + key));
+        repository.store(contract, promisors.createLifeCyclePromisor(()-> new KeyedDispatcherImpl(config)));
+        return config.contracts().claim(contract);
     }
   
     @Override
@@ -61,16 +80,9 @@ final class MetalogImpl implements Metalog, AutoClose {
     public AutoClose open() {
         if (openState.transitionToOpened()) {
             realOpen();
-            return this;
+            return this::close;
         } else {
             return () -> {}; // all open calls after the first get a do nothing close
-        }
-    }
-
-    @Override
-    public void close() {
-        if (openState.transitionToClosed()) {
-            realClose();
         }
     }
     
@@ -83,41 +95,74 @@ final class MetalogImpl implements Metalog, AutoClose {
     }
     
     private void realOpen() {
-        ofNullable(repository).ifPresent(Repository::open);
-        dispatcher = config.contracts().claim(Dispatcher.CONTRACT);
+        final Promisors promisors = config.contracts().claim(Promisors.CONTRACT);
+        closeRepository = repository.open();
+//        dispatchers.put("",config.contracts().claim(Dispatcher.KEYED_CONTRACT));
+        
+        final Contract<Dispatcher> unkeyedContract = Contract.create(Dispatcher.class, n -> n.name("Unkeyed Dispatcher"));
+        repository.store(unkeyedContract, promisors.createLifeCyclePromisor(()-> new UnkeyedDispatcherImpl(config)));
+        dispatchers.put("", config.contracts().claim(unkeyedContract));
+//            promisors.createLifeCyclePromisor(()-> new UnkeyedDispatcherImpl(config)
+//        unkeyedDispatcher = config.contracts().claim(Dispatcher.UNKEYED_CONTRACT);
+        
         metaFactory = config.contracts().claim(Meta.Builder.FACTORY_CONTRACT);
         if (config.systemOutput()) {
             config.contracts().claim(Console.CONTRACT);
         }
     }
     
+    private void close() {
+        if (openState.transitionToClosed()) {
+            realClose();
+        }
+    }
+    
     private void realClose() {
-        ofNullable(repository).ifPresent(close -> {
+        ofNullable(closeRepository).ifPresent(close -> {
             repository = null;
+            closeRepository = null;
             close.close();
         });
     }
     
+    @SuppressWarnings("resource") // keeping promises alive for life of Metalog
     private void bindContracts(Config config, Promisors promisors) {
         repository.store(Metalog.CONTRACT, () -> this);
         repository.store(MetalogFactory.CONTRACT, promisors.createLifeCyclePromisor(MetalogFactoryImpl::new));
-        repository.store(Dispatcher.CONTRACT, promisors.createLifeCyclePromisor(()-> new DispatcherImpl(config)));
         repository.store(Entities.Builder.FACTORY_CONTRACT, () -> EntitiesImpl::new);
         repository.store(Entity.Builder.FACTORY_CONTRACT, () -> EntityImpl::new);
         repository.store(Meta.Builder.FACTORY_CONTRACT, () -> MetaImpl::new);
         repository.store(Console.CONTRACT, promisors.createLifeCyclePromisor(() -> new ConsoleImpl(config)));
     }
     
-    private void dispatch(Log log, Meta meta) {
-        subscribers.forEach(s -> s.receive(log, meta));
+    private void transmitToAll(Log log, Meta meta) {
+        subscribers.forEach(subscriber -> {
+            if (subscriber.test(meta)) {
+                transmitToSubscriber(subscriber, log, meta);
+            }
+        });
+    }
+    
+    private void transmitToSubscriber(Subscriber subscriber, Log log, Meta meta) {
+        final Instant start = Instant.now();
+        try {
+            subscriber.receive(log, meta);
+        } catch (Throwable ignored) {
+        } finally {
+            final Duration duration = Duration.between(start, Instant.now());
+            if (duration.compareTo(Duration.ofSeconds(1)) > 0) {
+                // slow
+            }
+        }
     }
     
     @SuppressWarnings({"FieldCanBeLocal","unused"})
     private final Config config;
     private final IdempotentImpl openState = new IdempotentImpl();
     private Repository repository;
+    private AutoClose closeRepository;
     private final List<Subscriber> subscribers = new CopyOnWriteArrayList<>();
     private final Filterable filters = new FiltersImpl();
-    private Dispatcher dispatcher;
+    private final ConcurrentHashMap<String,Dispatcher> dispatchers = new ConcurrentHashMap<>();
     private Supplier<Meta.Builder<?>> metaFactory;
 }

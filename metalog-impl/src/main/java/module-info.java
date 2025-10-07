@@ -7,6 +7,7 @@ import io.github.jonloucks.metalog.impl.MetalogFactoryImpl;
 module io.github.jonloucks.metalog.impl {
     requires transitive io.github.jonloucks.contracts.api;
     requires transitive io.github.jonloucks.metalog.api;
+    requires jdk.xml.dom;
     
     provides MetalogFactory with MetalogFactoryImpl;
 }

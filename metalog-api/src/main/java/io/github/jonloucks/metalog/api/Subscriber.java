@@ -13,4 +13,8 @@ public interface Subscriber {
      * @param meta the meta information
      */
     void receive(Log log, Meta meta);
+    
+    default boolean test(Meta meta) {
+        return true;
+    }
 }
