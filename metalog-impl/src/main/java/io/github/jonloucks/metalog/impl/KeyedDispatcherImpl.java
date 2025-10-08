@@ -14,7 +14,7 @@ final class KeyedDispatcherImpl implements Dispatcher, AutoOpen {
     @Override
     public AutoClose open() {
         if (idempotent.transitionToOpened()) {
-            thread.start();
+            worker.start();
             return this::close;
         } else {
             return ()->{};
@@ -27,24 +27,24 @@ final class KeyedDispatcherImpl implements Dispatcher, AutoOpen {
         if (idempotent.isRejecting()) {
             throw new IllegalStateException("Executor has been closed.");
         }
-        semaphore.acquireUninterruptibly();
+        inflightSemaphore.acquireUninterruptibly();
         try {
             queue.put(validCommand);
         } catch (InterruptedException e) {
-            semaphore.release();
+            inflightSemaphore.release();
         }
     }
     
     KeyedDispatcherImpl(Metalog.Config config) {
-        this.semaphore = new Semaphore(config.keyedQueueLimit());
+        this.inflightSemaphore = new Semaphore(config.keyedQueueLimit());
         this.queue = new ArrayBlockingQueue<>(config.keyedQueueLimit());
-        this.thread = new Thread(this::consumeLoop);
+        this.worker = new Thread(this::consumeLoop);
     }
     
     private void close() {
         if (idempotent.transitionToClosed()) {
-            thread.interrupt();
-            semaphore.release(queue.size());
+            worker.interrupt();
+            inflightSemaphore.release(queue.size());
             queue.clear();
         }
     }
@@ -56,7 +56,7 @@ final class KeyedDispatcherImpl implements Dispatcher, AutoOpen {
                 try {
                     command.run();
                 } finally {
-                    semaphore.release();
+                    inflightSemaphore.release();
                 }
             }  catch (InterruptedException ignored) {
             }
@@ -64,7 +64,7 @@ final class KeyedDispatcherImpl implements Dispatcher, AutoOpen {
     }
     
     private final IdempotentImpl idempotent = new IdempotentImpl();
-    private final Semaphore semaphore;
-    private final Thread thread;
+    private final Semaphore inflightSemaphore;
+    private final Thread worker;
     private final ArrayBlockingQueue<Runnable> queue;
 }

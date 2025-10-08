@@ -1,13 +1,9 @@
-import io.github.jonloucks.metalog.api.MetalogFactory;
-import io.github.jonloucks.metalog.impl.MetalogFactoryImpl;
-
 /**
- * Metalog default implementation
+ * The implementation module for Metalog
  */
 module io.github.jonloucks.metalog.impl {
     requires transitive io.github.jonloucks.contracts.api;
     requires transitive io.github.jonloucks.metalog.api;
-    requires jdk.xml.dom;
     
-    provides MetalogFactory with MetalogFactoryImpl;
+    provides io.github.jonloucks.metalog.api.MetalogFactory with io.github.jonloucks.metalog.impl.MetalogFactoryImpl;
 }

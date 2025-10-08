@@ -1,5 +1,8 @@
-module io.github.metalog.metalog.test.run {
-    requires transitive io.github.metalog.metalog.test;
+/**
+ * Module to run tests on the test tools
+ */
+module io.github.jonloucks.metalog.test.run {
+    requires transitive io.github.jonloucks.metalog.test;
     
     opens io.github.jonloucks.metalog.test.run to org.junit.platform.commons;
 }

@@ -12,7 +12,7 @@ import static io.github.jonloucks.metalog.impl.Internal.entityCheck;
 import static java.util.Optional.ofNullable;
 
 final class EntityImpl implements Entity, Entity.Builder<EntityImpl> {
-
+    
     @Override
     public EntityImpl id(String id) {
         this.id = id;
@@ -22,6 +22,12 @@ final class EntityImpl implements Entity, Entity.Builder<EntityImpl> {
     @Override
     public EntityImpl name(String name) {
         this.name = name;
+        return this;
+    }
+    
+    @Override
+    public EntityImpl unique(boolean unique) {
+        this.unique = unique;
         return this;
     }
     
@@ -91,6 +97,11 @@ final class EntityImpl implements Entity, Entity.Builder<EntityImpl> {
     }
     
     @Override
+    public boolean isUnique() {
+        return unique;
+    }
+    
+    @Override
     public Optional<Object> getValue() {
         return ofNullable(value);
     }
@@ -115,6 +126,7 @@ final class EntityImpl implements Entity, Entity.Builder<EntityImpl> {
 
     private String id;
     private String name;
+    private boolean unique;
     private Supplier<CharSequence> textSupplier;
     private Object value;
     private CharSequence text;

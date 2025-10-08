@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static io.github.jonloucks.contracts.api.Checks.typeCheck;
 import static io.github.jonloucks.metalog.impl.Internal.*;
 
 final class MetaImpl implements Meta.Builder<MetaImpl>, Entity.Builder<MetaImpl> {
@@ -38,52 +39,37 @@ final class MetaImpl implements Meta.Builder<MetaImpl>, Entity.Builder<MetaImpl>
     
     @Override
     public MetaImpl thread(Thread thread) {
-        if (null == thread) {
-            thisEntity.correlations( b -> b.removeIf(byName(THREAD_ENTITY_NAME)));
-        } else {
-            correlation(b -> b.name(THREAD_ENTITY_NAME).id(Long.toString(thread.getId())).value(thread));
-        }
-        return this;
+        return setUniqueEntity(THREAD_ENTITY_NAME, thread);
     }
     
     @Override
     public MetaImpl thrown(Throwable thrown) {
-        if (thrown == null) {
-            thisEntity.correlations( b -> b.removeIf(byName(THROWN_ENTITY_NAME)));
-        } else {
-            return correlation(b -> b.name(THROWN_ENTITY_NAME).value(thrown));
-        }
-        return this;
+        return setUniqueEntity(THROWN_ENTITY_NAME, thrown);
     }
     
     @Override
     public MetaImpl time(Temporal timestamp) {
-        if (timestamp == null) {
-            thisEntity.correlations( b -> b.removeIf(byName(TIME_ENTITY_NAME)));
-        } else {
-            return correlation(b -> b.name(TIME_ENTITY_NAME).value(timestamp));
-        }
-        return this;
+        return setUniqueEntity(TIME_ENTITY_NAME, timestamp);
     }
     
     @Override
-    public boolean isBlock() {
+    public boolean hasBlock() {
         return block;
     }
     
     @Override
     public Optional<Temporal> getTime() {
-        return findFirstByNameAndType(thisEntity, TIME_ENTITY_NAME, Temporal.class);
+        return getUniqueEntity(TIME_ENTITY_NAME, Temporal.class);
     }
     
     @Override
     public Optional<Throwable> getThrown() {
-        return findFirstByNameAndType(thisEntity, THROWN_ENTITY_NAME, Throwable.class);
+        return getUniqueEntity(THROWN_ENTITY_NAME, Throwable.class);
     }
     
     @Override
     public Optional<Thread> getThread() {
-        return findFirstByNameAndType(thisEntity, THREAD_ENTITY_NAME, Thread.class);
+        return getUniqueEntity(THREAD_ENTITY_NAME, Thread.class);
     }
     
     @Override
@@ -117,8 +103,19 @@ final class MetaImpl implements Meta.Builder<MetaImpl>, Entity.Builder<MetaImpl>
     }
     
     @Override
+    public boolean isUnique() {
+        return thisEntity.isUnique();
+    }
+    
+    @Override
     public MetaImpl name(String name) {
         thisEntity.name(name);
+        return this;
+    }
+    
+    @Override
+    public MetaImpl unique(boolean unique) {
+        thisEntity.unique(unique);
         return this;
     }
     
@@ -158,7 +155,7 @@ final class MetaImpl implements Meta.Builder<MetaImpl>, Entity.Builder<MetaImpl>
         
         thisEntity.copy(validFromMeta);
         
-        block(validFromMeta.isBlock());
+        block(validFromMeta.hasBlock());
         channel(validFromMeta.getChannel());
         validFromMeta.getKey().ifPresent(this::key);
         
@@ -178,6 +175,23 @@ final class MetaImpl implements Meta.Builder<MetaImpl>, Entity.Builder<MetaImpl>
     }
     
     MetaImpl() {
+    }
+    
+    private <T> MetaImpl setUniqueEntity(String name, T value) {
+        if (value == null) {
+            return correlations( b -> b.removeIf(byName(name).and(byUnique(true))));
+        } else {
+            return correlation(b -> b.unique(true).name(name).value(value));
+        }
+    }
+    
+    private <T> Optional<T> getUniqueEntity(String name, Class<T> type) {
+        final Optional<Entities> optional = getCorrelations();
+        if (optional.isPresent()) {
+            final Entities entities = optional.get();
+            return entities.findFirstValueWithType(byName(name).and(byUnique(true)), typeCheck(type));
+        }
+        return Optional.empty();
     }
     
     private static final String THROWN_ENTITY_NAME = "thrown";

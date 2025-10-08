@@ -43,11 +43,18 @@ public interface Entity extends Supplier<CharSequence> {
     
     /**
      * The optional correlations for this entity
-     * Exmaples: An entity representing the support contact information for error
+     * Examples: An entity representing the support contact information for error
      * @return the optional correlations
      */
     default Optional<Entities> getCorrelations() {
         return empty();
+    }
+    
+    /**
+     * @return if true then only one unique entity with the same name should exist
+     */
+    default boolean isUnique() {
+        return false;
     }
     
     /**
@@ -74,6 +81,13 @@ public interface Entity extends Supplier<CharSequence> {
          * @return this builder
          */
         B name(String name);
+        
+        /**
+         * Set unique name for the Entity
+         * @param unique true makes this entity unique
+         * @return this builder
+         */
+        B unique(boolean unique);
         
         /**
          * Set the text supplier for the Entity

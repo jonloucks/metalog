@@ -14,7 +14,6 @@ import static io.github.jonloucks.contracts.test.Tools.assertObject;
 import static io.github.jonloucks.metalog.test.Tools.metaWithId;
 import static io.github.jonloucks.metalog.test.Tools.uniqueString;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

@@ -72,7 +72,7 @@ public interface MetaTests {
             assertEquals(timestamp, metaBuilder.getTime().get());
             assertTrue(metaBuilder.getThrown().isPresent());
             assertEquals(thrown, metaBuilder.getThrown().get());
-            assertEquals(fromBuilder.isBlock(), metaBuilder.isBlock());
+            assertEquals(fromBuilder.hasBlock(), metaBuilder.hasBlock());
             assertTrue(metaBuilder.getThread().isPresent());
             assertEquals(thread, metaBuilder.getThread().get());
         });
@@ -112,7 +112,7 @@ public interface MetaTests {
             assertEquals(timestamp, metaBuilder.getTime().get());
             assertTrue(metaBuilder.getThrown().isPresent());
             assertEquals(thrown, metaBuilder.getThrown().get());
-            assertEquals(fromBuilder.isBlock(), metaBuilder.isBlock());
+            assertEquals(fromBuilder.hasBlock(), metaBuilder.hasBlock());
             assertTrue(metaBuilder.getThread().isPresent());
             assertEquals(thread, metaBuilder.getThread().get());
         });
@@ -155,7 +155,7 @@ public interface MetaTests {
             assertEquals(timestamp, metaBuilder.getTime().get());
             assertTrue(metaBuilder.getThrown().isPresent());
             assertEquals(thrown, metaBuilder.getThrown().get());
-            assertFalse(metaBuilder.isBlock());
+            assertFalse(metaBuilder.hasBlock());
             assertTrue(metaBuilder.getThread().isPresent());
             assertEquals(thread, metaBuilder.getThread().get());
         });
