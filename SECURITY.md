@@ -33,7 +33,7 @@ Only the latest stable release of this project is actively supported for securit
 
 ## Supported Versions
 | Version | Supported          |
-| ------- | ------------------ |
+|---------|--------------------|
 | 1.0.x   | :white_check_mark: |
 
 ## Reporting a Vulnerability

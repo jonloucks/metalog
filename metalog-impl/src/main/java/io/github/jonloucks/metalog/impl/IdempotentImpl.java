@@ -14,6 +14,10 @@ final class IdempotentImpl {
         return transitionTo(State.OPENED);
     }
     
+    boolean transitionToFailed() {
+        return transitionTo(State.FAILED);
+    }
+    
     boolean transitionToClosing() {
         return transitionTo(State.CLOSING);
     }
@@ -54,7 +58,7 @@ final class IdempotentImpl {
         OPENING {
             @Override
             boolean canTransitionTo(State state) {
-                return state == OPENED;
+                return state == OPENED || state == FAILED;
             }
             @Override
             boolean isActive() {
@@ -82,6 +86,16 @@ final class IdempotentImpl {
             }
         },
         CLOSED {
+            @Override
+            boolean canTransitionTo(State state) {
+                return false;
+            }
+            @Override
+            boolean isActive() {
+                return false;
+            }
+        },
+        FAILED {
             @Override
             boolean canTransitionTo(State state) {
                 return false;

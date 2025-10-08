@@ -6,7 +6,9 @@ import static io.github.jonloucks.contracts.test.Tools.assertInstantiateThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @SuppressWarnings("Convert2MethodRef")
-public interface ToolsTests {
+public interface ToolsTests extends
+    BadMetalogFactoryTests
+{
     
     @Test
     default void testTools_Instantiate_Throws() {

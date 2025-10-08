@@ -1,7 +1,6 @@
 package io.github.jonloucks.metalog.api;
 
 import io.github.jonloucks.contracts.api.ContractException;
-import io.github.jonloucks.contracts.api.Contracts;
 
 import java.util.Optional;
 import java.util.ServiceLoader;
@@ -16,14 +15,9 @@ import static java.util.Optional.ofNullable;
 final class MetalogFactoryFinder {
     MetalogFactoryFinder(Metalog.Config config) {
         this.config = configCheck(config);
-        this.contracts = config.contracts();
     }
     
     MetalogFactory find() {
-        if (contracts.isBound(MetalogFactory.CONTRACT)) {
-            return contracts.claim(MetalogFactory.CONTRACT);
-        }
-        
         return createByReflection()
             .or(this::createByServiceLoader)
             .orElseThrow(this::newNotFoundException);
@@ -68,5 +62,4 @@ final class MetalogFactoryFinder {
     }
     
     private final Metalog.Config config;
-    private final Contracts contracts;
 }

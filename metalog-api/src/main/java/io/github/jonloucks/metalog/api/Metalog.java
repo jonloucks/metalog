@@ -43,7 +43,7 @@ public interface Metalog extends Publisher, Filterable, AutoOpen {
          * @return the class name to use if reflection is used to find the MetalogFactory
          */
         default String reflectionClassName() {
-            return "io.github.jonloucks.metalog.impl.ServiceFactoryImpl";
+            return "io.github.jonloucks.metalog.impl.MetalogFactoryImpl";
         }
         
         /**

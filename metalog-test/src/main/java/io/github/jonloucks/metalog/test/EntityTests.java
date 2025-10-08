@@ -26,13 +26,32 @@ import static org.junit.jupiter.api.Assertions.*;
 public interface EntityTests {
     
     @Test
-    default void entity_InitialValues() {
+    default void entity_Builder_Defaults() {
         runWithScenario( builder -> {
             assertFalse(builder.getId().isPresent());
             assertFalse(builder.getName().isPresent());
             assertFalse(builder.getValue().isPresent());
             assertFalse(builder.getCorrelations().isPresent());
+            assertFalse(builder.isUnique());
             assertNotNull(builder.get());
+        });
+    }
+    
+    @Test
+    default void entity_Defaults() {
+        final Entity entity = () -> null;
+        assertFalse(entity.getId().isPresent());
+        assertFalse(entity.getName().isPresent());
+        assertFalse(entity.getValue().isPresent());
+        assertFalse(entity.getCorrelations().isPresent());
+        assertFalse(entity.isUnique());
+    }
+    
+    @Test
+    default void entity_unique_works() {
+        runWithScenario( builder -> {
+            builder.unique(true);
+            assertTrue(builder.isUnique());
         });
     }
     
@@ -109,7 +128,7 @@ public interface EntityTests {
     
     @Test
     default void entity_copy_OverwritesWhenPresent() {
-        final Entity fromEntity = createTestEntity("from name", "from value", "from id", false);
+        final Entity fromEntity = createTestEntity("from name", "from value", "from id", true);
         runWithScenario( builder -> {
             builder.id("original id").name("original name").value("original value");
             final Entity.Builder<?> result = builder.copy(fromEntity);
@@ -121,6 +140,7 @@ public interface EntityTests {
             assertEquals("from name", builder.getName().get());
             assertTrue(builder.getValue().isPresent());
             assertEquals("from value", builder.getValue().get());
+            assertEquals(fromEntity.isUnique(), builder.isUnique());
         });
     }
     

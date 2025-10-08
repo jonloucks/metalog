@@ -6,7 +6,7 @@ import io.github.jonloucks.contracts.api.Contract;
  * Responsible for the special logging case of System.out and System.err
  * It is both a Subscriber and Publisher
  */
-public interface Console extends Subscriber, Publisher, Filterable {
+public interface Console extends Publisher, Subscriber, Filterable {
     
     /**
      * The Contract for the Console.
@@ -14,4 +14,16 @@ public interface Console extends Subscriber, Publisher, Filterable {
      * from System.err and System.out
      */
     Contract<Console> CONTRACT = Contract.create(Console.class, b -> b.replaceable(true));
+    
+    /**
+     * Publishes the log with Console info meta
+     * @param log the log to publish
+     */
+    void info(Log log);
+    
+    /**
+     * Publishes the log with Console error meta
+     * @param log the log to publish
+     */
+    void error(Log log);
 }

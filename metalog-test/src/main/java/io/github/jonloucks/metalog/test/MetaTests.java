@@ -53,6 +53,7 @@ public interface MetaTests {
                 .block(true)
                 .thread(thread)
                 .thrown(thrown)
+                .unique(true)
                 .time(timestamp);
             
             metaBuilder.copy(fromBuilder);
@@ -75,6 +76,7 @@ public interface MetaTests {
             assertEquals(fromBuilder.hasBlock(), metaBuilder.hasBlock());
             assertTrue(metaBuilder.getThread().isPresent());
             assertEquals(thread, metaBuilder.getThread().get());
+            assertTrue(metaBuilder.isUnique());
         });
     }
     

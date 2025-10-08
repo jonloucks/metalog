@@ -16,7 +16,7 @@ public interface Entity extends Supplier<CharSequence> {
     
     /**
      * The optional user defined name for this entity
-     * Examples: "myModule, "thread", "time", "thrown"
+     * Examples: "myModule", "thread", "time", "thrown"
      * @return the optional name
      */
     default Optional<String> getName() {
