@@ -199,13 +199,13 @@ extends <a href="Meta.html" title="interface in io.github.jonloucks.metalog.api"
 </div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-io.github.jonloucks.metalog.api.Entity">Methods inherited from interface&nbsp;io.github.jonloucks.metalog.api.<a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a></h3>
-<code><a href="Entity.html#getCorrelations()">getCorrelations</a>, <a href="Entity.html#getId()">getId</a>, <a href="Entity.html#getName()">getName</a>, <a href="Entity.html#getValue()">getValue</a></code></div>
+<code><a href="Entity.html#getCorrelations()">getCorrelations</a>, <a href="Entity.html#getId()">getId</a>, <a href="Entity.html#getName()">getName</a>, <a href="Entity.html#getValue()">getValue</a>, <a href="Entity.html#isUnique()">isUnique</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-io.github.jonloucks.metalog.api.Entity.Builder">Methods inherited from interface&nbsp;io.github.jonloucks.metalog.api.<a href="Entity.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entity.Builder</a></h3>
-<code><a href="Entity.Builder.html#copy(io.github.jonloucks.metalog.api.Entity)">copy</a>, <a href="Entity.Builder.html#correlation(io.github.jonloucks.metalog.api.Entity)">correlation</a>, <a href="Entity.Builder.html#correlation(java.util.function.Consumer)">correlation</a>, <a href="Entity.Builder.html#correlations(java.util.function.Consumer)">correlations</a>, <a href="Entity.Builder.html#text(java.util.function.Supplier)">text</a>, <a href="Entity.Builder.html#value(java.lang.Object)">value</a></code></div>
+<code><a href="Entity.Builder.html#copy(io.github.jonloucks.metalog.api.Entity)">copy</a>, <a href="Entity.Builder.html#correlation(io.github.jonloucks.metalog.api.Entity)">correlation</a>, <a href="Entity.Builder.html#correlation(java.util.function.Consumer)">correlation</a>, <a href="Entity.Builder.html#correlations(java.util.function.Consumer)">correlations</a>, <a href="Entity.Builder.html#text(java.util.function.Supplier)">text</a>, <a href="Entity.Builder.html#unique(boolean)">unique</a>, <a href="Entity.Builder.html#value(java.lang.Object)">value</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-io.github.jonloucks.metalog.api.Meta">Methods inherited from interface&nbsp;io.github.jonloucks.metalog.api.<a href="Meta.html" title="interface in io.github.jonloucks.metalog.api">Meta</a></h3>
-<code><a href="Meta.html#getChannel()">getChannel</a>, <a href="Meta.html#getKey()">getKey</a>, <a href="Meta.html#getThread()">getThread</a>, <a href="Meta.html#getThrown()">getThrown</a>, <a href="Meta.html#getTime()">getTime</a>, <a href="Meta.html#isBlock()">isBlock</a></code></div>
+<code><a href="Meta.html#getChannel()">getChannel</a>, <a href="Meta.html#getKey()">getKey</a>, <a href="Meta.html#getThread()">getThread</a>, <a href="Meta.html#getThrown()">getThrown</a>, <a href="Meta.html#getTime()">getTime</a>, <a href="Meta.html#hasBlock()">hasBlock</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-java.util.function.Supplier">Methods inherited from interface&nbsp;java.util.function.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html" title="class or interface in java.util.function" class="external-link">Supplier</a></h3>
 <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html#get()" title="class or interface in java.util.function" class="external-link">get</a></code></div>
@@ -298,7 +298,7 @@ extends <a href="Meta.html" title="interface in io.github.jonloucks.metalog.api"
 <div class="block">Set the block mode for the Meta</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>block</code> - true will enable <a href="Meta.html#isBlock()"><code>Meta.isBlock()</code></a></dd>
+<dd><code>block</code> - true will enable <a href="Meta.html#hasBlock()"><code>Meta.hasBlock()</code></a></dd>
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>

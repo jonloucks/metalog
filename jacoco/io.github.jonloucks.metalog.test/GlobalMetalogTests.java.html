@@ -14,7 +14,6 @@ import static io.github.jonloucks.contracts.test.Tools.assertObject;
 import static io.github.jonloucks.metalog.test.Tools.metaWithId;
 import static io.github.jonloucks.metalog.test.Tools.uniqueString;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -23,43 +22,43 @@ public interface GlobalMetalogTests {
     
     @Test
     default void globalMetalog_Instantiate_Throws() {
-<span class="fc" id="L26">        assertInstantiateThrows(GlobalMetalog.class);</span>
-<span class="fc" id="L27">    }</span>
+<span class="fc" id="L25">        assertInstantiateThrows(GlobalMetalog.class);</span>
+<span class="fc" id="L26">    }</span>
     
     @Test
     default void globalMetalog_getInstance_Works() {
-<span class="fc" id="L31">        assertObject(GlobalMetalog.getInstance());</span>
-<span class="fc" id="L32">    }</span>
+<span class="fc" id="L30">        assertObject(GlobalMetalog.getInstance());</span>
+<span class="fc" id="L31">    }</span>
  
     @Test
     default void globalMetalog_LogWithBuild_RoundTrip(@Mock Subscriber subscriber, @Mock Log log) {
-<span class="fc" id="L36">        final String text = uniqueString();</span>
-<span class="fc" id="L37">        when(log.get()).thenReturn(text);</span>
-<span class="fc" id="L38">        when(subscriber.test(any())).thenReturn(true);</span>
-<span class="fc" id="L39">        final String id = uniqueString();</span>
+<span class="fc" id="L35">        final String text = uniqueString();</span>
+<span class="fc" id="L36">        when(log.get()).thenReturn(text);</span>
+<span class="fc" id="L37">        when(subscriber.test(any())).thenReturn(true);</span>
+<span class="fc" id="L38">        final String id = uniqueString();</span>
         
-<span class="fc" id="L41">        try (AutoClose closeSubscriber = GlobalMetalog.subscribe(subscriber)) {</span>
-<span class="fc" id="L42">            final AutoClose ignored = closeSubscriber;</span>
-<span class="fc" id="L43">            GlobalMetalog.publish(log, b -&gt; b.id(id).block());</span>
-<span class="fc" id="L44">            verify(subscriber, times(1)).receive(any(), metaWithId(id));</span>
+<span class="fc" id="L40">        try (AutoClose closeSubscriber = GlobalMetalog.subscribe(subscriber)) {</span>
+<span class="fc" id="L41">            final AutoClose ignored = closeSubscriber;</span>
+<span class="fc" id="L42">            GlobalMetalog.publish(log, b -&gt; b.id(id).block());</span>
+<span class="fc" id="L43">            verify(subscriber, times(1)).receive(any(), metaWithId(id));</span>
         }
-<span class="fc" id="L46">        GlobalMetalog.publish(log, b -&gt; b.id(id).block());</span>
-<span class="fc" id="L47">        verify(subscriber, times(1)).receive(any(), metaWithId(id));</span>
-<span class="fc" id="L48">    }</span>
+<span class="fc" id="L45">        GlobalMetalog.publish(log, b -&gt; b.id(id).block());</span>
+<span class="fc" id="L46">        verify(subscriber, times(1)).receive(any(), metaWithId(id));</span>
+<span class="fc" id="L47">    }</span>
     
     @Test
     default void globalMetalog_Log_DoesNotThrow() {
-<span class="pc" id="L52">        assertDoesNotThrow(() -&gt; GlobalMetalog.publish((() -&gt; &quot;hi&quot;)));</span>
-<span class="fc" id="L53">    }</span>
+<span class="pc" id="L51">        assertDoesNotThrow(() -&gt; GlobalMetalog.publish((() -&gt; &quot;hi&quot;)));</span>
+<span class="fc" id="L52">    }</span>
     
     @Test
     default void globalMetalog_LogAndMeta_DoesNotThrow() {
-<span class="pc" id="L57">        assertDoesNotThrow(() -&gt; GlobalMetalog.publish((() -&gt; &quot;hi&quot;), Meta.DEFAULT));</span>
-<span class="fc" id="L58">    }</span>
+<span class="pc" id="L56">        assertDoesNotThrow(() -&gt; GlobalMetalog.publish((() -&gt; &quot;hi&quot;), Meta.DEFAULT));</span>
+<span class="fc" id="L57">    }</span>
     
     @Test
     default void globalMetalog_LogAndBuilder_DoesNotThrow() {
-<span class="pc" id="L62">        assertDoesNotThrow(() -&gt; GlobalMetalog.publish((() -&gt; &quot;hi&quot;), b -&gt; b.name(&quot;x&quot;)));</span>
-<span class="fc" id="L63">    }</span>
+<span class="pc" id="L61">        assertDoesNotThrow(() -&gt; GlobalMetalog.publish((() -&gt; &quot;hi&quot;), b -&gt; b.name(&quot;x&quot;)));</span>
+<span class="fc" id="L62">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

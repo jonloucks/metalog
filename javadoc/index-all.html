@@ -49,7 +49,7 @@ loadScripts(document, 'script');</script>
 <div class="header">
 <h1>Index</h1>
 </div>
-<a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:K">K</a>&nbsp;<a href="#I:L">L</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<br><a href="allclasses-index.html">All&nbsp;Classes&nbsp;and&nbsp;Interfaces</a><span class="vertical-separator">|</span><a href="allpackages-index.html">All&nbsp;Packages</a>
+<a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:H">H</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:K">K</a>&nbsp;<a href="#I:L">L</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<br><a href="allclasses-index.html">All&nbsp;Classes&nbsp;and&nbsp;Interfaces</a><span class="vertical-separator">|</span><a href="allpackages-index.html">All&nbsp;Packages</a>
 <h2 class="title" id="I:A">A</h2>
 <dl class="index">
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Filterable.html#addFilter(java.util.function.Predicate)" class="member-name-link">addFilter(Predicate&lt;Meta&gt;)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Filterable.html" title="interface in io.github.jonloucks.metalog.api">Filterable</a></dt>
@@ -57,7 +57,9 @@ loadScripts(document, 'script');</script>
 <div class="block">Add a new filter</div>
 </dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html#asList()" class="member-name-link">asList()</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html" title="interface in io.github.jonloucks.metalog.api">Entities</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Create a new List containing all the entities in the proper order</div>
+</dd>
 </dl>
 <h2 class="title" id="I:B">B</h2>
 <dl class="index">
@@ -136,15 +138,22 @@ loadScripts(document, 'script');</script>
 <h2 class="title" id="I:E">E</h2>
 <dl class="index">
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html" class="type-name-link" title="interface in io.github.jonloucks.metalog.api">Entities</a> - Interface in <a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/package-summary.html">io.github.jonloucks.metalog.api</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Contains zero or more Entity instances
+ Supports both unique and duplicate entities, determined by the entity name and unique fields.</div>
+</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.Builder.html" class="type-name-link" title="interface in io.github.jonloucks.metalog.api">Entities.Builder</a>&lt;<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.Builder.html" title="type parameter in Entities.Builder">B</a> extends <a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entities.Builder</a>&lt;<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.Builder.html" title="type parameter in Entities.Builder">B</a>&gt;&gt; - Interface in <a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/package-summary.html">io.github.jonloucks.metalog.api</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.Visitor.html" class="type-name-link" title="interface in io.github.jonloucks.metalog.api">Entities.Visitor</a>&lt;<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.Visitor.html" title="type parameter in Entities.Visitor">T</a>&gt; - Interface in <a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/package-summary.html">io.github.jonloucks.metalog.api</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">The Entities Builder</div>
+</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.Builder.html#entity(io.github.jonloucks.metalog.api.Entity)" class="member-name-link">entity(Entity)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entities.Builder</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Add an entity</div>
+</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.Builder.html#entity(java.util.function.Consumer)" class="member-name-link">entity(Consumer&lt;Entity.Builder&lt;?&gt;&gt;)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entities.Builder</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Add an entity via a builder consumer</div>
+</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entity.html" class="type-name-link" title="interface in io.github.jonloucks.metalog.api">Entity</a> - Interface in <a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/package-summary.html">io.github.jonloucks.metalog.api</a></dt>
 <dd>
 <div class="block">A generalized representation of anything</div>
@@ -157,7 +166,9 @@ loadScripts(document, 'script');</script>
 <h2 class="title" id="I:F">F</h2>
 <dl class="index">
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.Builder.html#FACTORY_CONTRACT" class="member-name-link">FACTORY_CONTRACT</a> - Static variable in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entities.Builder</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Entities Builder Factory Contract</div>
+</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entity.Builder.html#FACTORY_CONTRACT" class="member-name-link">FACTORY_CONTRACT</a> - Static variable in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entity.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entity.Builder</a></dt>
 <dd>
 <div class="block">Used to promise and claim the Entity.Builder implementation</div>
@@ -170,18 +181,22 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Responsible for combining many predicates into one</div>
 </dd>
-<dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html#findAllByNameWithType(java.lang.String,java.lang.Class)" class="member-name-link">findAllByNameWithType(String, Class&lt;T&gt;)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html" title="interface in io.github.jonloucks.metalog.api">Entities</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html#findAllIf(java.util.function.Predicate)" class="member-name-link">findAllIf(Predicate&lt;? super Entity&gt;)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html" title="interface in io.github.jonloucks.metalog.api">Entities</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html#findAllWithType(java.util.function.Predicate,java.lang.Class)" class="member-name-link">findAllWithType(Predicate&lt;? super Entity&gt;, Class&lt;T&gt;)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html" title="interface in io.github.jonloucks.metalog.api">Entities</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html#findFirstByNameWithType(java.lang.String,java.lang.Class)" class="member-name-link">findFirstByNameWithType(String, Class&lt;T&gt;)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html" title="interface in io.github.jonloucks.metalog.api">Entities</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Finds all entities matching a filter</div>
+</dd>
+<dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html#findAllValuesWithType(java.util.function.Predicate,java.lang.Class)" class="member-name-link">findAllValuesWithType(Predicate&lt;? super Entity&gt;, Class&lt;T&gt;)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html" title="interface in io.github.jonloucks.metalog.api">Entities</a></dt>
+<dd>
+<div class="block">Finds all the values of each entity matching a filter and has the correct type</div>
+</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html#findFirstIf(java.util.function.Predicate)" class="member-name-link">findFirstIf(Predicate&lt;? super Entity&gt;)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html" title="interface in io.github.jonloucks.metalog.api">Entities</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html#findFirstWithType(java.util.function.Predicate,java.lang.Class)" class="member-name-link">findFirstWithType(Predicate&lt;? super Entity&gt;, Class&lt;T&gt;)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html" title="interface in io.github.jonloucks.metalog.api">Entities</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Finds the first entity matching a filter</div>
+</dd>
+<dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html#findFirstValueWithType(java.util.function.Predicate,java.lang.Class)" class="member-name-link">findFirstValueWithType(Predicate&lt;? super Entity&gt;, Class&lt;T&gt;)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html" title="interface in io.github.jonloucks.metalog.api">Entities</a></dt>
+<dd>
+<div class="block">Finds the value of the first entity matching a filter and has the correct type</div>
+</dd>
 </dl>
 <h2 class="title" id="I:G">G</h2>
 <dl class="index">
@@ -196,7 +211,7 @@ loadScripts(document, 'script');</script>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entity.html#getCorrelations()" class="member-name-link">getCorrelations()</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a></dt>
 <dd>
 <div class="block">The optional correlations for this entity
- Exmaples: An entity representing the support contact information for error</div>
+ Examples: An entity representing the support contact information for error</div>
 </dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entity.html#getId()" class="member-name-link">getId()</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a></dt>
 <dd>
@@ -238,6 +253,13 @@ loadScripts(document, 'script');</script>
 <div class="block">Globally shared Metalog singleton</div>
 </dd>
 </dl>
+<h2 class="title" id="I:H">H</h2>
+<dl class="index">
+<dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Meta.html#hasBlock()" class="member-name-link">hasBlock()</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Meta.html" title="interface in io.github.jonloucks.metalog.api">Meta</a></dt>
+<dd>
+<div class="block">if true the <a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Log.html#get()"><code>Log.get()</code></a> will be invoked immediately (if needed).</div>
+</dd>
+</dl>
 <h2 class="title" id="I:I">I</h2>
 <dl class="index">
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entity.Builder.html#id(java.lang.String)" class="member-name-link">id(String)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entity.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entity.Builder</a></dt>
@@ -249,14 +271,14 @@ loadScripts(document, 'script');</script>
 <div class="block">Set the id for the Meta</div>
 </dd>
 <dt><a href="io.github.jonloucks.metalog.api/module-summary.html">io.github.jonloucks.metalog.api</a> - module io.github.jonloucks.metalog.api</dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">The API module for Metalog</div>
+</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/package-summary.html">io.github.jonloucks.metalog.api</a> - package io.github.jonloucks.metalog.api</dt>
 <dd>&nbsp;</dd>
-<dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Meta.html#isBlock()" class="member-name-link">isBlock()</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Meta.html" title="interface in io.github.jonloucks.metalog.api">Meta</a></dt>
-<dd>
-<div class="block">if true the <a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Log.html#get()"><code>Log.get()</code></a> will be invoked immediately (if needed).</div>
-</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html#isEmpty()" class="member-name-link">isEmpty()</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html" title="interface in io.github.jonloucks.metalog.api">Entities</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entity.html#isUnique()" class="member-name-link">isUnique()</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a></dt>
 <dd>&nbsp;</dd>
 </dl>
 <h2 class="title" id="I:K">K</h2>
@@ -315,19 +337,25 @@ loadScripts(document, 'script');</script>
 <h2 class="title" id="I:P">P</h2>
 <dl class="index">
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/GlobalMetalog.html#publish(io.github.jonloucks.metalog.api.Log)" class="member-name-link">publish(Log)</a> - Static method in class io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/GlobalMetalog.html" title="class in io.github.jonloucks.metalog.api">GlobalMetalog</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Publish a log message with the default meta information.</div>
+</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Publisher.html#publish(io.github.jonloucks.metalog.api.Log)" class="member-name-link">publish(Log)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Publisher.html" title="interface in io.github.jonloucks.metalog.api">Publisher</a></dt>
 <dd>
 <div class="block">Publish a log message with the default meta information.</div>
 </dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/GlobalMetalog.html#publish(io.github.jonloucks.metalog.api.Log,io.github.jonloucks.metalog.api.Meta)" class="member-name-link">publish(Log, Meta)</a> - Static method in class io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/GlobalMetalog.html" title="class in io.github.jonloucks.metalog.api">GlobalMetalog</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Publish a log message and it's included meta information.</div>
+</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Publisher.html#publish(io.github.jonloucks.metalog.api.Log,io.github.jonloucks.metalog.api.Meta)" class="member-name-link">publish(Log, Meta)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Publisher.html" title="interface in io.github.jonloucks.metalog.api">Publisher</a></dt>
 <dd>
 <div class="block">Publish a log message and it's included meta information.</div>
 </dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/GlobalMetalog.html#publish(io.github.jonloucks.metalog.api.Log,java.util.function.Consumer)" class="member-name-link">publish(Log, Consumer&lt;Meta.Builder&lt;?&gt;&gt;)</a> - Static method in class io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/GlobalMetalog.html" title="class in io.github.jonloucks.metalog.api">GlobalMetalog</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Publish a log message with the meta initialized in a callback</div>
+</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Publisher.html#publish(io.github.jonloucks.metalog.api.Log,java.util.function.Consumer)" class="member-name-link">publish(Log, Consumer&lt;Meta.Builder&lt;?&gt;&gt;)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Publisher.html" title="interface in io.github.jonloucks.metalog.api">Publisher</a></dt>
 <dd>
 <div class="block">Publish a log message with the meta initialized in a callback</div>
@@ -346,9 +374,13 @@ loadScripts(document, 'script');</script>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Metalog.Config.html#reflectionClassName()" class="member-name-link">reflectionClassName()</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Metalog.Config.html" title="interface in io.github.jonloucks.metalog.api">Metalog.Config</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.Builder.html#removeIf(java.util.function.Predicate)" class="member-name-link">removeIf(Predicate&lt;? super Entity&gt;)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entities.Builder</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Removes each entity that matches a filter</div>
+</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.Builder.html#replaceIf(java.util.function.Predicate,io.github.jonloucks.metalog.api.Entity)" class="member-name-link">replaceIf(Predicate&lt;? super Entity&gt;, Entity)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entities.Builder</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Replaces each entity that matches a filter with a replacement entity</div>
+</dd>
 </dl>
 <h2 class="title" id="I:S">S</h2>
 <dl class="index">
@@ -361,7 +393,9 @@ loadScripts(document, 'script');</script>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html#size()" class="member-name-link">size()</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html" title="interface in io.github.jonloucks.metalog.api">Entities</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/GlobalMetalog.html#subscribe(io.github.jonloucks.metalog.api.Subscriber)" class="member-name-link">subscribe(Subscriber)</a> - Static method in class io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/GlobalMetalog.html" title="class in io.github.jonloucks.metalog.api">GlobalMetalog</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Add a new log subscription</div>
+</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Metalog.html#subscribe(io.github.jonloucks.metalog.api.Subscriber)" class="member-name-link">subscribe(Subscriber)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Metalog.html" title="interface in io.github.jonloucks.metalog.api">Metalog</a></dt>
 <dd>
 <div class="block">Add a new log subscription</div>
@@ -379,10 +413,10 @@ loadScripts(document, 'script');</script>
 </dl>
 <h2 class="title" id="I:T">T</h2>
 <dl class="index">
-<dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Console.html#test(io.github.jonloucks.metalog.api.Meta)" class="member-name-link">test(Meta)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Console.html" title="interface in io.github.jonloucks.metalog.api">Console</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Subscriber.html#test(io.github.jonloucks.metalog.api.Meta)" class="member-name-link">test(Meta)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Subscriber.html" title="interface in io.github.jonloucks.metalog.api">Subscriber</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Used to short circuit needless processing</div>
+</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entity.Builder.html#text(java.util.function.Supplier)" class="member-name-link">text(Supplier&lt;CharSequence&gt;)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entity.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entity.Builder</a></dt>
 <dd>
 <div class="block">Set the text supplier for the Entity</div>
@@ -410,8 +444,10 @@ loadScripts(document, 'script');</script>
 </dl>
 <h2 class="title" id="I:U">U</h2>
 <dl class="index">
-<dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.Builder.html#unique(boolean)" class="member-name-link">unique(boolean)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entities.Builder</a></dt>
-<dd>&nbsp;</dd>
+<dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entity.Builder.html#unique(boolean)" class="member-name-link">unique(boolean)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entity.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entity.Builder</a></dt>
+<dd>
+<div class="block">Set unique name for the Entity</div>
+</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Metalog.Config.html#unkeyedFairness()" class="member-name-link">unkeyedFairness()</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Metalog.Config.html" title="interface in io.github.jonloucks.metalog.api">Metalog.Config</a></dt>
 <dd>
 <div class="block">true if all thread log messages are processed in FIFO order</div>
@@ -431,12 +467,20 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Set the value for the Entity</div>
 </dd>
-<dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.Visitor.html#visit(T)" class="member-name-link">visit(T)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.Visitor.html" title="interface in io.github.jonloucks.metalog.api">Entities.Visitor</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html#visitEach(io.github.jonloucks.metalog.api.Entities.Visitor)" class="member-name-link">visitEach(Entities.Visitor&lt;? super Entity&gt;)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html" title="interface in io.github.jonloucks.metalog.api">Entities</a></dt>
-<dd>&nbsp;</dd>
+<dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Visitor.html#visit(T)" class="member-name-link">visit(T)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Visitor.html" title="interface in io.github.jonloucks.metalog.api">Visitor</a></dt>
+<dd>
+<div class="block">Called for each item</div>
+</dd>
+<dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html#visitEach(io.github.jonloucks.metalog.api.Visitor)" class="member-name-link">visitEach(Visitor&lt;? super Entity&gt;)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entities.html" title="interface in io.github.jonloucks.metalog.api">Entities</a></dt>
+<dd>
+<div class="block">Visit each entity</div>
+</dd>
+<dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Visitor.html" class="type-name-link" title="interface in io.github.jonloucks.metalog.api">Visitor</a>&lt;<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Visitor.html" title="type parameter in Visitor">T</a>&gt; - Interface in <a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/package-summary.html">io.github.jonloucks.metalog.api</a></dt>
+<dd>
+<div class="block">Like an iterator except there is not a 'remove'</div>
+</dd>
 </dl>
-<a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:K">K</a>&nbsp;<a href="#I:L">L</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<br><a href="allclasses-index.html">All&nbsp;Classes&nbsp;and&nbsp;Interfaces</a><span class="vertical-separator">|</span><a href="allpackages-index.html">All&nbsp;Packages</a></main>
+<a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:H">H</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:K">K</a>&nbsp;<a href="#I:L">L</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<br><a href="allclasses-index.html">All&nbsp;Classes&nbsp;and&nbsp;Interfaces</a><span class="vertical-separator">|</span><a href="allpackages-index.html">All&nbsp;Packages</a></main>
 </div>
 </div>
 </body>

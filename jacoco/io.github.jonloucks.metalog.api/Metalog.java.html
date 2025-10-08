@@ -9,7 +9,7 @@ import java.time.Duration;
  *
  * @see io.github.jonloucks.metalog.api.Publisher
  */
-public interface Metalog extends Publisher, AutoOpen {
+public interface Metalog extends Publisher, Filterable, AutoOpen {
     /**
      * Access the current Metalog implementation
      */

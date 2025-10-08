@@ -8,44 +8,106 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+/**
+ * Contains zero or more Entity instances
+ * Supports both unique and duplicate entities, determined by the entity name and unique fields.
+ * Examples of unique entities are &quot;thread&quot;, &quot;time&quot;, and &quot;thrown&quot;
+ * Examples of non-unique entities could be &quot;event&quot; where there are multiple events associated with a log
+ */
 public interface Entities {
     
-    @FunctionalInterface
-    interface Visitor&lt;T&gt; {
-        boolean visit(T t);
-    }
-    
+    /**
+     * Visit each entity
+     * @param visitor the callback to receive each entity
+     */
     void visitEach(Visitor&lt;? super Entity&gt; visitor);
     
+    /**
+     * Finds the first entity matching a filter
+     * @param filter determines the match
+     * @return optionally the entity found
+     */
     Optional&lt;Entity&gt; findFirstIf(Predicate&lt;? super Entity&gt; filter);
     
-    &lt;T&gt; Optional&lt;T&gt; findFirstWithType(Predicate&lt;? super Entity&gt; filter, Class&lt;T&gt; type);
-
+    /**
+     * Finds the value of the first entity matching a filter and has the correct type
+     * @param filter determines the match
+     * @param type the type of value required
+     * @return optionally the value found (null is a valid value)
+     * @param &lt;T&gt; the type of value
+     */
+    &lt;T&gt; Optional&lt;T&gt; findFirstValueWithType(Predicate&lt;? super Entity&gt; filter, Class&lt;T&gt; type);
+    
+    /**
+     * Finds all entities matching a filter
+     * @param filter determines the match
+     * @return a list of all matching entities
+     */
     List&lt;Entity&gt; findAllIf(Predicate&lt;? super Entity&gt; filter);
-
-    &lt;T&gt; List&lt;T&gt; findAllByNameWithType(String name, Class&lt;T&gt; type);
     
-    &lt;T&gt; List&lt;T&gt; findAllWithType(Predicate&lt;? super Entity&gt; filter, Class&lt;T&gt; type);
+    /**
+     * Finds all the values of each entity matching a filter and has the correct type
+     * @param filter determines the match
+     * @param type the type of value required
+     * @return a list of all the values (null is valid value)
+     * @param &lt;T&gt; the type of value
+     */
+    &lt;T&gt; List&lt;T&gt; findAllValuesWithType(Predicate&lt;? super Entity&gt; filter, Class&lt;T&gt; type);
     
-    &lt;T&gt; Optional&lt;T&gt; findFirstByNameWithType(String name, Class&lt;T&gt; type);
-    
+    /**
+     * Create a new List containing all the entities in the proper order
+     * @return the list
+     */
     List&lt;Entity&gt; asList();
     
+    /**
+     * @return true when empty
+     */
     boolean isEmpty();
     
+    /**
+     * @return the number of entities
+     */
     int size();
     
+    /**
+     * The Entities Builder
+     * @param &lt;B&gt; recursive builder type
+     */
     interface Builder&lt;B extends Builder&lt;B&gt;&gt; extends Entities {
-<span class="fc" id="L39">        Contract&lt;Supplier&lt;Entities.Builder&lt;?&gt;&gt;&gt; FACTORY_CONTRACT = Contract.create(&quot;Entities Builder Factory&quot;);</span>
         
-        boolean replaceIf(Predicate&lt;? super Entity&gt; filter, Entity entity);
+        /**
+         * Entities Builder Factory Contract
+         */
+<span class="fc" id="L82">        Contract&lt;Supplier&lt;Entities.Builder&lt;?&gt;&gt;&gt; FACTORY_CONTRACT = Contract.create(&quot;Entities Builder Factory&quot;);</span>
         
+        /**
+         * Replaces each entity that matches a filter with a replacement entity
+         * @param filter determines if an entity will be replaced
+         * @param replacement the entity used to replace any instances that match the filter
+         * @return this builder
+         */
+        boolean replaceIf(Predicate&lt;? super Entity&gt; filter, Entity replacement);
+        
+        /**
+         * Removes each entity that matches a filter
+         * @param filter determines if an entity will be removed
+         * @return this builder
+         */
         boolean removeIf(Predicate&lt;? super Entity&gt; filter);
-        
-        B unique(boolean unique);
-        
+
+        /**
+         * Add an entity via a builder consumer
+         * @param builderConsumer the entity builder consumer
+         * @return this builder
+         */
         B entity(Consumer&lt;Entity.Builder&lt;?&gt;&gt; builderConsumer);
         
+        /**
+         * Add an entity
+         * @param entity the entity to add
+         * @return this builder
+         */
         B entity(Entity entity);
     }
 }

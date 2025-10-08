@@ -11,33 +11,45 @@ import static io.github.jonloucks.contracts.api.Checks.nullCheck;
  * Globally shared Metalog singleton
  */
 public final class GlobalMetalog {
-    
+
     /**
+     * Publish a log message with the default meta information.
+     * This is minimal log message, there will be no timestamp, thread info, etc.
+     * @param log the log message to publish
      * @see Metalog#publish(Log)
      */
     public static void publish(Log log) {
-<span class="fc" id="L19">        INSTANCE.metalog.publish(log);</span>
-<span class="fc" id="L20">    }</span>
-    
+<span class="fc" id="L22">        INSTANCE.metalog.publish(log);</span>
+<span class="fc" id="L23">    }</span>
+
     /**
+     * Publish a log message and it's included meta information.
+     * @param log the log message to publish
+     * @param meta the meta information for the given log
      * @see Metalog#publish(Log, Meta)
      */
     public static void publish(Log log, Meta meta) {
-<span class="fc" id="L26">        INSTANCE.metalog.publish(log, meta);</span>
-<span class="fc" id="L27">    }</span>
-    
+<span class="fc" id="L32">        INSTANCE.metalog.publish(log, meta);</span>
+<span class="fc" id="L33">    }</span>
+
     /**
+     * Publish a log message with the meta initialized in a callback
+     * @param log the log message to publish
+     * @param builderConsumer the callback to accept the Meta.Builder
      * @see Metalog#publish(Log, Consumer)
      */
-    public static void publish(Log log, Consumer&lt;Meta.Builder&lt;?&gt;&gt; metaBuilder) {
-<span class="fc" id="L33">        INSTANCE.metalog.publish(log, metaBuilder);</span>
-<span class="fc" id="L34">    }</span>
- 
+    public static void publish(Log log, Consumer&lt;Meta.Builder&lt;?&gt;&gt; builderConsumer) {
+<span class="fc" id="L42">        INSTANCE.metalog.publish(log, builderConsumer);</span>
+<span class="fc" id="L43">    }</span>
+
     /**
+     * Add a new log subscription
+     * @param subscriber the subscriber to add
+     * @return calling close removes the subscription
      * @see Metalog#subscribe(Subscriber)
      */
     public static AutoClose subscribe(Subscriber subscriber) {
-<span class="fc" id="L40">        return INSTANCE.metalog.subscribe(subscriber);</span>
+<span class="fc" id="L52">        return INSTANCE.metalog.subscribe(subscriber);</span>
     }
     
     /**
@@ -45,7 +57,7 @@ public final class GlobalMetalog {
      * @return the instance
      */
     public static Metalog getInstance() {
-<span class="fc" id="L48">        return INSTANCE.metalog;</span>
+<span class="fc" id="L60">        return INSTANCE.metalog;</span>
     }
     
     /**
@@ -58,20 +70,20 @@ public final class GlobalMetalog {
      * &lt;/p&gt;
      */
     public static Metalog createMetalog(Metalog.Config config) {
-<span class="fc" id="L61">        final Metalog.Config validConfig = configCheck(config);</span>
-<span class="fc" id="L62">        final MetalogFactoryFinder factoryFinder = new MetalogFactoryFinder(config);</span>
-<span class="fc" id="L63">        final MetalogFactory factory = nullCheck(factoryFinder.find(), &quot;Metalog factory must be present.&quot;);</span>
-<span class="fc" id="L64">        final Metalog metalog = factory.create(validConfig);</span>
+<span class="fc" id="L73">        final Metalog.Config validConfig = configCheck(config);</span>
+<span class="fc" id="L74">        final MetalogFactoryFinder factoryFinder = new MetalogFactoryFinder(config);</span>
+<span class="fc" id="L75">        final MetalogFactory factory = nullCheck(factoryFinder.find(), &quot;Metalog factory must be present.&quot;);</span>
+<span class="fc" id="L76">        final Metalog metalog = factory.create(validConfig);</span>
         
-<span class="fc" id="L66">        return nullCheck(metalog, &quot;Metalog could not be created.&quot;);</span>
+<span class="fc" id="L78">        return nullCheck(metalog, &quot;Metalog could not be created.&quot;);</span>
     }
     
-<span class="fc" id="L69">    private GlobalMetalog() {</span>
-<span class="fc" id="L70">        this.metalog = createMetalog(Metalog.Config.DEFAULT);</span>
-<span class="fc" id="L71">        this.close = metalog.open();</span>
-<span class="fc" id="L72">    }</span>
+<span class="fc" id="L81">    private GlobalMetalog() {</span>
+<span class="fc" id="L82">        this.metalog = createMetalog(Metalog.Config.DEFAULT);</span>
+<span class="fc" id="L83">        this.close = metalog.open();</span>
+<span class="fc" id="L84">    }</span>
     
-<span class="fc" id="L74">    private static final GlobalMetalog INSTANCE = new GlobalMetalog();</span>
+<span class="fc" id="L86">    private static final GlobalMetalog INSTANCE = new GlobalMetalog();</span>
     
     private final Metalog metalog;
     @SuppressWarnings({&quot;FieldCanBeLocal&quot;, &quot;unused&quot;})

@@ -14,7 +14,7 @@ final class SequencerTracker implements Subscriber {
 <span class="fc" id="L14">        final Optional&lt;String&gt; optionalKey = meta.getKey();</span>
         // storing the sequence number directly in the meta value for tests.
 <span class="fc" id="L16">        final Optional&lt;Object&gt; optionalValue = meta.getValue();</span>
-<span class="pc bpc" id="L17" title="2 of 4 branches missed.">        if (optionalKey.isPresent() &amp;&amp; optionalValue.isPresent()) {</span>
+<span class="pc bpc" id="L17" title="1 of 4 branches missed.">        if (optionalKey.isPresent() &amp;&amp; optionalValue.isPresent()) {</span>
 <span class="fc" id="L18">            final Sequence sequence = getSequence(optionalKey.get());</span>
 <span class="fc" id="L19">            synchronized (sequence) {</span>
 <span class="fc" id="L20">                final int actual = (Integer) optionalValue.get();</span>

@@ -109,7 +109,7 @@ public interface EntityTests {
     
     @Test
     default void entity_copy_OverwritesWhenPresent() {
-<span class="fc" id="L112">        final Entity fromEntity = createTestEntity(&quot;from name&quot;, &quot;from value&quot;, &quot;from id&quot;);</span>
+<span class="fc" id="L112">        final Entity fromEntity = createTestEntity(&quot;from name&quot;, &quot;from value&quot;, &quot;from id&quot;, false);</span>
 <span class="fc" id="L113">        runWithScenario( builder -&gt; {</span>
 <span class="fc" id="L114">            builder.id(&quot;original id&quot;).name(&quot;original name&quot;).value(&quot;original value&quot;);</span>
 <span class="fc" id="L115">            final Entity.Builder&lt;?&gt; result = builder.copy(fromEntity);</span>
@@ -126,7 +126,7 @@ public interface EntityTests {
     
     @Test
     default void entity_copy_DiscardsWhenNotPresent() {
-<span class="fc" id="L129">        final Entity fromEntity = createTestEntity(null, null, null);</span>
+<span class="fc" id="L129">        final Entity fromEntity = createTestEntity(null, null, null, false);</span>
 <span class="fc" id="L130">        runWithScenario( builder -&gt; {</span>
 <span class="fc" id="L131">            builder.id(&quot;original id&quot;).name(&quot;original name&quot;).value(&quot;original value&quot;);</span>
 <span class="fc" id="L132">            final Entity.Builder&lt;?&gt; result = builder.copy(fromEntity);</span>
@@ -143,7 +143,7 @@ public interface EntityTests {
     
     @Test
     default void entity_copy_SetsNotPresent() {
-<span class="fc" id="L146">        final Entity fromEntity = createTestEntity(&quot;from name&quot;, &quot;from value&quot;, &quot;from id&quot;);</span>
+<span class="fc" id="L146">        final Entity fromEntity = createTestEntity(&quot;from name&quot;, &quot;from value&quot;, &quot;from id&quot;, false);</span>
 <span class="fc" id="L147">        runWithScenario( builder -&gt; {</span>
 <span class="fc" id="L148">            final Entity.Builder&lt;?&gt; result = builder.copy(fromEntity);</span>
             

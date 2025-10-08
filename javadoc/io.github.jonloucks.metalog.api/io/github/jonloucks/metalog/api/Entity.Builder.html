@@ -168,8 +168,13 @@ extends <a href="Entity.html" title="interface in io.github.jonloucks.metalog.ap
 <div class="block">Set the text supplier for the Entity</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Entity.Builder.html" title="type parameter in Entity.Builder">B</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#value(java.lang.Object)" class="member-name-link">value</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;value)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#unique(boolean)" class="member-name-link">unique</a><wbr>(boolean&nbsp;unique)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Set unique name for the Entity</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Entity.Builder.html" title="type parameter in Entity.Builder">B</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#value(java.lang.Object)" class="member-name-link">value</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;value)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Set the value for the Entity</div>
 </div>
 </div>
@@ -177,7 +182,7 @@ extends <a href="Entity.html" title="interface in io.github.jonloucks.metalog.ap
 </div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-io.github.jonloucks.metalog.api.Entity">Methods inherited from interface&nbsp;io.github.jonloucks.metalog.api.<a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a></h3>
-<code><a href="Entity.html#getCorrelations()">getCorrelations</a>, <a href="Entity.html#getId()">getId</a>, <a href="Entity.html#getName()">getName</a>, <a href="Entity.html#getValue()">getValue</a></code></div>
+<code><a href="Entity.html#getCorrelations()">getCorrelations</a>, <a href="Entity.html#getId()">getId</a>, <a href="Entity.html#getName()">getName</a>, <a href="Entity.html#getValue()">getValue</a>, <a href="Entity.html#isUnique()">isUnique</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-java.util.function.Supplier">Methods inherited from interface&nbsp;java.util.function.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html" title="class or interface in java.util.function" class="external-link">Supplier</a></h3>
 <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html#get()" title="class or interface in java.util.function" class="external-link">get</a></code></div>
@@ -228,6 +233,19 @@ extends <a href="Entity.html" title="interface in io.github.jonloucks.metalog.ap
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>name</code> - the name for the Entity</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="unique(boolean)">
+<h3>unique</h3>
+<div class="member-signature"><span class="return-type"><a href="Entity.Builder.html" title="type parameter in Entity.Builder">B</a></span>&nbsp;<span class="element-name">unique</span><wbr><span class="parameters">(boolean&nbsp;unique)</span></div>
+<div class="block">Set unique name for the Entity</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>unique</code> - true makes this entity unique</dd>
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>

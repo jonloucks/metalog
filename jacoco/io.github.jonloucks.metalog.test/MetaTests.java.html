@@ -72,7 +72,7 @@ public interface MetaTests {
 <span class="fc" id="L72">            assertEquals(timestamp, metaBuilder.getTime().get());</span>
 <span class="fc" id="L73">            assertTrue(metaBuilder.getThrown().isPresent());</span>
 <span class="fc" id="L74">            assertEquals(thrown, metaBuilder.getThrown().get());</span>
-<span class="fc" id="L75">            assertEquals(fromBuilder.isBlock(), metaBuilder.isBlock());</span>
+<span class="fc" id="L75">            assertEquals(fromBuilder.hasBlock(), metaBuilder.hasBlock());</span>
 <span class="fc" id="L76">            assertTrue(metaBuilder.getThread().isPresent());</span>
 <span class="fc" id="L77">            assertEquals(thread, metaBuilder.getThread().get());</span>
 <span class="fc" id="L78">        });</span>
@@ -112,7 +112,7 @@ public interface MetaTests {
 <span class="fc" id="L112">            assertEquals(timestamp, metaBuilder.getTime().get());</span>
 <span class="fc" id="L113">            assertTrue(metaBuilder.getThrown().isPresent());</span>
 <span class="fc" id="L114">            assertEquals(thrown, metaBuilder.getThrown().get());</span>
-<span class="fc" id="L115">            assertEquals(fromBuilder.isBlock(), metaBuilder.isBlock());</span>
+<span class="fc" id="L115">            assertEquals(fromBuilder.hasBlock(), metaBuilder.hasBlock());</span>
 <span class="fc" id="L116">            assertTrue(metaBuilder.getThread().isPresent());</span>
 <span class="fc" id="L117">            assertEquals(thread, metaBuilder.getThread().get());</span>
 <span class="fc" id="L118">        });</span>
@@ -155,7 +155,7 @@ public interface MetaTests {
 <span class="fc" id="L155">            assertEquals(timestamp, metaBuilder.getTime().get());</span>
 <span class="fc" id="L156">            assertTrue(metaBuilder.getThrown().isPresent());</span>
 <span class="fc" id="L157">            assertEquals(thrown, metaBuilder.getThrown().get());</span>
-<span class="fc" id="L158">            assertFalse(metaBuilder.isBlock());</span>
+<span class="fc" id="L158">            assertFalse(metaBuilder.hasBlock());</span>
 <span class="fc" id="L159">            assertTrue(metaBuilder.getThread().isPresent());</span>
 <span class="fc" id="L160">            assertEquals(thread, metaBuilder.getThread().get());</span>
 <span class="fc" id="L161">        });</span>

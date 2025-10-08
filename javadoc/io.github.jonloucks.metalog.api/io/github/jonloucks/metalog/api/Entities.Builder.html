@@ -73,6 +73,10 @@ loadScripts(document, 'script');</script>
 </div>
 <section class="class-description" id="class-description">
 <dl class="notes">
+<dt>Type Parameters:</dt>
+<dd><code>B</code> - recursive builder type</dd>
+</dl>
+<dl class="notes">
 <dt>All Superinterfaces:</dt>
 <dd><code><a href="Entities.html" title="interface in io.github.jonloucks.metalog.api">Entities</a></code></dd>
 </dl>
@@ -83,6 +87,7 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="type-signature"><span class="modifiers">public static interface </span><span class="element-name type-name-label">Entities.Builder&lt;B extends Entities.Builder&lt;B&gt;&gt;</span><span class="extends-implements">
 extends <a href="Entities.html" title="interface in io.github.jonloucks.metalog.api">Entities</a></span></div>
+<div class="block">The Entities Builder</div>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -92,7 +97,7 @@ extends <a href="Entities.html" title="interface in io.github.jonloucks.metalog.
 <h2>Nested Class Summary</h2>
 <div class="inherited-list">
 <h2 id="nested-classes-inherited-from-class-io.github.jonloucks.metalog.api.Entities">Nested classes/interfaces inherited from interface&nbsp;io.github.jonloucks.metalog.api.<a href="Entities.html" title="interface in io.github.jonloucks.metalog.api">Entities</a></h2>
-<code><a href="Entities.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entities.Builder</a>&lt;<a href="Entities.Builder.html" title="type parameter in Entities.Builder">B</a> extends <a href="Entities.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entities.Builder</a>&lt;<a href="Entities.Builder.html" title="type parameter in Entities.Builder">B</a>&gt;&gt;, <a href="Entities.Visitor.html" title="interface in io.github.jonloucks.metalog.api">Entities.Visitor</a>&lt;<a href="Entities.Visitor.html" title="type parameter in Entities.Visitor">T</a>&gt;</code></div>
+<code><a href="Entities.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entities.Builder</a>&lt;<a href="Entities.Builder.html" title="type parameter in Entities.Builder">B</a> extends <a href="Entities.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entities.Builder</a>&lt;<a href="Entities.Builder.html" title="type parameter in Entities.Builder">B</a>&gt;&gt;</code></div>
 </section>
 </li>
 <!-- =========== FIELD SUMMARY =========== -->
@@ -106,7 +111,9 @@ extends <a href="Entities.html" title="interface in io.github.jonloucks.metalog.
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>static final io.github.jonloucks.contracts.api.Contract&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html" title="class or interface in java.util.function" class="external-link">Supplier</a>&lt;<a href="Entities.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entities.Builder</a>&lt;?&gt;&gt;&gt;</code></div>
 <div class="col-second even-row-color"><code><a href="#FACTORY_CONTRACT" class="member-name-link">FACTORY_CONTRACT</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">Entities Builder Factory Contract</div>
+</div>
 </div>
 </section>
 </li>
@@ -123,26 +130,31 @@ extends <a href="Entities.html" title="interface in io.github.jonloucks.metalog.
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Entities.Builder.html" title="type parameter in Entities.Builder">B</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#entity(io.github.jonloucks.metalog.api.Entity)" class="member-name-link">entity</a><wbr>(<a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&nbsp;entity)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Add an entity</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Entities.Builder.html" title="type parameter in Entities.Builder">B</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#entity(java.util.function.Consumer)" class="member-name-link">entity</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="Entity.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entity.Builder</a>&lt;?&gt;&gt;&nbsp;builderConsumer)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Add an entity via a builder consumer</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>boolean</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#removeIf(java.util.function.Predicate)" class="member-name-link">removeIf</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;? super <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;&nbsp;filter)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Removes each entity that matches a filter</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>boolean</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#replaceIf(java.util.function.Predicate,io.github.jonloucks.metalog.api.Entity)" class="member-name-link">replaceIf</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;? super <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;&nbsp;filter,
- <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&nbsp;entity)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Entities.Builder.html" title="type parameter in Entities.Builder">B</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#unique(boolean)" class="member-name-link">unique</a><wbr>(boolean&nbsp;unique)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+ <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&nbsp;replacement)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Replaces each entity that matches a filter with a replacement entity</div>
+</div>
 </div>
 </div>
 </div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-io.github.jonloucks.metalog.api.Entities">Methods inherited from interface&nbsp;io.github.jonloucks.metalog.api.<a href="Entities.html" title="interface in io.github.jonloucks.metalog.api">Entities</a></h3>
-<code><a href="Entities.html#asList()">asList</a>, <a href="Entities.html#findAllByNameWithType(java.lang.String,java.lang.Class)">findAllByNameWithType</a>, <a href="Entities.html#findAllIf(java.util.function.Predicate)">findAllIf</a>, <a href="Entities.html#findAllWithType(java.util.function.Predicate,java.lang.Class)">findAllWithType</a>, <a href="Entities.html#findFirstByNameWithType(java.lang.String,java.lang.Class)">findFirstByNameWithType</a>, <a href="Entities.html#findFirstIf(java.util.function.Predicate)">findFirstIf</a>, <a href="Entities.html#findFirstWithType(java.util.function.Predicate,java.lang.Class)">findFirstWithType</a>, <a href="Entities.html#isEmpty()">isEmpty</a>, <a href="Entities.html#size()">size</a>, <a href="Entities.html#visitEach(io.github.jonloucks.metalog.api.Entities.Visitor)">visitEach</a></code></div>
+<code><a href="Entities.html#asList()">asList</a>, <a href="Entities.html#findAllIf(java.util.function.Predicate)">findAllIf</a>, <a href="Entities.html#findAllValuesWithType(java.util.function.Predicate,java.lang.Class)">findAllValuesWithType</a>, <a href="Entities.html#findFirstIf(java.util.function.Predicate)">findFirstIf</a>, <a href="Entities.html#findFirstValueWithType(java.util.function.Predicate,java.lang.Class)">findFirstValueWithType</a>, <a href="Entities.html#isEmpty()">isEmpty</a>, <a href="Entities.html#size()">size</a>, <a href="Entities.html#visitEach(io.github.jonloucks.metalog.api.Visitor)">visitEach</a></code></div>
 </section>
 </li>
 </ul>
@@ -158,6 +170,7 @@ extends <a href="Entities.html" title="interface in io.github.jonloucks.metalog.
 <section class="detail" id="FACTORY_CONTRACT">
 <h3>FACTORY_CONTRACT</h3>
 <div class="member-signature"><span class="modifiers">static final</span>&nbsp;<span class="return-type">io.github.jonloucks.contracts.api.Contract&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Supplier.html" title="class or interface in java.util.function" class="external-link">Supplier</a>&lt;<a href="Entities.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entities.Builder</a>&lt;?&gt;&gt;&gt;</span>&nbsp;<span class="element-name">FACTORY_CONTRACT</span></div>
+<div class="block">Entities Builder Factory Contract</div>
 </section>
 </li>
 </ul>
@@ -172,31 +185,54 @@ extends <a href="Entities.html" title="interface in io.github.jonloucks.metalog.
 <section class="detail" id="replaceIf(java.util.function.Predicate,io.github.jonloucks.metalog.api.Entity)">
 <h3>replaceIf</h3>
 <div class="member-signature"><span class="return-type">boolean</span>&nbsp;<span class="element-name">replaceIf</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;? super <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;&nbsp;filter,
- <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&nbsp;entity)</span></div>
+ <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&nbsp;replacement)</span></div>
+<div class="block">Replaces each entity that matches a filter with a replacement entity</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>filter</code> - determines if an entity will be replaced</dd>
+<dd><code>replacement</code> - the entity used to replace any instances that match the filter</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
 </section>
 </li>
 <li>
 <section class="detail" id="removeIf(java.util.function.Predicate)">
 <h3>removeIf</h3>
 <div class="member-signature"><span class="return-type">boolean</span>&nbsp;<span class="element-name">removeIf</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;? super <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;&nbsp;filter)</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="unique(boolean)">
-<h3>unique</h3>
-<div class="member-signature"><span class="return-type"><a href="Entities.Builder.html" title="type parameter in Entities.Builder">B</a></span>&nbsp;<span class="element-name">unique</span><wbr><span class="parameters">(boolean&nbsp;unique)</span></div>
+<div class="block">Removes each entity that matches a filter</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>filter</code> - determines if an entity will be removed</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
 </section>
 </li>
 <li>
 <section class="detail" id="entity(java.util.function.Consumer)">
 <h3>entity</h3>
 <div class="member-signature"><span class="return-type"><a href="Entities.Builder.html" title="type parameter in Entities.Builder">B</a></span>&nbsp;<span class="element-name">entity</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="Entity.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entity.Builder</a>&lt;?&gt;&gt;&nbsp;builderConsumer)</span></div>
+<div class="block">Add an entity via a builder consumer</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>builderConsumer</code> - the entity builder consumer</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
 </section>
 </li>
 <li>
 <section class="detail" id="entity(io.github.jonloucks.metalog.api.Entity)">
 <h3>entity</h3>
 <div class="member-signature"><span class="return-type"><a href="Entities.Builder.html" title="type parameter in Entities.Builder">B</a></span>&nbsp;<span class="element-name">entity</span><wbr><span class="parameters">(<a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&nbsp;entity)</span></div>
+<div class="block">Add an entity</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>entity</code> - the entity to add</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
 </section>
 </li>
 </ul>

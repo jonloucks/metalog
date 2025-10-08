@@ -14,7 +14,7 @@ final class KeyedDispatcherImpl implements Dispatcher, AutoOpen {
     @Override
     public AutoClose open() {
 <span class="pc bpc" id="L16" title="1 of 2 branches missed.">        if (idempotent.transitionToOpened()) {</span>
-<span class="fc" id="L17">            thread.start();</span>
+<span class="fc" id="L17">            worker.start();</span>
 <span class="fc" id="L18">            return this::close;</span>
         } else {
 <span class="nc" id="L20">            return ()-&gt;{};</span>
@@ -27,24 +27,24 @@ final class KeyedDispatcherImpl implements Dispatcher, AutoOpen {
 <span class="pc bpc" id="L27" title="1 of 2 branches missed.">        if (idempotent.isRejecting()) {</span>
 <span class="nc" id="L28">            throw new IllegalStateException(&quot;Executor has been closed.&quot;);</span>
         }
-<span class="fc" id="L30">        semaphore.acquireUninterruptibly();</span>
+<span class="fc" id="L30">        inflightSemaphore.acquireUninterruptibly();</span>
         try {
 <span class="fc" id="L32">            queue.put(validCommand);</span>
 <span class="nc" id="L33">        } catch (InterruptedException e) {</span>
-<span class="nc" id="L34">            semaphore.release();</span>
+<span class="nc" id="L34">            inflightSemaphore.release();</span>
 <span class="fc" id="L35">        }</span>
 <span class="fc" id="L36">    }</span>
     
 <span class="fc" id="L38">    KeyedDispatcherImpl(Metalog.Config config) {</span>
-<span class="fc" id="L39">        this.semaphore = new Semaphore(config.keyedQueueLimit());</span>
+<span class="fc" id="L39">        this.inflightSemaphore = new Semaphore(config.keyedQueueLimit());</span>
 <span class="fc" id="L40">        this.queue = new ArrayBlockingQueue&lt;&gt;(config.keyedQueueLimit());</span>
-<span class="fc" id="L41">        this.thread = new Thread(this::consumeLoop);</span>
+<span class="fc" id="L41">        this.worker = new Thread(this::consumeLoop);</span>
 <span class="fc" id="L42">    }</span>
     
     private void close() {
 <span class="pc bpc" id="L45" title="1 of 2 branches missed.">        if (idempotent.transitionToClosed()) {</span>
-<span class="fc" id="L46">            thread.interrupt();</span>
-<span class="fc" id="L47">            semaphore.release(queue.size());</span>
+<span class="fc" id="L46">            worker.interrupt();</span>
+<span class="fc" id="L47">            inflightSemaphore.release(queue.size());</span>
 <span class="fc" id="L48">            queue.clear();</span>
         }
 <span class="fc" id="L50">    }</span>
@@ -56,7 +56,7 @@ final class KeyedDispatcherImpl implements Dispatcher, AutoOpen {
                 try {
 <span class="fc" id="L57">                    command.run();</span>
                 } finally {
-<span class="fc" id="L59">                    semaphore.release();</span>
+<span class="fc" id="L59">                    inflightSemaphore.release();</span>
                 }
 <span class="fc" id="L61">            }  catch (InterruptedException ignored) {</span>
 <span class="fc" id="L62">            }</span>
@@ -64,8 +64,8 @@ final class KeyedDispatcherImpl implements Dispatcher, AutoOpen {
 <span class="fc" id="L64">    }</span>
     
 <span class="fc" id="L66">    private final IdempotentImpl idempotent = new IdempotentImpl();</span>
-    private final Semaphore semaphore;
-    private final Thread thread;
+    private final Semaphore inflightSemaphore;
+    private final Thread worker;
     private final ArrayBlockingQueue&lt;Runnable&gt; queue;
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

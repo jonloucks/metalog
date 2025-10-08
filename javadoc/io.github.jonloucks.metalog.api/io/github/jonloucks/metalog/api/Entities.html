@@ -78,6 +78,10 @@ loadScripts(document, 'script');</script>
 </dl>
 <hr>
 <div class="type-signature"><span class="modifiers">public interface </span><span class="element-name type-name-label">Entities</span></div>
+<div class="block">Contains zero or more Entity instances
+ Supports both unique and duplicate entities, determined by the entity name and unique fields.
+ Examples of unique entities are "thread", "time", and "thrown"
+ Examples of non-unique entities could be "event" where there are multiple events associated with a log</div>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -92,10 +96,9 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>static interface&nbsp;</code></div>
 <div class="col-second even-row-color"><code><a href="Entities.Builder.html" class="type-name-link" title="interface in io.github.jonloucks.metalog.api">Entities.Builder</a>&lt;<a href="Entities.Builder.html" title="type parameter in Entities.Builder">B</a> extends <a href="Entities.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entities.Builder</a>&lt;<a href="Entities.Builder.html" title="type parameter in Entities.Builder">B</a>&gt;&gt;</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>static interface&nbsp;</code></div>
-<div class="col-second odd-row-color"><code><a href="Entities.Visitor.html" class="type-name-link" title="interface in io.github.jonloucks.metalog.api">Entities.Visitor</a>&lt;<a href="Entities.Visitor.html" title="type parameter in Entities.Visitor">T</a>&gt;</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">The Entities Builder</div>
+</div>
 </div>
 </section>
 </li>
@@ -112,29 +115,31 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#asList()" class="member-name-link">asList</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;T&gt;&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;T&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#findAllByNameWithType(java.lang.String,java.lang.Class)" class="member-name-link">findAllByNameWithType</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Create a new List containing all the entities in the proper order</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#findAllIf(java.util.function.Predicate)" class="member-name-link">findAllIf</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;? super <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;&nbsp;filter)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Finds all entities matching a filter</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;T&gt;&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;T&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#findAllValuesWithType(java.util.function.Predicate,java.lang.Class)" class="member-name-link">findAllValuesWithType</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;? super <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;&nbsp;filter,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;type)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#findAllIf(java.util.function.Predicate)" class="member-name-link">findAllIf</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;? super <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;&nbsp;filter)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;T&gt;&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;T&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#findAllWithType(java.util.function.Predicate,java.lang.Class)" class="member-name-link">findAllWithType</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;? super <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;&nbsp;filter,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;type)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;T&gt;&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;T&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#findFirstByNameWithType(java.lang.String,java.lang.Class)" class="member-name-link">findFirstByNameWithType</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;type)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Finds all the values of each entity matching a filter and has the correct type</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#findFirstIf(java.util.function.Predicate)" class="member-name-link">findFirstIf</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;? super <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;&nbsp;filter)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Finds the first entity matching a filter</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;T&gt;&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;T&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#findFirstWithType(java.util.function.Predicate,java.lang.Class)" class="member-name-link">findFirstWithType</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;? super <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;&nbsp;filter,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#findFirstValueWithType(java.util.function.Predicate,java.lang.Class)" class="member-name-link">findFirstValueWithType</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;? super <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;&nbsp;filter,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;type)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Finds the value of the first entity matching a filter and has the correct type</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>boolean</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#isEmpty()" class="member-name-link">isEmpty</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
@@ -142,8 +147,10 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#size()" class="member-name-link">size</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#visitEach(io.github.jonloucks.metalog.api.Entities.Visitor)" class="member-name-link">visitEach</a><wbr>(<a href="Entities.Visitor.html" title="interface in io.github.jonloucks.metalog.api">Entities.Visitor</a>&lt;? super <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;&nbsp;visitor)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#visitEach(io.github.jonloucks.metalog.api.Visitor)" class="member-name-link">visitEach</a><wbr>(<a href="Visitor.html" title="interface in io.github.jonloucks.metalog.api">Visitor</a>&lt;? super <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;&nbsp;visitor)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Visit each entity</div>
+</div>
 </div>
 </div>
 </div>
@@ -159,67 +166,105 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="visitEach(io.github.jonloucks.metalog.api.Entities.Visitor)">
+<section class="detail" id="visitEach(io.github.jonloucks.metalog.api.Visitor)">
 <h3>visitEach</h3>
-<div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">visitEach</span><wbr><span class="parameters">(<a href="Entities.Visitor.html" title="interface in io.github.jonloucks.metalog.api">Entities.Visitor</a>&lt;? super <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;&nbsp;visitor)</span></div>
+<div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">visitEach</span><wbr><span class="parameters">(<a href="Visitor.html" title="interface in io.github.jonloucks.metalog.api">Visitor</a>&lt;? super <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;&nbsp;visitor)</span></div>
+<div class="block">Visit each entity</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>visitor</code> - the callback to receive each entity</dd>
+</dl>
 </section>
 </li>
 <li>
 <section class="detail" id="findFirstIf(java.util.function.Predicate)">
 <h3>findFirstIf</h3>
 <div class="member-signature"><span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;</span>&nbsp;<span class="element-name">findFirstIf</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;? super <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;&nbsp;filter)</span></div>
+<div class="block">Finds the first entity matching a filter</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>filter</code> - determines the match</dd>
+<dt>Returns:</dt>
+<dd>optionally the entity found</dd>
+</dl>
 </section>
 </li>
 <li>
-<section class="detail" id="findFirstWithType(java.util.function.Predicate,java.lang.Class)">
-<h3>findFirstWithType</h3>
-<div class="member-signature"><span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;T&gt;</span>&nbsp;<span class="element-name">findFirstWithType</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;? super <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;&nbsp;filter,
+<section class="detail" id="findFirstValueWithType(java.util.function.Predicate,java.lang.Class)">
+<h3>findFirstValueWithType</h3>
+<div class="member-signature"><span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;T&gt;</span>&nbsp;<span class="element-name">findFirstValueWithType</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;? super <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;&nbsp;filter,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;type)</span></div>
+<div class="block">Finds the value of the first entity matching a filter and has the correct type</div>
+<dl class="notes">
+<dt>Type Parameters:</dt>
+<dd><code>T</code> - the type of value</dd>
+<dt>Parameters:</dt>
+<dd><code>filter</code> - determines the match</dd>
+<dd><code>type</code> - the type of value required</dd>
+<dt>Returns:</dt>
+<dd>optionally the value found (null is a valid value)</dd>
+</dl>
 </section>
 </li>
 <li>
 <section class="detail" id="findAllIf(java.util.function.Predicate)">
 <h3>findAllIf</h3>
 <div class="member-signature"><span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;</span>&nbsp;<span class="element-name">findAllIf</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;? super <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;&nbsp;filter)</span></div>
+<div class="block">Finds all entities matching a filter</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>filter</code> - determines the match</dd>
+<dt>Returns:</dt>
+<dd>a list of all matching entities</dd>
+</dl>
 </section>
 </li>
 <li>
-<section class="detail" id="findAllByNameWithType(java.lang.String,java.lang.Class)">
-<h3>findAllByNameWithType</h3>
-<div class="member-signature"><span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;T&gt;</span>&nbsp;<span class="element-name">findAllByNameWithType</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
+<section class="detail" id="findAllValuesWithType(java.util.function.Predicate,java.lang.Class)">
+<h3>findAllValuesWithType</h3>
+<div class="member-signature"><span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;T&gt;</span>&nbsp;<span class="element-name">findAllValuesWithType</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;? super <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;&nbsp;filter,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;type)</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="findAllWithType(java.util.function.Predicate,java.lang.Class)">
-<h3>findAllWithType</h3>
-<div class="member-signature"><span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;T&gt;</span>&nbsp;<span class="element-name">findAllWithType</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;? super <a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;&nbsp;filter,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;type)</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="findFirstByNameWithType(java.lang.String,java.lang.Class)">
-<h3>findFirstByNameWithType</h3>
-<div class="member-signature"><span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;T&gt;</span>&nbsp;<span class="element-name">findFirstByNameWithType</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;type)</span></div>
+<div class="block">Finds all the values of each entity matching a filter and has the correct type</div>
+<dl class="notes">
+<dt>Type Parameters:</dt>
+<dd><code>T</code> - the type of value</dd>
+<dt>Parameters:</dt>
+<dd><code>filter</code> - determines the match</dd>
+<dd><code>type</code> - the type of value required</dd>
+<dt>Returns:</dt>
+<dd>a list of all the values (null is valid value)</dd>
+</dl>
 </section>
 </li>
 <li>
 <section class="detail" id="asList()">
 <h3>asList</h3>
 <div class="member-signature"><span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a>&gt;</span>&nbsp;<span class="element-name">asList</span>()</div>
+<div class="block">Create a new List containing all the entities in the proper order</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the list</dd>
+</dl>
 </section>
 </li>
 <li>
 <section class="detail" id="isEmpty()">
 <h3>isEmpty</h3>
 <div class="member-signature"><span class="return-type">boolean</span>&nbsp;<span class="element-name">isEmpty</span>()</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>true when empty</dd>
+</dl>
 </section>
 </li>
 <li>
 <section class="detail" id="size()">
 <h3>size</h3>
 <div class="member-signature"><span class="return-type">int</span>&nbsp;<span class="element-name">size</span>()</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the number of entities</dd>
+</dl>
 </section>
 </li>
 </ul>

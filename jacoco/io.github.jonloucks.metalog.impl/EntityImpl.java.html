@@ -12,7 +12,7 @@ import static io.github.jonloucks.metalog.impl.Internal.entityCheck;
 import static java.util.Optional.ofNullable;
 
 final class EntityImpl implements Entity, Entity.Builder&lt;EntityImpl&gt; {
-
+    
     @Override
     public EntityImpl id(String id) {
 <span class="fc" id="L18">        this.id = id;</span>
@@ -26,98 +26,110 @@ final class EntityImpl implements Entity, Entity.Builder&lt;EntityImpl&gt; {
     }
     
     @Override
+    public EntityImpl unique(boolean unique) {
+<span class="fc" id="L30">        this.unique = unique;</span>
+<span class="fc" id="L31">        return this;</span>
+    }
+    
+    @Override
     public EntityImpl text(Supplier&lt;CharSequence&gt; textSupplier) {
-<span class="fc" id="L30">        this.textSupplier = textSupplier;</span>
-<span class="fc" id="L31">        this.text = null;</span>
-<span class="fc" id="L32">        return this;</span>
+<span class="fc" id="L36">        this.textSupplier = textSupplier;</span>
+<span class="fc" id="L37">        this.text = null;</span>
+<span class="fc" id="L38">        return this;</span>
     }
     
     @Override
     public EntityImpl value(Object value) {
-<span class="fc" id="L37">        this.value = value;</span>
-<span class="fc" id="L38">        this.text = null;</span>
-<span class="fc" id="L39">        return this;</span>
+<span class="fc" id="L43">        this.value = value;</span>
+<span class="fc" id="L44">        this.text = null;</span>
+<span class="fc" id="L45">        return this;</span>
     }
     
     @Override
     public Optional&lt;Entities&gt; getCorrelations() {
-<span class="fc bfc" id="L44" title="All 2 branches covered.">       return entityList.isEmpty() ? Optional.empty() : Optional.of(entityList);</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">       return entityList.isEmpty() ? Optional.empty() : Optional.of(entityList);</span>
     }
     
     @Override
     public EntityImpl correlation(Consumer&lt;Builder&lt;?&gt;&gt; builderConsumer) {
-<span class="fc" id="L49">        entityList.entity(builderConsumer);</span>
-<span class="fc" id="L50">        return this;</span>
+<span class="fc" id="L55">        entityList.entity(builderConsumer);</span>
+<span class="fc" id="L56">        return this;</span>
     }
     
     @Override
     public EntityImpl correlation(Entity entity) {
-<span class="fc" id="L55">        entityList.entity(entity);</span>
-<span class="fc" id="L56">        return this;</span>
+<span class="fc" id="L61">        entityList.entity(entity);</span>
+<span class="fc" id="L62">        return this;</span>
     }
     
     @Override
     public EntityImpl correlations(Consumer&lt;Entities.Builder&lt;?&gt;&gt; builderConsumer) {
         
-<span class="fc" id="L62">        builderConsumerCheck(builderConsumer).accept(entityList);</span>
+<span class="fc" id="L68">        builderConsumerCheck(builderConsumer).accept(entityList);</span>
        
-<span class="fc" id="L64">        return this;</span>
+<span class="fc" id="L70">        return this;</span>
     }
     
     @Override
     public EntityImpl copy(Entity entity) {
-<span class="fc" id="L69">        final Entity validFromEntity = entityCheck(entity);</span>
+<span class="fc" id="L75">        final Entity validFromEntity = entityCheck(entity);</span>
         
-<span class="fc" id="L71">        entity.getId().ifPresent(this::id);</span>
-<span class="fc" id="L72">        entity.getName().ifPresent(this::name);</span>
-<span class="fc" id="L73">        entity.getValue().ifPresent(this::value);</span>
+<span class="fc" id="L77">        entity.getId().ifPresent(this::id);</span>
+<span class="fc" id="L78">        entity.getName().ifPresent(this::name);</span>
+<span class="fc" id="L79">        entity.getValue().ifPresent(this::value);</span>
         
-<span class="fc" id="L75">        validFromEntity.getCorrelations().ifPresent(c -&gt; c.visitEach(e -&gt; {</span>
-<span class="fc" id="L76">                correlation(e);</span>
-<span class="fc" id="L77">                return true;</span>
+<span class="fc" id="L81">        validFromEntity.getCorrelations().ifPresent(c -&gt; c.visitEach(e -&gt; {</span>
+<span class="fc" id="L82">                correlation(e);</span>
+<span class="fc" id="L83">                return true;</span>
             }
         ));
-<span class="fc" id="L80">        return this;</span>
+<span class="fc" id="L86">        return this;</span>
     }
     
     @Override
     public Optional&lt;String&gt; getId() {
-<span class="fc" id="L85">        return ofNullable(id);</span>
+<span class="fc" id="L91">        return ofNullable(id);</span>
     }
     
     @Override
     public Optional&lt;String&gt; getName() {
-<span class="fc" id="L90">        return ofNullable(name);</span>
+<span class="fc" id="L96">        return ofNullable(name);</span>
+    }
+    
+    @Override
+    public boolean isUnique() {
+<span class="fc" id="L101">        return unique;</span>
     }
     
     @Override
     public Optional&lt;Object&gt; getValue() {
-<span class="fc" id="L95">        return ofNullable(value);</span>
+<span class="fc" id="L106">        return ofNullable(value);</span>
     }
 
     @Override
     public CharSequence get() {
-<span class="fc bfc" id="L100" title="All 2 branches covered.">        if (null == text) {</span>
-<span class="fc bfc" id="L101" title="All 2 branches covered.">            if (null == textSupplier) {</span>
-<span class="fc bfc" id="L102" title="All 2 branches covered.">                if (null != value) {</span>
-<span class="fc" id="L103">                    text = value.toString();</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">        if (null == text) {</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">            if (null == textSupplier) {</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">                if (null != value) {</span>
+<span class="fc" id="L114">                    text = value.toString();</span>
                 }
             } else {
-<span class="fc" id="L106">                text = textSupplier.get();</span>
+<span class="fc" id="L117">                text = textSupplier.get();</span>
             }
         }
-<span class="fc bfc" id="L109" title="All 2 branches covered.">        return null == text ? &quot;&quot; : text;</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        return null == text ? &quot;&quot; : text;</span>
     }
     
-<span class="fc" id="L112">    EntityImpl() {</span>
+<span class="fc" id="L123">    EntityImpl() {</span>
     
-<span class="fc" id="L114">    }</span>
+<span class="fc" id="L125">    }</span>
 
     private String id;
     private String name;
+    private boolean unique;
     private Supplier&lt;CharSequence&gt; textSupplier;
     private Object value;
     private CharSequence text;
-<span class="fc" id="L121">    private final EntitiesImpl entityList = new EntitiesImpl();</span>
+<span class="fc" id="L133">    private final EntitiesImpl entityList = new EntitiesImpl();</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

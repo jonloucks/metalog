@@ -103,18 +103,26 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#publish(io.github.jonloucks.metalog.api.Log)" class="member-name-link">publish</a><wbr>(<a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a>&nbsp;log)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Publish a log message with the default meta information.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#publish(io.github.jonloucks.metalog.api.Log,io.github.jonloucks.metalog.api.Meta)" class="member-name-link">publish</a><wbr>(<a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a>&nbsp;log,
  <a href="Meta.html" title="interface in io.github.jonloucks.metalog.api">Meta</a>&nbsp;meta)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Publish a log message and it's included meta information.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#publish(io.github.jonloucks.metalog.api.Log,java.util.function.Consumer)" class="member-name-link">publish</a><wbr>(<a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a>&nbsp;log,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="Meta.Builder.html" title="interface in io.github.jonloucks.metalog.api">Meta.Builder</a>&lt;?&gt;&gt;&nbsp;metaBuilder)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="Meta.Builder.html" title="interface in io.github.jonloucks.metalog.api">Meta.Builder</a>&lt;?&gt;&gt;&nbsp;builderConsumer)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Publish a log message with the meta initialized in a callback</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.github.jonloucks.contracts.api.AutoClose</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#subscribe(io.github.jonloucks.metalog.api.Subscriber)" class="member-name-link">subscribe</a><wbr>(<a href="Subscriber.html" title="interface in io.github.jonloucks.metalog.api">Subscriber</a>&nbsp;subscriber)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Add a new log subscription</div>
+</div>
 </div>
 </div>
 </div>
@@ -136,7 +144,11 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="publish(io.github.jonloucks.metalog.api.Log)">
 <h3>publish</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">publish</span><wbr><span class="parameters">(<a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a>&nbsp;log)</span></div>
+<div class="block">Publish a log message with the default meta information.
+ This is minimal log message, there will be no timestamp, thread info, etc.</div>
 <dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>log</code> - the log message to publish</dd>
 <dt>See Also:</dt>
 <dd>
 <ul class="see-list">
@@ -151,7 +163,11 @@ loadScripts(document, 'script');</script>
 <h3>publish</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">publish</span><wbr><span class="parameters">(<a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a>&nbsp;log,
  <a href="Meta.html" title="interface in io.github.jonloucks.metalog.api">Meta</a>&nbsp;meta)</span></div>
+<div class="block">Publish a log message and it's included meta information.</div>
 <dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>log</code> - the log message to publish</dd>
+<dd><code>meta</code> - the meta information for the given log</dd>
 <dt>See Also:</dt>
 <dd>
 <ul class="see-list-long">
@@ -165,8 +181,12 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="publish(io.github.jonloucks.metalog.api.Log,java.util.function.Consumer)">
 <h3>publish</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">publish</span><wbr><span class="parameters">(<a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a>&nbsp;log,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="Meta.Builder.html" title="interface in io.github.jonloucks.metalog.api">Meta.Builder</a>&lt;?&gt;&gt;&nbsp;metaBuilder)</span></div>
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="Meta.Builder.html" title="interface in io.github.jonloucks.metalog.api">Meta.Builder</a>&lt;?&gt;&gt;&nbsp;builderConsumer)</span></div>
+<div class="block">Publish a log message with the meta initialized in a callback</div>
 <dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>log</code> - the log message to publish</dd>
+<dd><code>builderConsumer</code> - the callback to accept the Meta.Builder</dd>
 <dt>See Also:</dt>
 <dd>
 <ul class="see-list-long">
@@ -180,7 +200,12 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="subscribe(io.github.jonloucks.metalog.api.Subscriber)">
 <h3>subscribe</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">io.github.jonloucks.contracts.api.AutoClose</span>&nbsp;<span class="element-name">subscribe</span><wbr><span class="parameters">(<a href="Subscriber.html" title="interface in io.github.jonloucks.metalog.api">Subscriber</a>&nbsp;subscriber)</span></div>
+<div class="block">Add a new log subscription</div>
 <dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>subscriber</code> - the subscriber to add</dd>
+<dt>Returns:</dt>
+<dd>calling close removes the subscription</dd>
 <dt>See Also:</dt>
 <dd>
 <ul class="see-list">

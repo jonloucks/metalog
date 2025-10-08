@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Internal.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">metalog</a> &gt; <a href="index.source.html" class="el_package">io.github.jonloucks.metalog.impl</a> &gt; <span class="el_source">Internal.java</span></div><h1>Internal.java</h1><pre class="source lang-java linenums">package io.github.jonloucks.metalog.impl;
 
-import io.github.jonloucks.metalog.api.Entities;
-import io.github.jonloucks.metalog.api.Entity;
-import io.github.jonloucks.metalog.api.Log;
-import io.github.jonloucks.metalog.api.Meta;
+import io.github.jonloucks.metalog.api.*;
 
-import java.util.Optional;
 import java.util.function.Predicate;
 
 import static io.github.jonloucks.contracts.api.Checks.nameCheck;
@@ -17,42 +13,42 @@ final class Internal {
      * Utility class instantiation protection
      * Test coverage not possible, java module protections in place
      */
-<span class="nc" id="L20">    private Internal() {</span>
-<span class="nc" id="L21">        throw new AssertionError(&quot;Illegal constructor call.&quot;);</span>
+<span class="nc" id="L16">    private Internal() {</span>
+<span class="nc" id="L17">        throw new AssertionError(&quot;Illegal constructor call.&quot;);</span>
     }
     
     static &lt;T extends Log&gt; T logCheck(T log) {
-<span class="fc" id="L25">        return nullCheck(log, &quot;Log must be present.&quot;);</span>
+<span class="fc" id="L21">        return nullCheck(log, &quot;Log must be present.&quot;);</span>
     }
     
     static &lt;T extends Meta&gt; T metaCheck(T meta) {
-<span class="fc" id="L29">        return nullCheck(meta, &quot;Meta must be present.&quot;);</span>
+<span class="fc" id="L25">        return nullCheck(meta, &quot;Meta must be present.&quot;);</span>
     }
     
     static Entity entityCheck(Entity entity) {
-<span class="fc" id="L33">        return nullCheck(entity, &quot;Entity must be present.&quot;);</span>
+<span class="fc" id="L29">        return nullCheck(entity, &quot;Entity must be present.&quot;);</span>
     }
     
     static &lt;T&gt; Predicate&lt;T&gt; filterCheck(Predicate&lt;T&gt; filter) {
-<span class="fc" id="L37">        return nullCheck(filter, &quot;Filter must be present.&quot;);</span>
+<span class="fc" id="L33">        return nullCheck(filter, &quot;Filter must be present.&quot;);</span>
     }
    
     static String channelCheck(String name) {
-<span class="fc" id="L41">        return nullCheck(name, &quot;Channel must be present.&quot;);</span>
-    }
-
-    static &lt;T&gt; Optional&lt;T&gt; findFirstByNameAndType(Entity entity, String name, Class&lt;T&gt; type) {
-<span class="fc" id="L45">        final Optional&lt;Entities&gt; optional = entity.getCorrelations();</span>
-<span class="fc bfc" id="L46" title="All 2 branches covered.">        if (optional.isPresent()) {</span>
-<span class="fc" id="L47">            return optional.get().findFirstByNameWithType(name, type);</span>
-        }
-<span class="fc" id="L49">        return Optional.empty();</span>
+<span class="fc" id="L37">        return nullCheck(name, &quot;Channel must be present.&quot;);</span>
     }
     
-    static Predicate&lt;? super Entity&gt; byName(String name) {
-<span class="fc" id="L53">        final String validName = nameCheck(name);</span>
+    static &lt;T&gt; Visitor&lt;T&gt; visitorCheck(Visitor&lt;T&gt; visitor) {
+<span class="fc" id="L41">        return nullCheck(visitor, &quot;Visitor must be present.&quot;);</span>
+    }
+    
+    static Predicate&lt;Entity&gt; byName(String name) {
+<span class="fc" id="L45">        final String validName = nameCheck(name);</span>
         
-<span class="fc" id="L55">        return entity -&gt; entity.getName().filter(s -&gt; validName.equals(s)).isPresent();</span>
+<span class="fc" id="L47">        return entity -&gt; entity.getName().filter(s -&gt; validName.equals(s)).isPresent();</span>
+    }
+    
+    static Predicate&lt;Entity&gt; byUnique(boolean unique) {
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">        return entity -&gt; entity.isUnique() == unique;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
