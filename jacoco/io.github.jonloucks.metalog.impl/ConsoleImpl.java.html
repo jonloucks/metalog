@@ -6,94 +6,128 @@ import io.github.jonloucks.metalog.api.*;
 
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 import static io.github.jonloucks.contracts.api.Checks.builderConsumerCheck;
 import static io.github.jonloucks.metalog.impl.Internal.logCheck;
+import static io.github.jonloucks.metalog.impl.Internal.metaCheck;
 import static java.util.Optional.ofNullable;
 
 final class ConsoleImpl implements Console, AutoOpen {
+    
+    @Override
+    public void info(Log log) {
+<span class="nc" id="L19">        publish(log, INFO_META);</span>
+<span class="nc" id="L20">    }</span>
+    
+    @Override
+    public void error(Log log) {
+<span class="nc" id="L24">        publish(log, ERROR_META);</span>
+<span class="nc" id="L25">    }</span>
+    
+    @Override
+    public void publish(Log log) {
+<span class="nc" id="L29">        publish(log, INFO_META);</span>
+<span class="nc" id="L30">    }</span>
 
     @Override
     public void publish(Log log, Meta meta) {
-<span class="fc bfc" id="L19" title="All 2 branches covered.">        if (test(meta)) {</span>
-<span class="fc" id="L20">            receive(log, meta);</span>
+<span class="pc bpc" id="L34" title="1 of 2 branches missed.">        if (test(meta)) {</span>
+<span class="nc" id="L35">            metalog.publish(log, meta);</span>
         }
-<span class="fc" id="L22">    }</span>
-    
+<span class="nc" id="L37">    }</span>
+
     @Override
     public void publish(Log log, Consumer&lt;Meta.Builder&lt;?&gt;&gt; builderConsumer) {
-<span class="fc" id="L26">        final Meta.Builder&lt;?&gt; metaBuilder = metaFactory.get();</span>
-        
-<span class="fc" id="L28">        builderConsumerCheck(builderConsumer).accept(metaBuilder);</span>
-        
-<span class="fc" id="L30">        publish(logCheck(log), metaBuilder);</span>
-<span class="fc" id="L31">    }</span>
+<span class="fc" id="L41">        metalog.publish(log, b -&gt; {</span>
+<span class="fc" id="L42">            b.key(CONSOLE_KEY).channel(CONSOLE_INFO_CHANNEL);</span>
+<span class="fc" id="L43">            builderConsumerCheck(builderConsumer).accept(b);</span>
+<span class="fc" id="L44">        });</span>
+<span class="fc" id="L45">    }</span>
     
     @Override
     public void receive(Log log, Meta meta) {
-<span class="pc bpc" id="L35" title="1 of 2 branches missed.">        if (test(meta)) {</span>
-<span class="pc bpc" id="L36" title="1 of 3 branches missed.">            switch (meta.getChannel()) {</span>
-                case &quot;System.out&quot;:
-                case &quot;Console&quot;:
-<span class="fc" id="L39">                    System.out.println(log.get());</span>
-<span class="fc" id="L40">                    break;</span>
-                case &quot;System.err&quot;:
-<span class="fc" id="L42">                    System.err.println(log.get());</span>
+<span class="fc" id="L49">        final Log validLog = logCheck(log);</span>
+<span class="fc" id="L50">        final Meta validMeta = metaCheck(meta);</span>
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">        if (test(validMeta)) {</span>
+<span class="pc bpc" id="L52" title="1 of 3 branches missed.">            switch (validMeta.getChannel()) {</span>
+                case CONSOLE_INFO_CHANNEL:
+                case SYSTEM_INFO_CHANNEL:
+<span class="fc" id="L55">                    System.out.println(validLog.get());</span>
+<span class="fc" id="L56">                    break;</span>
+                case SYSTEM_ERROR_CHANNEL:
+                case CONSOLE_ERROR_CHANNEL:
+<span class="fc" id="L59">                    System.err.println(validLog.get());</span>
                     break;
             }
         }
-<span class="fc" id="L46">    }</span>
+<span class="fc" id="L63">    }</span>
     
     @Override
     public AutoClose addFilter(Predicate&lt;Meta&gt; filter) {
-<span class="fc" id="L50">        return filters.addFilter(filter);</span>
+<span class="fc" id="L67">        return filters.addFilter(filter);</span>
     }
     
     @Override
     public boolean test(Meta meta) {
-<span class="fc bfc" id="L55" title="All 4 branches covered.">        return isConsoleChannel(meta) &amp;&amp; filters.test(meta);</span>
+<span class="fc bfc" id="L72" title="All 4 branches covered.">        return isSupported(metaCheck(meta)) &amp;&amp; filters.test(meta);</span>
     }
     
     @Override
     public AutoClose open() {
-<span class="pc bpc" id="L60" title="1 of 2 branches missed.">        if (openState.transitionToOpened()) {</span>
-<span class="fc" id="L61">            metaFactory = config.contracts().claim(Meta.Builder.FACTORY_CONTRACT);</span>
-<span class="fc" id="L62">            closeSubscription = config.contracts().claim(Metalog.CONTRACT).subscribe(this);</span>
-<span class="fc" id="L63">            return this::close;</span>
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">        if (openState.transitionToOpened()) {</span>
+<span class="fc" id="L78">            return realOpen();</span>
         } else {
-<span class="nc" id="L65">            return () -&gt; {}; // all open calls after the first get a do nothing close</span>
+<span class="nc" id="L80">            return () -&gt; {}; // all open calls after the first get a do nothing close</span>
         }
     }
     
-<span class="fc" id="L69">    ConsoleImpl(Metalog.Config config) {</span>
-<span class="fc" id="L70">        this.config = config;</span>
-<span class="fc" id="L71">    }</span>
+<span class="fc" id="L84">    ConsoleImpl(Metalog.Config config) {</span>
+<span class="fc" id="L85">        this.config = config;</span>
+<span class="fc" id="L86">    }</span>
+    
+    private AutoClose realOpen() {
+<span class="fc" id="L89">        metalog = config.contracts().claim(Metalog.CONTRACT);</span>
+<span class="fc" id="L90">        closeSubscription = config.contracts().claim(Metalog.CONTRACT).subscribe(this);</span>
+<span class="fc" id="L91">        return this::close;</span>
+    }
     
     private void close() {
-<span class="pc bpc" id="L74" title="1 of 2 branches missed.">        if (openState.transitionToClosed()) {</span>
-<span class="fc" id="L75">            ofNullable(closeSubscription).ifPresent(close -&gt; {</span>
-<span class="fc" id="L76">                closeSubscription = null;</span>
-<span class="fc" id="L77">                close.close();</span>
-<span class="fc" id="L78">            });</span>
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if (openState.transitionToClosed()) {</span>
+<span class="fc" id="L96">            ofNullable(closeSubscription).ifPresent(close -&gt; {</span>
+<span class="fc" id="L97">                closeSubscription = null;</span>
+<span class="fc" id="L98">                close.close();</span>
+<span class="fc" id="L99">            });</span>
         }
-<span class="fc" id="L80">    }</span>
+<span class="fc" id="L101">    }</span>
     
-    private boolean isConsoleChannel(Meta meta) {
-<span class="fc bfc" id="L83" title="All 2 branches covered.">        switch (meta.getChannel()) {</span>
-            case &quot;System.out&quot;:
-            case &quot;Console&quot;:
-            case &quot;System.err&quot;:
-<span class="fc" id="L87">                return true;</span>
+    private boolean isSupported(Meta meta) {
+<span class="fc bfc" id="L104" title="All 2 branches covered.">        switch (meta.getChannel()) {</span>
+            case SYSTEM_INFO_CHANNEL:
+            case SYSTEM_ERROR_CHANNEL:
+            case CONSOLE_ERROR_CHANNEL:
+            case CONSOLE_INFO_CHANNEL:
+<span class="fc" id="L109">                return true;</span>
             default:
-<span class="fc" id="L89">                return false;</span>
+<span class="fc" id="L111">                return false;</span>
         }
     }
     
-<span class="fc" id="L93">    private final Filterable filters = new FiltersImpl();</span>
-<span class="fc" id="L94">    private final IdempotentImpl openState = new IdempotentImpl();</span>
+    private static Meta makeMeta(String channel) {
+<span class="fc" id="L116">        return new MetaImpl().key(CONSOLE_KEY).channel(channel);</span>
+    }
+    
+    private static final String CONSOLE_KEY = &quot;Console&quot;;
+    private static final String CONSOLE_INFO_CHANNEL = &quot;Console.info&quot;;
+    private static final String CONSOLE_ERROR_CHANNEL = &quot;Console.error&quot;;
+    private static final String SYSTEM_ERROR_CHANNEL = &quot;System.err&quot;;
+    private static final String SYSTEM_INFO_CHANNEL = &quot;System.out&quot;;
+<span class="fc" id="L124">    private static final Meta ERROR_META = makeMeta(CONSOLE_ERROR_CHANNEL);</span>
+<span class="fc" id="L125">    private static final Meta INFO_META = makeMeta(CONSOLE_INFO_CHANNEL);</span>
+    
+<span class="fc" id="L127">    private final Filterable filters = new FiltersImpl();</span>
+<span class="fc" id="L128">    private final IdempotentImpl openState = new IdempotentImpl();</span>
     private final Metalog.Config config;
-    private Supplier&lt;Meta.Builder&lt;?&gt;&gt; metaFactory;
+    private Metalog metalog;
     private AutoClose closeSubscription;
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

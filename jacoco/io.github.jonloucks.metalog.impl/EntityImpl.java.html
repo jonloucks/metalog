@@ -74,55 +74,56 @@ final class EntityImpl implements Entity, Entity.Builder&lt;EntityImpl&gt; {
     public EntityImpl copy(Entity entity) {
 <span class="fc" id="L75">        final Entity validFromEntity = entityCheck(entity);</span>
         
-<span class="fc" id="L77">        entity.getId().ifPresent(this::id);</span>
-<span class="fc" id="L78">        entity.getName().ifPresent(this::name);</span>
-<span class="fc" id="L79">        entity.getValue().ifPresent(this::value);</span>
+<span class="fc" id="L77">        unique(validFromEntity.isUnique());</span>
+<span class="fc" id="L78">        validFromEntity.getId().ifPresent(this::id);</span>
+<span class="fc" id="L79">        validFromEntity.getName().ifPresent(this::name);</span>
+<span class="fc" id="L80">        validFromEntity.getValue().ifPresent(this::value);</span>
         
-<span class="fc" id="L81">        validFromEntity.getCorrelations().ifPresent(c -&gt; c.visitEach(e -&gt; {</span>
-<span class="fc" id="L82">                correlation(e);</span>
-<span class="fc" id="L83">                return true;</span>
+<span class="fc" id="L82">        validFromEntity.getCorrelations().ifPresent(c -&gt; c.visitEach(e -&gt; {</span>
+<span class="fc" id="L83">                correlation(e);</span>
+<span class="fc" id="L84">                return true;</span>
             }
         ));
-<span class="fc" id="L86">        return this;</span>
+<span class="fc" id="L87">        return this;</span>
     }
     
     @Override
     public Optional&lt;String&gt; getId() {
-<span class="fc" id="L91">        return ofNullable(id);</span>
+<span class="fc" id="L92">        return ofNullable(id);</span>
     }
     
     @Override
     public Optional&lt;String&gt; getName() {
-<span class="fc" id="L96">        return ofNullable(name);</span>
+<span class="fc" id="L97">        return ofNullable(name);</span>
     }
     
     @Override
     public boolean isUnique() {
-<span class="fc" id="L101">        return unique;</span>
+<span class="fc" id="L102">        return unique;</span>
     }
     
     @Override
     public Optional&lt;Object&gt; getValue() {
-<span class="fc" id="L106">        return ofNullable(value);</span>
+<span class="fc" id="L107">        return ofNullable(value);</span>
     }
 
     @Override
     public CharSequence get() {
-<span class="fc bfc" id="L111" title="All 2 branches covered.">        if (null == text) {</span>
-<span class="fc bfc" id="L112" title="All 2 branches covered.">            if (null == textSupplier) {</span>
-<span class="fc bfc" id="L113" title="All 2 branches covered.">                if (null != value) {</span>
-<span class="fc" id="L114">                    text = value.toString();</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">        if (null == text) {</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">            if (null == textSupplier) {</span>
+<span class="fc bfc" id="L114" title="All 2 branches covered.">                if (null != value) {</span>
+<span class="fc" id="L115">                    text = value.toString();</span>
                 }
             } else {
-<span class="fc" id="L117">                text = textSupplier.get();</span>
+<span class="fc" id="L118">                text = textSupplier.get();</span>
             }
         }
-<span class="fc bfc" id="L120" title="All 2 branches covered.">        return null == text ? &quot;&quot; : text;</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">        return null == text ? &quot;&quot; : text;</span>
     }
     
-<span class="fc" id="L123">    EntityImpl() {</span>
+<span class="fc" id="L124">    EntityImpl() {</span>
     
-<span class="fc" id="L125">    }</span>
+<span class="fc" id="L126">    }</span>
 
     private String id;
     private String name;
@@ -130,6 +131,6 @@ final class EntityImpl implements Entity, Entity.Builder&lt;EntityImpl&gt; {
     private Supplier&lt;CharSequence&gt; textSupplier;
     private Object value;
     private CharSequence text;
-<span class="fc" id="L133">    private final EntitiesImpl entityList = new EntitiesImpl();</span>
+<span class="fc" id="L134">    private final EntitiesImpl entityList = new EntitiesImpl();</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

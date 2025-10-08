@@ -16,7 +16,7 @@ public interface Entity extends Supplier&lt;CharSequence&gt; {
     
     /**
      * The optional user defined name for this entity
-     * Examples: &quot;myModule, &quot;thread&quot;, &quot;time&quot;, &quot;thrown&quot;
+     * Examples: &quot;myModule&quot;, &quot;thread&quot;, &quot;time&quot;, &quot;thrown&quot;
      * @return the optional name
      */
     default Optional&lt;String&gt; getName() {
@@ -54,7 +54,7 @@ public interface Entity extends Supplier&lt;CharSequence&gt; {
      * @return if true then only one unique entity with the same name should exist
      */
     default boolean isUnique() {
-<span class="nc" id="L57">        return false;</span>
+<span class="fc" id="L57">        return false;</span>
     }
     
     /**

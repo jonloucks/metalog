@@ -6,16 +6,18 @@ import static io.github.jonloucks.contracts.test.Tools.assertInstantiateThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @SuppressWarnings(&quot;Convert2MethodRef&quot;)
-public interface ToolsTests {
+public interface ToolsTests extends
+    BadMetalogFactoryTests
+{
     
     @Test
     default void testTools_Instantiate_Throws() {
-<span class="fc" id="L13">        assertInstantiateThrows(Tools.class);</span>
-<span class="fc" id="L14">    }</span>
+<span class="fc" id="L15">        assertInstantiateThrows(Tools.class);</span>
+<span class="fc" id="L16">    }</span>
     
     @Test
     default void testTools_clean_DoesNotThrow() {
-<span class="fc" id="L18">        assertDoesNotThrow(()-&gt; Tools.clean());</span>
-<span class="fc" id="L19">    }</span>
+<span class="fc" id="L20">        assertDoesNotThrow(()-&gt; Tools.clean());</span>
+<span class="fc" id="L21">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

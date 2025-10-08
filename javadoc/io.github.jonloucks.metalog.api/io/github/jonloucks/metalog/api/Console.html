@@ -15,7 +15,11 @@
 <script type="text/javascript" src="../../../../../../script-dir/jquery-ui.min.js"></script>
 </head>
 <body class="class-declaration-page">
-<script type="text/javascript">var pathtoroot = "../../../../../../";
+<script type="text/javascript">var evenRowColor = "even-row-color";
+var oddRowColor = "odd-row-color";
+var tableTab = "table-tab";
+var activeTableTab = "active-table-tab";
+var pathtoroot = "../../../../../../";
 loadScripts(document, 'script');</script>
 <noscript>
 <div>JavaScript is disabled on your browser.</div>
@@ -48,7 +52,7 @@ loadScripts(document, 'script');</script>
 <li>Detail:&nbsp;</li>
 <li><a href="#field-detail">Field</a>&nbsp;|&nbsp;</li>
 <li>Constr&nbsp;|&nbsp;</li>
-<li>Method</li>
+<li><a href="#method-detail">Method</a></li>
 </ul>
 </div>
 <div class="nav-list-search"><label for="search-input">SEARCH:</label>
@@ -74,7 +78,7 @@ loadScripts(document, 'script');</script>
 </dl>
 <hr>
 <div class="type-signature"><span class="modifiers">public interface </span><span class="element-name type-name-label">Console</span><span class="extends-implements">
-extends <a href="Subscriber.html" title="interface in io.github.jonloucks.metalog.api">Subscriber</a>, <a href="Publisher.html" title="interface in io.github.jonloucks.metalog.api">Publisher</a>, <a href="Filterable.html" title="interface in io.github.jonloucks.metalog.api">Filterable</a></span></div>
+extends <a href="Publisher.html" title="interface in io.github.jonloucks.metalog.api">Publisher</a>, <a href="Subscriber.html" title="interface in io.github.jonloucks.metalog.api">Subscriber</a>, <a href="Filterable.html" title="interface in io.github.jonloucks.metalog.api">Filterable</a></span></div>
 <div class="block">Responsible for the special logging case of System.out and System.err
  It is both a Subscriber and Publisher</div>
 </section>
@@ -101,6 +105,26 @@ extends <a href="Subscriber.html" title="interface in io.github.jonloucks.metalo
 <li>
 <section class="method-summary" id="method-summary">
 <h2>Method Summary</h2>
+<div id="method-summary-table">
+<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab3" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab3', 3)" class="table-tab">Abstract Methods</button></div>
+<div id="method-summary-table.tabpanel" role="tabpanel" aria-labelledby="method-summary-table-tab0">
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Method</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#error(io.github.jonloucks.metalog.api.Log)" class="member-name-link">error</a><wbr>(<a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a>&nbsp;log)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Publishes the log with Console error meta</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#info(io.github.jonloucks.metalog.api.Log)" class="member-name-link">info</a><wbr>(<a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a>&nbsp;log)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Publishes the log with Console info meta</div>
+</div>
+</div>
+</div>
+</div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-io.github.jonloucks.metalog.api.Filterable">Methods inherited from interface&nbsp;io.github.jonloucks.metalog.api.<a href="Filterable.html" title="interface in io.github.jonloucks.metalog.api">Filterable</a></h3>
 <code><a href="Filterable.html#addFilter(java.util.function.Predicate)">addFilter</a></code></div>
@@ -131,6 +155,36 @@ extends <a href="Subscriber.html" title="interface in io.github.jonloucks.metalo
 <div class="block">The Contract for the Console.
  It is replaceable for scenarios where the Console output needs to redirected
  from System.err and System.out</div>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<!-- ============ METHOD DETAIL ========== -->
+<li>
+<section class="method-details" id="method-detail">
+<h2>Method Details</h2>
+<ul class="member-list">
+<li>
+<section class="detail" id="info(io.github.jonloucks.metalog.api.Log)">
+<h3>info</h3>
+<div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">info</span><wbr><span class="parameters">(<a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a>&nbsp;log)</span></div>
+<div class="block">Publishes the log with Console info meta</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>log</code> - the log to publish</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="error(io.github.jonloucks.metalog.api.Log)">
+<h3>error</h3>
+<div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">error</span><wbr><span class="parameters">(<a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a>&nbsp;log)</span></div>
+<div class="block">Publishes the log with Console error meta</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>log</code> - the log to publish</dd>
+</dl>
 </section>
 </li>
 </ul>

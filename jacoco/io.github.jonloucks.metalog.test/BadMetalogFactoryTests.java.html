@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BadMetalogFactoryTests.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">metalog</a> &gt; <a href="index.source.html" class="el_package">io.github.jonloucks.metalog.test</a> &gt; <span class="el_source">BadMetalogFactoryTests.java</span></div><h1>BadMetalogFactoryTests.java</h1><pre class="source lang-java linenums">package io.github.jonloucks.metalog.test;
+
+import io.github.jonloucks.metalog.api.Metalog;
+import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
+
+import static io.github.jonloucks.contracts.test.Tools.assertObject;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+@SuppressWarnings(&quot;CodeBlock2Expr&quot;)
+public interface BadMetalogFactoryTests {
+    @Test
+    default void badContractsFactory_HasProtectedConstructor() throws Throwable {
+<span class="fc" id="L17">        final Class&lt;?&gt; klass = Class.forName(BadMetalogFactory.class.getCanonicalName());</span>
+<span class="fc" id="L18">        final Constructor&lt;?&gt; constructor = klass.getDeclaredConstructor();</span>
+<span class="fc" id="L19">        constructor.setAccessible(true);</span>
+<span class="fc" id="L20">        final int modifiers = constructor.getModifiers();</span>
+        
+<span class="fc" id="L22">        assertFalse(Modifier.isPublic(modifiers), &quot;constructor should not be public.&quot;);</span>
+<span class="fc" id="L23">    }</span>
+    
+    @Test
+    default void badContractsFactory_HasPrivateConstructor() throws Throwable {
+<span class="fc" id="L27">        final BadMetalogFactory badContractsFactory = new BadMetalogFactory();</span>
+<span class="fc" id="L28">        final Metalog.Config config = new Metalog.Config(){};</span>
+<span class="fc" id="L29">        final Exception thrown = assertThrows(Exception.class, () -&gt; {</span>
+<span class="nc" id="L30">            badContractsFactory.create(config);</span>
+<span class="nc" id="L31">        });</span>
+        
+<span class="fc" id="L33">        assertObject(thrown);</span>
+<span class="fc" id="L34">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

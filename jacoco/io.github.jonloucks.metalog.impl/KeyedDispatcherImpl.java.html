@@ -13,57 +13,62 @@ import static io.github.jonloucks.contracts.api.Checks.nullCheck;
 final class KeyedDispatcherImpl implements Dispatcher, AutoOpen {
     @Override
     public AutoClose open() {
-<span class="pc bpc" id="L16" title="1 of 2 branches missed.">        if (idempotent.transitionToOpened()) {</span>
-<span class="fc" id="L17">            worker.start();</span>
-<span class="fc" id="L18">            return this::close;</span>
+<span class="pc bpc" id="L16" title="1 of 2 branches missed.">        if (idempotent.transitionToOpening()) {</span>
+            try {
+<span class="fc" id="L18">                worker.start();</span>
+<span class="fc" id="L19">                return this::close;</span>
+<span class="nc" id="L20">            } catch (Exception thrown) {</span>
+<span class="nc" id="L21">                idempotent.transitionToFailed();</span>
+<span class="nc" id="L22">                throw thrown;</span>
+            }
         } else {
-<span class="nc" id="L20">            return ()-&gt;{};</span>
+<span class="nc" id="L25">            return ()-&gt;{};</span>
         }
     }
     
     @Override
     public void dispatch(Meta meta, Runnable command) {
-<span class="fc" id="L26">        final Runnable validCommand = nullCheck(command, &quot;Command must be present.&quot;);</span>
-<span class="pc bpc" id="L27" title="1 of 2 branches missed.">        if (idempotent.isRejecting()) {</span>
-<span class="nc" id="L28">            throw new IllegalStateException(&quot;Executor has been closed.&quot;);</span>
+<span class="fc" id="L31">        final Runnable validCommand = nullCheck(command, &quot;Command must be present.&quot;);</span>
+<span class="pc bpc" id="L32" title="1 of 2 branches missed.">        if (idempotent.isRejecting()) {</span>
+<span class="nc" id="L33">            throw new IllegalStateException(&quot;Executor has been closed.&quot;);</span>
         }
-<span class="fc" id="L30">        inflightSemaphore.acquireUninterruptibly();</span>
+<span class="fc" id="L35">        inflightSemaphore.acquireUninterruptibly();</span>
         try {
-<span class="fc" id="L32">            queue.put(validCommand);</span>
-<span class="nc" id="L33">        } catch (InterruptedException e) {</span>
-<span class="nc" id="L34">            inflightSemaphore.release();</span>
-<span class="fc" id="L35">        }</span>
-<span class="fc" id="L36">    }</span>
+<span class="fc" id="L37">            queue.put(validCommand);</span>
+<span class="nc" id="L38">        } catch (InterruptedException e) {</span>
+<span class="nc" id="L39">            inflightSemaphore.release();</span>
+<span class="fc" id="L40">        }</span>
+<span class="fc" id="L41">    }</span>
     
-<span class="fc" id="L38">    KeyedDispatcherImpl(Metalog.Config config) {</span>
-<span class="fc" id="L39">        this.inflightSemaphore = new Semaphore(config.keyedQueueLimit());</span>
-<span class="fc" id="L40">        this.queue = new ArrayBlockingQueue&lt;&gt;(config.keyedQueueLimit());</span>
-<span class="fc" id="L41">        this.worker = new Thread(this::consumeLoop);</span>
-<span class="fc" id="L42">    }</span>
+<span class="fc" id="L43">    KeyedDispatcherImpl(Metalog.Config config) {</span>
+<span class="fc" id="L44">        this.inflightSemaphore = new Semaphore(config.keyedQueueLimit());</span>
+<span class="fc" id="L45">        this.queue = new ArrayBlockingQueue&lt;&gt;(config.keyedQueueLimit());</span>
+<span class="fc" id="L46">        this.worker = new Thread(this::consumeLoop);</span>
+<span class="fc" id="L47">    }</span>
     
     private void close() {
-<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        if (idempotent.transitionToClosed()) {</span>
-<span class="fc" id="L46">            worker.interrupt();</span>
-<span class="fc" id="L47">            inflightSemaphore.release(queue.size());</span>
-<span class="fc" id="L48">            queue.clear();</span>
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">        if (idempotent.transitionToClosed()) {</span>
+<span class="nc" id="L51">            worker.interrupt();</span>
+<span class="nc" id="L52">            inflightSemaphore.release(queue.size());</span>
+<span class="nc" id="L53">            queue.clear();</span>
         }
-<span class="fc" id="L50">    }</span>
+<span class="fc" id="L55">    }</span>
     
     private void consumeLoop() {
-<span class="fc bfc" id="L53" title="All 2 branches covered.">        while (idempotent.isActive()) {</span>
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">        while (idempotent.isActive()) {</span>
             try {
-<span class="fc" id="L55">                final Runnable command = queue.take();</span>
+<span class="fc" id="L60">                final Runnable command = queue.take();</span>
                 try {
-<span class="fc" id="L57">                    command.run();</span>
+<span class="fc" id="L62">                    command.run();</span>
                 } finally {
-<span class="fc" id="L59">                    inflightSemaphore.release();</span>
+<span class="fc" id="L64">                    inflightSemaphore.release();</span>
                 }
-<span class="fc" id="L61">            }  catch (InterruptedException ignored) {</span>
-<span class="fc" id="L62">            }</span>
+<span class="nc" id="L66">            }  catch (InterruptedException ignored) {</span>
+<span class="pc" id="L67">            }</span>
         }
-<span class="fc" id="L64">    }</span>
+<span class="nc" id="L69">    }</span>
     
-<span class="fc" id="L66">    private final IdempotentImpl idempotent = new IdempotentImpl();</span>
+<span class="fc" id="L71">    private final IdempotentImpl idempotent = new IdempotentImpl();</span>
     private final Semaphore inflightSemaphore;
     private final Thread worker;
     private final ArrayBlockingQueue&lt;Runnable&gt; queue;

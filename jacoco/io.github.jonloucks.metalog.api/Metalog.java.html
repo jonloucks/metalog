@@ -43,7 +43,7 @@ public interface Metalog extends Publisher, Filterable, AutoOpen {
          * @return the class name to use if reflection is used to find the MetalogFactory
          */
         default String reflectionClassName() {
-<span class="fc" id="L46">            return &quot;io.github.jonloucks.metalog.impl.ServiceFactoryImpl&quot;;</span>
+<span class="fc" id="L46">            return &quot;io.github.jonloucks.metalog.impl.MetalogFactoryImpl&quot;;</span>
         }
         
         /**
@@ -100,7 +100,7 @@ public interface Metalog extends Publisher, Filterable, AutoOpen {
          * @return the timeout duration
          */
         default Duration shutdownTimeout() {
-<span class="nc" id="L103">            return Duration.ofSeconds(60);</span>
+<span class="fc" id="L103">            return Duration.ofSeconds(60);</span>
         }
         
         /**
