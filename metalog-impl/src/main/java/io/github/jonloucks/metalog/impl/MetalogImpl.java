@@ -20,15 +20,15 @@ final class MetalogImpl implements Metalog {
     
     @Override
     public void publish(Log log, Meta meta) {
-        if (openState.isRejecting()) {
+        if (idempotent.isRejecting()) {
             throw new IllegalStateException("Metalog must be open.");
         }
         
         final Log validLog = new InvokeOnlyOnce(log);
         final Meta validMeta = null == meta ? Meta.DEFAULT : meta;
         
-        if (!subscribers.isEmpty() && test(validMeta)) {
-            if (validMeta.hasBlock() || onDispatchingThread()) {
+        if (shouldProcess(validMeta)) {
+            if (shouldTransmitNow(validMeta)) {
                 transmitNow(validLog, validMeta);
             } else {
                 relayToDispatcher(validMeta, validLog);
@@ -62,9 +62,8 @@ final class MetalogImpl implements Metalog {
 
     @Override
     public AutoClose open() {
-        if (openState.transitionToOpened()) {
-            realOpen();
-            return this::close;
+        if (idempotent.transitionToOpening()) {
+            return realOpening();
         } else {
             return () -> {}; // all open calls after the first get a do nothing close
         }
@@ -72,28 +71,43 @@ final class MetalogImpl implements Metalog {
     
     MetalogImpl(Config config) {
         this.config = configCheck(config);
-        final Promisors promisors = config.contracts().claim(Promisors.CONTRACT);
         this.repository = config.contracts().claim(Repository.FACTORY).get();
         
-        bindContracts(config, promisors);
+        bindContracts(config);
     }
     
+    private AutoClose realOpening() {
+        try {
+            realOpen();
+            idempotent.transitionToOpened();
+        } catch (Exception thrown) {
+            idempotent.transitionToFailed();
+            throw thrown;
+        }
+        return this::close;
+    }
     private void realOpen() {
-        final Promisors promisors = config.contracts().claim(Promisors.CONTRACT);
         closeRepository = repository.open();
-        
-        final Contract<Dispatcher> unkeyedContract = Contract.create(Dispatcher.class, n -> n.name("Unkeyed Dispatcher"));
-        repository.keep(unkeyedContract, promisors.createLifeCyclePromisor(()-> new UnkeyedDispatcherImpl(config)));
-        dispatchers.put("", config.contracts().claim(unkeyedContract));
-   
         metaFactory = config.contracts().claim(Meta.Builder.FACTORY_CONTRACT);
-        if (config.systemOutput()) {
+        createUnkeyedDispatcher();
+        activateConsole();
+    }
+    
+    private void createUnkeyedDispatcher() {
+        final Promisors promisors = config.contracts().claim(Promisors.CONTRACT);
+        final Contract<Dispatcher> contract = Contract.create(Dispatcher.class, n -> n.name("Unkeyed Dispatcher"));
+        repository.keep(contract, promisors.createLifeCyclePromisor(()-> new UnkeyedDispatcherImpl(config)));
+        dispatchers.put("", config.contracts().claim(contract));
+    }
+    
+    private void activateConsole() {
+        if (config.systemOutput() && config.contracts().isBound(Console.CONTRACT)) {
             config.contracts().claim(Console.CONTRACT);
         }
     }
     
     private void close() {
-        if (openState.transitionToClosed()) {
+        if (idempotent.transitionToClosed()) {
             realClose();
         }
     }
@@ -104,6 +118,17 @@ final class MetalogImpl implements Metalog {
             closeRepository = null;
             close.close();
         });
+    }
+    
+    private boolean shouldTransmitNow(Meta meta) {
+        return meta.hasBlock() || onDispatchingThread();
+    }
+    
+    private boolean shouldProcess(Meta meta) {
+        if (!subscribers.isEmpty() && test(meta)) {
+            return subscribers.stream().anyMatch(s -> s.test(meta));
+        }
+        return false;
     }
     
     private void relayToDispatcher(Meta meta, Log log) {
@@ -143,7 +168,8 @@ final class MetalogImpl implements Metalog {
         return config.contracts().claim(contract);
     }
     
-    private void bindContracts(Config config, Promisors promisors) {
+    private void bindContracts(Config config) {
+        final Promisors promisors = config.contracts().claim(Promisors.CONTRACT);
         repository.keep(Metalog.CONTRACT, () -> this);
         repository.keep(MetalogFactory.CONTRACT, promisors.createLifeCyclePromisor(MetalogFactoryImpl::new));
         repository.keep(Entities.Builder.FACTORY_CONTRACT, () -> EntitiesImpl::new);
@@ -164,7 +190,7 @@ final class MetalogImpl implements Metalog {
     private static final String DISPATCHING_PROPERTY = "dispatching";
     
     private final Config config;
-    private final IdempotentImpl openState = new IdempotentImpl();
+    private final IdempotentImpl idempotent = new IdempotentImpl();
     private Repository repository;
     private AutoClose closeRepository;
     private final List<Subscriber> subscribers = new CopyOnWriteArrayList<>();

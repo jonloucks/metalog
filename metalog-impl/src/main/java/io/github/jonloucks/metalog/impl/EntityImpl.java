@@ -74,9 +74,10 @@ final class EntityImpl implements Entity, Entity.Builder<EntityImpl> {
     public EntityImpl copy(Entity entity) {
         final Entity validFromEntity = entityCheck(entity);
         
-        entity.getId().ifPresent(this::id);
-        entity.getName().ifPresent(this::name);
-        entity.getValue().ifPresent(this::value);
+        unique(validFromEntity.isUnique());
+        validFromEntity.getId().ifPresent(this::id);
+        validFromEntity.getName().ifPresent(this::name);
+        validFromEntity.getValue().ifPresent(this::value);
         
         validFromEntity.getCorrelations().ifPresent(c -> c.visitEach(e -> {
                 correlation(e);

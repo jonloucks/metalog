@@ -13,9 +13,14 @@ import static io.github.jonloucks.contracts.api.Checks.nullCheck;
 final class KeyedDispatcherImpl implements Dispatcher, AutoOpen {
     @Override
     public AutoClose open() {
-        if (idempotent.transitionToOpened()) {
-            worker.start();
-            return this::close;
+        if (idempotent.transitionToOpening()) {
+            try {
+                worker.start();
+                return this::close;
+            } catch (Exception thrown) {
+                idempotent.transitionToFailed();
+                throw thrown;
+            }
         } else {
             return ()->{};
         }

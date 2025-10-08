@@ -11,6 +11,7 @@ public interface Tests extends
     MetaTests,
     MetalogTests,
     InternalTests,
+    ToolsTests,
     TorrentTests
 {
 }

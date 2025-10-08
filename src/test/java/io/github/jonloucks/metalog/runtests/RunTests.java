@@ -10,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(RunTests.RunExtension.class)
-public final class RunTests implements Tests {
+public final class RunTests implements InternalTests, Tests {
     public RunTests() {
     
     }

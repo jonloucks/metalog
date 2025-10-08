@@ -80,8 +80,8 @@ public interface EntitiesTests {
                 entities.entity(createUniqueTestEntity("entity" + (i%uniqueNames)));
             }
             
-            assertFalse(entities.isEmpty(), "Entities should be empty");
-            assertEquals(uniqueNames, entities.size(), "Entities size ");
+            assertFalse(entities.isEmpty(), "Entities should not be empty");
+            assertEquals(uniqueNames, entities.size(), "Entities size");
             final List<Entity> found = entities.findAllIf(p -> true);
             assertNotNull(found);
             assertEquals(uniqueNames, found.size(), "Found size");
@@ -89,7 +89,7 @@ public interface EntitiesTests {
     }
     
     @Test
-    default void entities_entity_WithManyMixed_Worksx() {
+    default void entities_entity_WithManyMixedValues_Works() {
         runWithScenario( entities -> {
             final int entityCount = 100;
            
