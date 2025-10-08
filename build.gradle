@@ -22,6 +22,11 @@ repositories {
 dependencies {
     api project(':metalog-api')
     api project(':metalog-impl')
+    api project(':metalog-test')
+    api libs.contracts.api
+
+    testImplementation libs.contracts.test
+    testImplementation libs.contracts
 
     testImplementation project(':metalog-test')
 }

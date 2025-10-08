@@ -58,11 +58,15 @@ public final class Tools {
         return createTestEntity(name, null);
     }
     
-    static Entity createTestEntity(String name, Object value) {
-        return createTestEntity(name, value, null);
+    static Entity createUniqueTestEntity(String name) {
+        return createTestEntity(name, null, null, true);
     }
     
-    static Entity createTestEntity(String name, Object value, String id) {
+    static Entity createTestEntity(String name, Object value) {
+        return createTestEntity(name, value, null, false);
+    }
+    
+    static Entity createTestEntity(String name, Object value, String id, boolean unique) {
         return new Entity() {
             @Override
             public CharSequence get() {
@@ -80,6 +84,11 @@ public final class Tools {
             }
             
             @Override
+            public boolean isUnique() {
+                return unique;
+            }
+            
+            @Override
             public Optional<Object> getValue() {
                 return Optional.ofNullable(value);
             }
@@ -88,7 +97,7 @@ public final class Tools {
     
     public static void assertMetaDefaults(Meta meta) {
         assertEquals(Meta.DEFAULT.getName().isPresent(), meta.getName().isPresent());
-        assertEquals(Meta.DEFAULT.isBlock(), meta.isBlock());
+        assertEquals(Meta.DEFAULT.hasBlock(), meta.hasBlock());
         assertEquals(Meta.DEFAULT.getValue().isPresent(), meta.getValue().isPresent());
         assertEquals(Meta.DEFAULT.getId().isPresent(), meta.getId().isPresent());
         assertEquals(Meta.DEFAULT.getThrown().isPresent(), meta.getThrown().isPresent());

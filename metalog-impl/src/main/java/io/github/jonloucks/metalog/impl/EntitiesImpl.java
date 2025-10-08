@@ -2,6 +2,7 @@ package io.github.jonloucks.metalog.impl;
 
 import io.github.jonloucks.metalog.api.Entities;
 import io.github.jonloucks.metalog.api.Entity;
+import io.github.jonloucks.metalog.api.Visitor;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -12,11 +13,11 @@ import java.util.stream.Collectors;
 import static io.github.jonloucks.contracts.api.Checks.*;
 import static io.github.jonloucks.metalog.impl.Internal.*;
 
-final class EntitiesImpl implements Entities, Entities.Builder<EntitiesImpl> {
+final class EntitiesImpl implements Entities.Builder<EntitiesImpl> {
 
     @Override
     public void visitEach(Visitor<? super Entity> visitor) {
-        final Visitor<? super Entity> validVisitor = nullCheck(visitor, "Visitor must be present.");
+        final Visitor<? super Entity> validVisitor = visitorCheck(visitor);
         for (Entity entity : list) {
             if (!validVisitor.visit(entity)) {
                 return;
@@ -35,20 +36,20 @@ final class EntitiesImpl implements Entities, Entities.Builder<EntitiesImpl> {
     }
     
     @Override
-    public boolean replaceIf(Predicate<? super Entity> filter, Entity entity) {
+    public boolean replaceIf(Predicate<? super Entity> filter, Entity replacement) {
         final Predicate<? super Entity> validFilter = filterCheck(filter);
-        final Entity validEntity = entityCheck(entity);
-        boolean replaced = false;
+        final Entity validEntity = entityCheck(replacement);
+        int replacedEntities = 0;
         
         final ListIterator<Entity> iterator = list.listIterator();
         while (iterator.hasNext()) {
             final Entity nextEntity = iterator.next();
             if (validFilter.test(nextEntity)) {
                 iterator.set(validEntity);
-                replaced = true;
+                ++replacedEntities;
             }
         }
-        return replaced;
+        return replacedEntities > 0;
     }
     
     @Override
@@ -65,13 +66,7 @@ final class EntitiesImpl implements Entities, Entities.Builder<EntitiesImpl> {
     public int size() {
         return list.size();
     }
-    
-    @Override
-    public EntitiesImpl unique(boolean unique) {
-        this.unique = unique;
-        return this;
-    }
-    
+
     @Override
     public EntitiesImpl entity(Consumer<Entity.Builder<?>> builderConsumer) {
         final EntityImpl builder = new EntityImpl();
@@ -83,28 +78,25 @@ final class EntitiesImpl implements Entities, Entities.Builder<EntitiesImpl> {
     @Override
     public EntitiesImpl entity(Entity entity) {
         final Entity validEntity = entityCheck(entity);
-        if (unique) {
+        if (validEntity.isUnique()) {
             final Optional<String> optionalName = validEntity.getName();
-            if (optionalName.isPresent() && replaceIf(byName(optionalName.get()), validEntity)) {
-                return this;
+            if (optionalName.isPresent()) {
+                if (replaceIf(byName(optionalName.get()).and(byUnique(true)), validEntity)) {
+                    return this;
+                }
             }
         }
         list.addLast(validEntity);
         return this;
     }
-    
-    @Override
-    public <T> Optional<T> findFirstByNameWithType(String name, Class<T> type) {
-        return findFirstWithType(byName(name), typeCheck(type));
-    }
-    
+  
     @Override
     public List<Entity> asList() {
         return new ArrayList<>(list);
     }
     
     @Override
-    public <T> Optional<T> findFirstWithType(Predicate<? super Entity> filter, Class<T> type) {
+    public <T> Optional<T> findFirstValueWithType(Predicate<? super Entity> filter, Class<T> type) {
         final Predicate<? super Entity> validFilter = filterCheck(filter);
         final Class<T> validType = typeCheck(type);
         final AtomicReference<T> result = new AtomicReference<>();
@@ -127,12 +119,7 @@ final class EntitiesImpl implements Entities, Entities.Builder<EntitiesImpl> {
     }
     
     @Override
-    public <T> List<T> findAllByNameWithType(String name, Class<T> type) {
-        return findAllWithType(byName(name), typeCheck(type));
-    }
-    
-    @Override
-    public <T> List<T> findAllWithType(Predicate<? super Entity> filter, Class<T> type) {
+    public <T> List<T> findAllValuesWithType(Predicate<? super Entity> filter, Class<T> type) {
         final Predicate<? super Entity> validFilter = filterCheck(filter);
         final Class<T> validType = typeCheck(type);
         final LinkedList<T> matchedList = new LinkedList<>();
@@ -157,5 +144,5 @@ final class EntitiesImpl implements Entities, Entities.Builder<EntitiesImpl> {
     }
   
     private final LinkedList<Entity> list = new LinkedList<>();
-    private boolean unique;
+//    private boolean unique;
 }

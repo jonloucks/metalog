@@ -22,6 +22,7 @@ import static io.github.jonloucks.contracts.test.Tools.*;
 import static io.github.jonloucks.metalog.api.GlobalMetalog.createMetalog;
 import static io.github.jonloucks.metalog.test.EntitiesTests.EntitiesTestsTools.runWithScenario;
 import static io.github.jonloucks.metalog.test.Tools.createTestEntity;
+import static io.github.jonloucks.metalog.test.Tools.createUniqueTestEntity;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings({"Convert2MethodRef", "CodeBlock2Expr"})
@@ -53,8 +54,6 @@ public interface EntitiesTests {
             final List<Entity> expected = new ArrayList<>();
             final int entityCount = 1234;
             
-            Entities.Builder<?> returnBuilder = entitiesBuilder.unique(false);
-            
             for (int i = 0; i < entityCount; i++) {
                 final Entity entity = createTestEntity("same name");
                 
@@ -62,7 +61,6 @@ public interface EntitiesTests {
                 expected.add(entity);
             }
 
-            assertNotNull(returnBuilder);
             assertFalse(entitiesBuilder.isEmpty(), "Entities should not be empty");
             assertEquals(entityCount, entitiesBuilder.size(), "Entities size ");
             final List<Entity> found = entitiesBuilder.asList();
@@ -76,13 +74,10 @@ public interface EntitiesTests {
     default void entities_entity_WithManyMixed_Works() {
         runWithScenario( entities -> {
             final int entityCount = 1234;
-            
-            entities.unique(true);
-            
             final int uniqueNames = 5;
             
             for (int i = 0; i < entityCount; i++) {
-                entities.entity(createTestEntity("entity" + (i%uniqueNames)));
+                entities.entity(createUniqueTestEntity("entity" + (i%uniqueNames)));
             }
             
             assertFalse(entities.isEmpty(), "Entities should be empty");
@@ -97,9 +92,7 @@ public interface EntitiesTests {
     default void entities_entity_WithManyMixed_Worksx() {
         runWithScenario( entities -> {
             final int entityCount = 100;
-            
-            entities.unique(false);
-            
+           
             for (int i = 0; i < entityCount; i++) {
                 final Object value;
                 switch (i%5) {
@@ -118,11 +111,11 @@ public interface EntitiesTests {
                 entities.entity(entity);
             }
             
-            final List<Integer> integers = entities.findAllWithType(e->true, Integer.class);
-            final List<Instant>  instants = entities.findAllWithType(e->true, Instant.class);
-            final List<Boolean> booleans = entities.findAllWithType(e->true, Boolean.class);
-            final List<Temporal> temporals = entities.findAllWithType(e->true, Temporal.class);
-            final List<Integer> failedIntegers = entities.findAllWithType(e->false, Integer.class);
+            final List<Integer> integers = entities.findAllValuesWithType(e->true, Integer.class);
+            final List<Instant>  instants = entities.findAllValuesWithType(e->true, Instant.class);
+            final List<Boolean> booleans = entities.findAllValuesWithType(e->true, Boolean.class);
+            final List<Temporal> temporals = entities.findAllValuesWithType(e->true, Temporal.class);
+            final List<Integer> failedIntegers = entities.findAllValuesWithType(e->false, Integer.class);
             
             assertAll(
                 () -> assertEquals(60, integers.size(), "Integers size "),
@@ -203,10 +196,10 @@ public interface EntitiesTests {
     }
     
     @Test
-    default void entities_findAllWithType_WithNullFilter_Throws() {
+    default void entities_findAllWithType_Values_WithNullFilter_Throws() {
         runWithScenario( entities -> {
             final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-                entities.findAllWithType(null, String.class);
+                entities.findAllValuesWithType(null, String.class);
             });
             
             assertThrown(thrown);
@@ -214,31 +207,18 @@ public interface EntitiesTests {
     }
     
     @Test
-    default void entities_findAllWithType_WithNullType_Throws() {
+    default void entities_findAllWithType_Values_WithNullType_Throws() {
         final Predicate<? super Entity> filter = e -> true;
         
         runWithScenario( entities -> {
             final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-                entities.findAllWithType(filter, null);
+                entities.findAllValuesWithType(filter, null);
             });
             
             assertThrown(thrown);
         });
     }
     
-    //    public <T> List<T> findAllWithType(Predicate<? super Entity> filter, Class<T> type) {
-    
-    @Test
-    default void entities_findAllByNameWithType_WithNullName_Throws() {
-        final Class<String> type = String.class;
-        runWithScenario( entities -> {
-            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-                entities.findAllByNameWithType(null, type);
-            });
-            
-            assertThrown(thrown);
-        });
-    }
     
     @Test
     default void entities_findFirstIf_WithNullFilter_Throws() {

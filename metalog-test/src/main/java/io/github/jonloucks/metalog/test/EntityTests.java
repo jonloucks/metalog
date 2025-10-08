@@ -109,7 +109,7 @@ public interface EntityTests {
     
     @Test
     default void entity_copy_OverwritesWhenPresent() {
-        final Entity fromEntity = createTestEntity("from name", "from value", "from id");
+        final Entity fromEntity = createTestEntity("from name", "from value", "from id", false);
         runWithScenario( builder -> {
             builder.id("original id").name("original name").value("original value");
             final Entity.Builder<?> result = builder.copy(fromEntity);
@@ -126,7 +126,7 @@ public interface EntityTests {
     
     @Test
     default void entity_copy_DiscardsWhenNotPresent() {
-        final Entity fromEntity = createTestEntity(null, null, null);
+        final Entity fromEntity = createTestEntity(null, null, null, false);
         runWithScenario( builder -> {
             builder.id("original id").name("original name").value("original value");
             final Entity.Builder<?> result = builder.copy(fromEntity);
@@ -143,7 +143,7 @@ public interface EntityTests {
     
     @Test
     default void entity_copy_SetsNotPresent() {
-        final Entity fromEntity = createTestEntity("from name", "from value", "from id");
+        final Entity fromEntity = createTestEntity("from name", "from value", "from id", false);
         runWithScenario( builder -> {
             final Entity.Builder<?> result = builder.copy(fromEntity);
             

@@ -48,7 +48,7 @@ public interface Meta extends Entity {
      * </p>
      * @return true if blocking, the default is false
      */
-    default boolean isBlock() {
+    default boolean hasBlock() {
         return false;
     }
     
@@ -132,7 +132,7 @@ public interface Meta extends Entity {
         
         /**
          * Set the block mode for the Meta
-         * @param block true will enable {@link Meta#isBlock()}
+         * @param block true will enable {@link Meta#hasBlock()}
          * @return this builder
          */
         B block(boolean block);

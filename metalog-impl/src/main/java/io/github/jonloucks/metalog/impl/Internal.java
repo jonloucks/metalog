@@ -1,11 +1,7 @@
 package io.github.jonloucks.metalog.impl;
 
-import io.github.jonloucks.metalog.api.Entities;
-import io.github.jonloucks.metalog.api.Entity;
-import io.github.jonloucks.metalog.api.Log;
-import io.github.jonloucks.metalog.api.Meta;
+import io.github.jonloucks.metalog.api.*;
 
-import java.util.Optional;
 import java.util.function.Predicate;
 
 import static io.github.jonloucks.contracts.api.Checks.nameCheck;
@@ -40,18 +36,18 @@ final class Internal {
     static String channelCheck(String name) {
         return nullCheck(name, "Channel must be present.");
     }
-
-    static <T> Optional<T> findFirstByNameAndType(Entity entity, String name, Class<T> type) {
-        final Optional<Entities> optional = entity.getCorrelations();
-        if (optional.isPresent()) {
-            return optional.get().findFirstByNameWithType(name, type);
-        }
-        return Optional.empty();
+    
+    static <T> Visitor<T> visitorCheck(Visitor<T> visitor) {
+        return nullCheck(visitor, "Visitor must be present.");
     }
     
-    static Predicate<? super Entity> byName(String name) {
+    static Predicate<Entity> byName(String name) {
         final String validName = nameCheck(name);
         
         return entity -> entity.getName().filter(s -> validName.equals(s)).isPresent();
+    }
+    
+    static Predicate<Entity> byUnique(boolean unique) {
+        return entity -> entity.isUnique() == unique;
     }
 }

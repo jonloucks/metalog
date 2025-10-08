@@ -1,11 +1,12 @@
 package io.github.jonloucks.metalog.api;
 
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  *  Responsible for publishing log messages
  */
-public interface Publisher extends Filterable {
+public interface Publisher extends Predicate<Meta> {
     
     /**
      * Publish a log message with the default meta information.
