@@ -58,6 +58,7 @@ final class ConsoleImpl implements Console, AutoOpen {
                 case CONSOLE_ERROR_CHANNEL:
                     System.err.println(validLog.get());
                     break;
+                default:
             }
         }
     }
