@@ -18,7 +18,7 @@ final class EntitiesImpl implements Entities.Builder<EntitiesImpl> {
     @Override
     public void visitEach(Visitor<? super Entity> visitor) {
         final Visitor<? super Entity> validVisitor = visitorCheck(visitor);
-        for (Entity entity : list) {
+        for (Entity entity : entityList) {
             if (!validVisitor.visit(entity)) {
                 return;
             }
@@ -27,12 +27,12 @@ final class EntitiesImpl implements Entities.Builder<EntitiesImpl> {
 
     @Override
     public Optional<Entity> findFirstIf(Predicate<? super Entity> filter) {
-        return list.stream().filter(filterCheck(filter)).findFirst();
+        return entityList.stream().filter(filterCheck(filter)).findFirst();
     }
 
     @Override
     public List<Entity> findAllIf(Predicate<? super Entity> filter) {
-        return list.stream().filter(filterCheck(filter)).collect(Collectors.toList());
+        return entityList.stream().filter(filterCheck(filter)).collect(Collectors.toList());
     }
     
     @Override
@@ -41,7 +41,7 @@ final class EntitiesImpl implements Entities.Builder<EntitiesImpl> {
         final Entity validEntity = entityCheck(replacement);
         int replacedEntities = 0;
         
-        final ListIterator<Entity> iterator = list.listIterator();
+        final ListIterator<Entity> iterator = entityList.listIterator();
         while (iterator.hasNext()) {
             final Entity nextEntity = iterator.next();
             if (validFilter.test(nextEntity)) {
@@ -54,17 +54,17 @@ final class EntitiesImpl implements Entities.Builder<EntitiesImpl> {
     
     @Override
     public boolean removeIf(Predicate<? super Entity> filter) {
-        return list.removeIf(filterCheck(filter));
+        return entityList.removeIf(filterCheck(filter));
     }
     
     @Override
     public boolean isEmpty() {
-        return list.isEmpty();
+        return entityList.isEmpty();
     }
     
     @Override
     public int size() {
-        return list.size();
+        return entityList.size();
     }
 
     @Override
@@ -86,13 +86,13 @@ final class EntitiesImpl implements Entities.Builder<EntitiesImpl> {
                 }
             }
         }
-        list.addLast(validEntity);
+        entityList.addLast(validEntity);
         return this;
     }
   
     @Override
     public List<Entity> asList() {
-        return new ArrayList<>(list);
+        return new ArrayList<>(entityList);
     }
     
     @Override
@@ -106,7 +106,7 @@ final class EntitiesImpl implements Entities.Builder<EntitiesImpl> {
             if (validFilter.test(entity)) {
                 if (optionalValue.isPresent()) {
                     final Object value = optionalValue.get();
-                    if (validType.isInstance(value) && validFilter.test(entity)) {
+                    if (validType.isInstance(value)) {
                         result.set(validType.cast(value));
                         return false;
                     }
@@ -129,7 +129,7 @@ final class EntitiesImpl implements Entities.Builder<EntitiesImpl> {
             if (validFilter.test(entity)) {
                 if (optionalValue.isPresent()) {
                     final Object value = optionalValue.get();
-                    if (validType.isInstance(value) && validFilter.test(entity)) {
+                    if (validType.isInstance(value)) {
                         matchedList.add(validType.cast(value));
                     }
                 }
@@ -143,6 +143,5 @@ final class EntitiesImpl implements Entities.Builder<EntitiesImpl> {
     
     }
   
-    private final LinkedList<Entity> list = new LinkedList<>();
-//    private boolean unique;
+    private final LinkedList<Entity> entityList = new LinkedList<>();
 }
