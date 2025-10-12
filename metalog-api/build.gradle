@@ -8,6 +8,7 @@ apply from: "${rootDir}/gradle/java-publishing.gradle"
 dependencies {
     api libs.contracts.api
 
+    testImplementation libs.contracts.test
     testRuntimeOnly libs.contracts
 }
 
