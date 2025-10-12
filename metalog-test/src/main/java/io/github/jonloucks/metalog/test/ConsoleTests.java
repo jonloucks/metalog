@@ -17,6 +17,7 @@ import static io.github.jonloucks.contracts.test.Tools.assertThrown;
 import static io.github.jonloucks.metalog.test.ConsoleTests.ConsoleTestsTools.assertIndirectConsole;
 import static io.github.jonloucks.metalog.test.ConsoleTests.ConsoleTestsTools.assertDirectConsole;
 import static io.github.jonloucks.metalog.test.Tools.withMetalog;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -33,6 +34,22 @@ public interface ConsoleTests {
                 console.info(null);
             });
             assertThrown(thrown);
+        });
+    }
+    
+    @Test
+    default void console_info_WithLog_Works() {
+        withMetalog((contracts, metalog) -> {
+            final Console console = contracts.claim(Console.CONTRACT);
+            assertDoesNotThrow( () -> console.info(() -> "Hello"));
+        });
+    }
+    
+    @Test
+    default void console_error_WithLog_Works() {
+        withMetalog((contracts, metalog) -> {
+            final Console console = contracts.claim(Console.CONTRACT);
+            assertDoesNotThrow( () -> console.error(() -> "Hello"));
         });
     }
     

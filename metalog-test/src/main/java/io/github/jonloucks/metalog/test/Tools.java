@@ -96,6 +96,8 @@ public final class Tools {
     }
     
     public static void assertMetaDefaults(Meta meta) {
+        assertNotNull(meta.getChannel());
+        assertEquals("info", meta.getChannel());
         assertEquals(Meta.DEFAULT.getName().isPresent(), meta.getName().isPresent());
         assertEquals(Meta.DEFAULT.hasBlock(), meta.hasBlock());
         assertEquals(Meta.DEFAULT.getValue().isPresent(), meta.getValue().isPresent());

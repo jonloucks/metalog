@@ -9,7 +9,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.*;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static io.github.jonloucks.metalog.impl.Internal.commandCheck;
+import static io.github.jonloucks.metalog.impl.Internal.unreportableError;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 final class UnkeyedDispatcherImpl implements Dispatcher, AutoOpen {
 
@@ -18,13 +20,19 @@ final class UnkeyedDispatcherImpl implements Dispatcher, AutoOpen {
         if (idempotent.transitionToOpened()) {
             return this::close;
         } else {
+            // Possibly impossible to happen, but a good practice
             return ()->{};
         }
     }
     
     @Override
     public void dispatch(Meta meta, Runnable command) {
-        command.run();
+        final Runnable validCommand = commandCheck(command);
+        if (idempotent.isRejecting()) {
+            validCommand.run();
+            return;
+        }
+        this.executor.execute(validCommand);
     }
     
     UnkeyedDispatcherImpl(Metalog.Config config) {
@@ -56,7 +64,7 @@ final class UnkeyedDispatcherImpl implements Dispatcher, AutoOpen {
                 final Duration duration = Duration.between(start, Instant.now());
                 if (hasForcedShutdown) {
                     if (isTimeToGiveUp(duration)) {
-                        System.err.println("Metalog unkeyed dispatcher failed to shutdown.");
+                        unreportableError(()-> "Metalog unkeyed dispatcher failed to shutdown.");
                         return;
                     }
                 } else if (isTimeToForceShutdown(duration)) {
@@ -74,7 +82,8 @@ final class UnkeyedDispatcherImpl implements Dispatcher, AutoOpen {
     }
     
     private boolean isTimeToForceShutdown(Duration duration) {
-        return duration.compareTo(config.shutdownTimeout().dividedBy(2)) > 0;
+        final Duration shutdownTime = config.shutdownTimeout();
+        return duration.compareTo(shutdownTime.dividedBy(2)) > 0;
     }
     
     private void initiateShutdown() {
@@ -83,7 +92,7 @@ final class UnkeyedDispatcherImpl implements Dispatcher, AutoOpen {
     
     private boolean checkIfShutdown() {
         try {
-            return executor.awaitTermination(1, SECONDS);
+            return executor.awaitTermination(1, MILLISECONDS);
         } catch (InterruptedException thrown) {
             return executor.isShutdown();
         }

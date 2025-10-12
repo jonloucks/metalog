@@ -81,7 +81,7 @@ final class EntitiesImpl implements Entities.Builder<EntitiesImpl> {
         if (validEntity.isUnique()) {
             final Optional<String> optionalName = validEntity.getName();
             if (optionalName.isPresent()) {
-                if (replaceIf(byName(optionalName.get()).and(byUnique(true)), validEntity)) {
+                if (replaceIf(byName(optionalName.get()).and(byUnique()), validEntity)) {
                     return this;
                 }
             }

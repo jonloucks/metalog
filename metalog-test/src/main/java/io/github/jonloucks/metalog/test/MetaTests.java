@@ -50,7 +50,7 @@ public interface MetaTests {
                 .value("value1")
                 .channel("channel1")
                 .key("sequenceKey1")
-                .block(true)
+                .block()
                 .thread(thread)
                 .thrown(thrown)
                 .unique(true)

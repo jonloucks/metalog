@@ -22,7 +22,7 @@ public interface Meta extends Entity {
     /**
      * User defined value to help subscribers determine how to process a log message
      * Common values would be "info", "warn", "error", "trace", "debug"
-     * In addition System.err and System.out get redirected to System
+     * In addition System err and System out get redirected to System
      * @return the channel
      */
     default String getChannel() {

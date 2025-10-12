@@ -20,12 +20,15 @@ final class MetalogImpl implements Metalog {
     
     @Override
     public void publish(Log log, Meta meta) {
-        if (idempotent.isRejecting()) {
-            throw new IllegalStateException("Metalog must be open.");
-        }
-        
         final Log validLog = new InvokeOnlyOnce(log);
         final Meta validMeta = null == meta ? Meta.DEFAULT : meta;
+        
+        if (idempotent.isRejecting()) {
+            if (config.debug()) {
+                unreportableError(() -> "Rejecting publish when not active : " + validLog.get());
+            }
+            return;
+        }
         
         if (shouldProcess(validMeta)) {
             if (shouldTransmitNow(validMeta)) {
@@ -55,7 +58,7 @@ final class MetalogImpl implements Metalog {
     
     @Override
     public AutoClose subscribe(Subscriber subscriber) {
-        final Subscriber validSubscriber = nullCheck(subscriber, "Subscriber must be present.");
+        final Subscriber validSubscriber = subscriberCheck(subscriber);
         subscribers.add(validSubscriber);
         return () -> subscribers.removeIf( x -> x == validSubscriber);
     }
@@ -81,8 +84,9 @@ final class MetalogImpl implements Metalog {
             realOpen();
             idempotent.transitionToOpened();
         } catch (Exception thrown) {
-            idempotent.transitionToFailed();
-            throw thrown;
+            if (idempotent.transitionToFailed()) {
+                throw thrown;
+            }
         }
         return this::close;
     }

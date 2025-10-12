@@ -49,20 +49,20 @@ final class ConsoleImpl implements Console, AutoOpen {
         final Log validLog = logCheck(log);
         final Meta validMeta = metaCheck(meta);
         if (test(validMeta)) {
-            switch (validMeta.getChannel()) {
+            switch (meta.getChannel()) {
                 case CONSOLE_INFO_CHANNEL:
                 case SYSTEM_INFO_CHANNEL:
-                    System.out.println(validLog.get());
+                    System.out.println(log.get());
                     break;
                 case SYSTEM_ERROR_CHANNEL:
                 case CONSOLE_ERROR_CHANNEL:
-                    System.err.println(validLog.get());
+                    System.err.println(log.get());
                     break;
                 default:
             }
         }
     }
-    
+  
     @Override
     public AutoClose addFilter(Predicate<Meta> filter) {
         return filters.addFilter(filter);
@@ -85,7 +85,7 @@ final class ConsoleImpl implements Console, AutoOpen {
     ConsoleImpl(Metalog.Config config) {
         this.config = config;
     }
-    
+
     private AutoClose realOpen() {
         metalog = config.contracts().claim(Metalog.CONTRACT);
         closeSubscription = config.contracts().claim(Metalog.CONTRACT).subscribe(this);

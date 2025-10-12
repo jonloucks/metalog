@@ -11,6 +11,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
+import static io.github.jonloucks.contracts.test.Tools.assertInstantiateThrows;
 import static io.github.jonloucks.contracts.test.Tools.sleep;
 import static io.github.jonloucks.metalog.test.Tools.withMetalog;
 import static io.github.jonloucks.metalog.test.TorrentTests.TorrentTestsTools.runWithScenario;
@@ -43,6 +44,11 @@ public interface TorrentTests {
     default void torrent_half_and_half() {
         runWithScenario(new TorrentTestsTools.ScenarioConfig() {
         });
+    }
+    
+    @Test
+    default void torrent_InstantiateTorrentTestsTools_Throws() {
+        assertInstantiateThrows(TorrentTestsTools.class);
     }
     
     final class TorrentTestsTools {

@@ -112,5 +112,9 @@ public interface Metalog extends Publisher, Filterable, AutoOpen {
         default boolean systemOutput() {
             return true;
         }
+        
+        default boolean debug() {
+            return false;
+        }
     }
 }

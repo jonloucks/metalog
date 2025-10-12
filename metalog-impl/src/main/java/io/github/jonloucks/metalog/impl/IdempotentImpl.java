@@ -50,10 +50,6 @@ final class IdempotentImpl {
             boolean canTransitionTo(State state) {
                 return state == OPENED || state == OPENING;
             }
-            @Override
-            boolean isActive() {
-                return false;
-            }
         },
         OPENING {
             @Override
@@ -85,29 +81,15 @@ final class IdempotentImpl {
                 return true;
             }
         },
-        CLOSED {
-            @Override
-            boolean canTransitionTo(State state) {
-                return false;
-            }
-            @Override
-            boolean isActive() {
-                return false;
-            }
-        },
-        FAILED {
-            @Override
-            boolean canTransitionTo(State state) {
-                return false;
-            }
-            @Override
-            boolean isActive() {
-                return false;
-            }
-        };
+        CLOSED,
+        FAILED;
      
-        abstract boolean isActive();
-        abstract boolean canTransitionTo(State state);
+         boolean isActive() {
+             return false;
+         }
+         boolean canTransitionTo(State state) {
+             return false;
+         }
         
         State() {
         }
