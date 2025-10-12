@@ -52,11 +52,11 @@ final class ConsoleImpl implements Console, AutoOpen {
             switch (meta.getChannel()) {
                 case CONSOLE_INFO_CHANNEL:
                 case SYSTEM_INFO_CHANNEL:
-                    System.out.println(log.get());
+                    System.out.println(validLog.get());
                     break;
                 case SYSTEM_ERROR_CHANNEL:
                 case CONSOLE_ERROR_CHANNEL:
-                    System.err.println(log.get());
+                    System.err.println(validLog.get());
                     break;
                 default:
             }

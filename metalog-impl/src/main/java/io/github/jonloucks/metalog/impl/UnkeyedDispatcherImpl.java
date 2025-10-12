@@ -10,7 +10,6 @@ import java.time.Instant;
 import java.util.concurrent.*;
 
 import static io.github.jonloucks.metalog.impl.Internal.commandCheck;
-import static io.github.jonloucks.metalog.impl.Internal.unreportableError;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 final class UnkeyedDispatcherImpl implements Dispatcher, AutoOpen {
@@ -64,7 +63,6 @@ final class UnkeyedDispatcherImpl implements Dispatcher, AutoOpen {
                 final Duration duration = Duration.between(start, Instant.now());
                 if (hasForcedShutdown) {
                     if (isTimeToGiveUp(duration)) {
-                        unreportableError(()-> "Metalog unkeyed dispatcher failed to shutdown.");
                         return;
                     }
                 } else if (isTimeToForceShutdown(duration)) {

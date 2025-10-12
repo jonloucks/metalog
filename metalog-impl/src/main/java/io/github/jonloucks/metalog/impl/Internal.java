@@ -3,7 +3,6 @@ package io.github.jonloucks.metalog.impl;
 import io.github.jonloucks.metalog.api.*;
 
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 import static io.github.jonloucks.contracts.api.Checks.nameCheck;
 import static io.github.jonloucks.contracts.api.Checks.nullCheck;
@@ -19,11 +18,7 @@ final class Internal {
         // Java modules protects agents invoking private methods.
         // There are unit tests that will fail if this constructor is not private
     }
-    
-    static void unreportableError(Supplier<CharSequence> messageSupplier) {
-        System.err.println(messageSupplier.get());
-    }
-    
+
     static <T extends Log> T logCheck(T log) {
         return nullCheck(log, "Log must be present.");
     }

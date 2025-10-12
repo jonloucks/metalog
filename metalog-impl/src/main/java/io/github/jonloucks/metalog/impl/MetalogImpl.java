@@ -24,9 +24,6 @@ final class MetalogImpl implements Metalog {
         final Meta validMeta = null == meta ? Meta.DEFAULT : meta;
         
         if (idempotent.isRejecting()) {
-            if (config.debug()) {
-                unreportableError(() -> "Rejecting publish when not active : " + validLog.get());
-            }
             return;
         }
         
