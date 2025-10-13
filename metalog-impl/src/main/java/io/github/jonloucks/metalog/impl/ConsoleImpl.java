@@ -6,6 +6,7 @@ import io.github.jonloucks.metalog.api.*;
 
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import static io.github.jonloucks.contracts.api.Checks.builderConsumerCheck;
 import static io.github.jonloucks.metalog.impl.Internal.logCheck;
@@ -15,8 +16,8 @@ import static java.util.Optional.ofNullable;
 final class ConsoleImpl implements Console, AutoOpen {
     
     @Override
-    public void info(Log log) {
-        publish(log, INFO_META);
+    public void output(Log log) {
+        publish(log, OUTPUT_META);
     }
     
     @Override
@@ -25,42 +26,51 @@ final class ConsoleImpl implements Console, AutoOpen {
     }
     
     @Override
-    public void publish(Log log) {
-        publish(log, INFO_META);
+    public Outcome publish(Log log) {
+        return publish(log, OUTPUT_META);
     }
 
     @Override
-    public void publish(Log log, Meta meta) {
+    public Outcome publish(Log log, Meta meta) {
         if (test(meta)) {
-            metalog.publish(log, meta);
+            final Outcome outcome = metalog.publish(log, meta);
+            if (outcome == Outcome.REJECTED) {
+                // directly process message
+                return receive(log,meta);
+            }
+            return outcome;
+        } else {
+            return Outcome.SKIPPED;
         }
     }
 
     @Override
-    public void publish(Log log, Consumer<Meta.Builder<?>> builderConsumer) {
-        metalog.publish(log, b -> {
-            b.key(CONSOLE_KEY).channel(CONSOLE_INFO_CHANNEL);
-            builderConsumerCheck(builderConsumer).accept(b);
-        });
+    public Outcome publish(Log log, Consumer<Meta.Builder<?>> builderConsumer) {
+        final Meta.Builder<?> metaBuilder = metaFactory.get();
+        metaBuilder.channel(CONSOLE_OUTPUT_CHANNEL);
+        builderConsumerCheck(builderConsumer).accept(metaBuilder);
+        metaBuilder.key(CONSOLE_KEY);
+        return publish(logCheck(log), metaBuilder);
     }
     
     @Override
-    public void receive(Log log, Meta meta) {
+    public Outcome receive(Log log, Meta meta) {
         final Log validLog = logCheck(log);
         final Meta validMeta = metaCheck(meta);
         if (test(validMeta)) {
             switch (meta.getChannel()) {
-                case CONSOLE_INFO_CHANNEL:
-                case SYSTEM_INFO_CHANNEL:
+                case CONSOLE_OUTPUT_CHANNEL:
+                case SYSTEM_OUT_CHANNEL:
                     System.out.println(validLog.get());
-                    break;
-                case SYSTEM_ERROR_CHANNEL:
+                    return Outcome.CONSUMED;
+                case SYSTEM_ERR_CHANNEL:
                 case CONSOLE_ERROR_CHANNEL:
                     System.err.println(validLog.get());
-                    break;
+                    return Outcome.CONSUMED;
                 default:
             }
         }
+        return Outcome.SKIPPED;
     }
   
     @Override
@@ -88,6 +98,7 @@ final class ConsoleImpl implements Console, AutoOpen {
 
     private AutoClose realOpen() {
         metalog = config.contracts().claim(Metalog.CONTRACT);
+        metaFactory = config.contracts().claim(Meta.Builder.FACTORY_CONTRACT);
         closeSubscription = config.contracts().claim(Metalog.CONTRACT).subscribe(this);
         return this::close;
     }
@@ -103,10 +114,10 @@ final class ConsoleImpl implements Console, AutoOpen {
     
     private boolean isSupported(Meta meta) {
         switch (meta.getChannel()) {
-            case SYSTEM_INFO_CHANNEL:
-            case SYSTEM_ERROR_CHANNEL:
+            case SYSTEM_OUT_CHANNEL:
+            case SYSTEM_ERR_CHANNEL:
             case CONSOLE_ERROR_CHANNEL:
-            case CONSOLE_INFO_CHANNEL:
+            case CONSOLE_OUTPUT_CHANNEL:
                 return true;
             default:
                 return false;
@@ -118,16 +129,17 @@ final class ConsoleImpl implements Console, AutoOpen {
     }
     
     private static final String CONSOLE_KEY = "Console";
-    private static final String CONSOLE_INFO_CHANNEL = "Console.info";
+    private static final String CONSOLE_OUTPUT_CHANNEL = "Console.output";
     private static final String CONSOLE_ERROR_CHANNEL = "Console.error";
-    private static final String SYSTEM_ERROR_CHANNEL = "System.err";
-    private static final String SYSTEM_INFO_CHANNEL = "System.out";
+    private static final String SYSTEM_ERR_CHANNEL = "System.err";
+    private static final String SYSTEM_OUT_CHANNEL = "System.out";
     private static final Meta ERROR_META = makeMeta(CONSOLE_ERROR_CHANNEL);
-    private static final Meta INFO_META = makeMeta(CONSOLE_INFO_CHANNEL);
+    private static final Meta OUTPUT_META = makeMeta(CONSOLE_OUTPUT_CHANNEL);
     
     private final Filterable filters = new FiltersImpl();
     private final IdempotentImpl openState = new IdempotentImpl();
     private final Metalog.Config config;
     private Metalog metalog;
     private AutoClose closeSubscription;
+    private Supplier<Meta.Builder<?>> metaFactory;
 }

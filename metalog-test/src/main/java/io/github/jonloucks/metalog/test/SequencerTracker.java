@@ -2,6 +2,7 @@ package io.github.jonloucks.metalog.test;
 
 import io.github.jonloucks.metalog.api.Log;
 import io.github.jonloucks.metalog.api.Meta;
+import io.github.jonloucks.metalog.api.Outcome;
 import io.github.jonloucks.metalog.api.Subscriber;
 
 import java.util.Optional;
@@ -10,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 final class SequencerTracker implements Subscriber {
 
     @Override
-    public void receive(Log log, Meta meta) {
+    public Outcome receive(Log log, Meta meta) {
         final Optional<String> optionalKey = meta.getKey();
         // storing the sequence number directly in the meta value for tests.
         final Optional<Object> optionalValue = meta.getValue();
@@ -26,6 +27,7 @@ final class SequencerTracker implements Subscriber {
                 }
             }
         }
+        return Outcome.CONSUMED;
     }
     
     SequencerTracker() {}

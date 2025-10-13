@@ -19,28 +19,32 @@ import static java.util.Optional.ofNullable;
 final class MetalogImpl implements Metalog {
     
     @Override
-    public void publish(Log log, Meta meta) {
+    public Outcome publish(Log log, Meta meta) {
         final Log validLog = new InvokeOnlyOnce(log);
-        final Meta validMeta = null == meta ? Meta.DEFAULT : meta;
+        final Meta validMeta = metaCheck(meta);
         
         if (idempotent.isRejecting()) {
-            return;
+            return Outcome.REJECTED;
         }
         
         if (shouldProcess(validMeta)) {
             if (shouldTransmitNow(validMeta)) {
                 transmitNow(validLog, validMeta);
+                return Outcome.CONSUMED;
             } else {
                 relayToDispatcher(validMeta, validLog);
+                return Outcome.DISPATCHED;
             }
+        } else {
+            return Outcome.SKIPPED;
         }
     }
     
     @Override
-    public void publish(Log log, Consumer<Meta.Builder<?>> builderConsumer) {
+    public Outcome publish(Log log, Consumer<Meta.Builder<?>> builderConsumer) {
         final Meta.Builder<?> metaBuilder = metaFactory.get();
         builderConsumerCheck(builderConsumer).accept(metaBuilder);
-        publish(logCheck(log), metaBuilder);
+        return publish(logCheck(log), metaBuilder);
     }
 
     @Override
@@ -81,9 +85,8 @@ final class MetalogImpl implements Metalog {
             realOpen();
             idempotent.transitionToOpened();
         } catch (Exception thrown) {
-            if (idempotent.transitionToFailed()) {
-                throw thrown;
-            }
+            idempotent.transitionToFailed();
+            throw thrown;
         }
         return this::close;
     }

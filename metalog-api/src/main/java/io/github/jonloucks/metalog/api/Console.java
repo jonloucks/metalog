@@ -15,11 +15,13 @@ public interface Console extends Publisher, Subscriber, Filterable {
      */
     Contract<Console> CONTRACT = Contract.create(Console.class, b -> b.replaceable(true));
     
+    @Override
+    Outcome publish(Log log);
     /**
      * Publishes the log with Console info meta
      * @param log the log to publish
      */
-    void info(Log log);
+    void output(Log log);
     
     /**
      * Publishes the log with Console error meta

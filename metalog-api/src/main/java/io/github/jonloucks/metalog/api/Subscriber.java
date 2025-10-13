@@ -13,8 +13,9 @@ public interface Subscriber extends Predicate<Meta> {
      *
      * @param log the log message
      * @param meta the meta information
+     * @return the outcome of processing the log
      */
-    void receive(Log log, Meta meta);
+    Outcome receive(Log log, Meta meta);
     
     /**
      * Used to short circuit needless processing

@@ -15,6 +15,7 @@ import org.mockito.stubbing.Answer;
 
 import java.time.Duration;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import static io.github.jonloucks.contracts.test.Tools.*;
 import static io.github.jonloucks.metalog.api.GlobalMetalog.createMetalog;
@@ -38,6 +39,17 @@ public interface MetalogTests {
             });
             
             assertThrown(thrown);
+        });
+    }
+    
+    @Test
+    default void metalog_addFilter_CloseTwice_DoesNotThrow() {
+        runWithScenario(metalog -> {
+            final Predicate<Meta> filter = m -> true;
+            try (AutoClose removeFilter = metalog.addFilter(filter)) {
+                implicitClose(removeFilter);
+                assertDoesNotThrow(() -> implicitClose(removeFilter));
+            }
         });
     }
     
@@ -163,7 +175,10 @@ public interface MetalogTests {
         };
         assertDoesNotThrow(() -> {
             final Metalog metalog = createMetalog(config);
-            final Subscriber subscriber = (l, m) -> sleep(Duration.ofMillis(100));
+            final Subscriber subscriber = (l, m) -> {
+                sleep(Duration.ofMillis(100));
+                return Outcome.CONSUMED;
+            };
             try (AutoClose closeMetalog = metalog.open();
                  AutoClose closeSubscriber = metalog.subscribe(subscriber)) {
                 final AutoClose ignored = closeSubscriber;

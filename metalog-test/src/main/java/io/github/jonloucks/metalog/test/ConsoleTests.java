@@ -27,21 +27,29 @@ import static org.mockito.Mockito.*;
 public interface ConsoleTests {
     
     @Test
-    default void console_info_WithNull_Throws() {
+    default void console_output_WithNull_Throws() {
         withMetalog((contracts, metalog) -> {
             final Console console = contracts.claim(Console.CONTRACT);
             final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-                console.info(null);
+                console.output(null);
             });
             assertThrown(thrown);
         });
     }
     
     @Test
-    default void console_info_WithLog_Works() {
+    default void console_output_WithLog_Works() {
         withMetalog((contracts, metalog) -> {
             final Console console = contracts.claim(Console.CONTRACT);
-            assertDoesNotThrow( () -> console.info(() -> "Hello"));
+            assertDoesNotThrow( () -> console.output(() -> "Hello"));
+        });
+    }
+    
+    @Test
+    default void console_publish_WithLog_Works() {
+        withMetalog((contracts, metalog) -> {
+            final Console console = contracts.claim(Console.CONTRACT);
+            assertDoesNotThrow( () -> console.publish(() -> "Hello"));
         });
     }
     
@@ -52,7 +60,7 @@ public interface ConsoleTests {
             assertDoesNotThrow( () -> console.error(() -> "Hello"));
         });
     }
-    
+
     @Test
     default void console_error_WithNull_Throws() {
         withMetalog((contracts, metalog) -> {
@@ -76,7 +84,7 @@ public interface ConsoleTests {
     }
     
     @ParameterizedTest(name = "channel = {0}")
-    @ValueSource(strings = {"System.out", "System.err", "Console.info", "Console.error"})
+    @ValueSource(strings = {"System.out", "System.err", "Console.output", "Console.error"})
     default void console_publish_Indirect_WithSupportedChannel(String channel) {
         withMetalog((contracts, metalog) -> {
             assertIndirectConsole(metalog, channel, 1);
@@ -84,13 +92,14 @@ public interface ConsoleTests {
     }
     
     @ParameterizedTest(name = "channel = {0}")
-    @ValueSource(strings = {"System.out", "System.err", "Console.info", "Console.error"})
+    @ValueSource(strings = {"System.out", "System.err", "Console.output", "Console.error"})
     default void console_publish_Indirect_WithSupportedChannel_Filtered(String channel) {
         withMetalog((contracts, metalog) -> {
             final Console console = contracts.claim(Console.CONTRACT);
             
-            try (AutoClose removeFilter = console.addFilter(x -> false)) {
-                final AutoClose ignoreRemoveFilter = removeFilter;
+            try (AutoClose anotherFilter = console.addFilter( m -> true);
+                AutoClose removeFilter = console.addFilter(x -> false)) {
+                final AutoClose ignore1 = removeFilter, ignore2 = anotherFilter;
                 assertIndirectConsole(metalog, channel, 0);
             }
             assertIndirectConsole(metalog, channel, 1);
@@ -98,7 +107,7 @@ public interface ConsoleTests {
     }
     
     @ParameterizedTest(name = "channel = {0}")
-    @ValueSource(strings = {"Console.error", "Console.info", "System.out", "System.err"})
+    @ValueSource(strings = {"Console.error", "Console.output", "System.out", "System.err"})
     default void console_publish_Direct_WithSupportedChannel(String channel) {
         withMetalog((contracts, metalog) -> {
             assertDirectConsole(contracts, channel, 1);
