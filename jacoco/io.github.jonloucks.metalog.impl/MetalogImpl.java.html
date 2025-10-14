@@ -7,10 +7,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import static io.github.jonloucks.contracts.api.BindStrategy.IF_NOT_BOUND;
 import static io.github.jonloucks.contracts.api.Checks.*;
 import static io.github.jonloucks.metalog.impl.Internal.*;
 import static java.lang.ThreadLocal.withInitial;
@@ -19,54 +21,52 @@ import static java.util.Optional.ofNullable;
 final class MetalogImpl implements Metalog {
     
     @Override
-    public void publish(Log log, Meta meta) {
-<span class="pc bpc" id="L23" title="1 of 2 branches missed.">        if (idempotent.isRejecting()) {</span>
-<span class="nc" id="L24">            throw new IllegalStateException(&quot;Metalog must be open.&quot;);</span>
+    public Outcome publish(Log log, Meta meta) {
+<span class="fc" id="L25">        final Log validLog = new InvokeOnlyOnce(log);</span>
+<span class="fc" id="L26">        final Meta validMeta = metaCheck(meta);</span>
+        
+<span class="fc bfc" id="L28" title="All 2 branches covered.">        if (idempotent.isRejecting()) {</span>
+<span class="fc" id="L29">            return Outcome.REJECTED;</span>
         }
         
-<span class="fc" id="L27">        final Log validLog = new InvokeOnlyOnce(log);</span>
-<span class="pc bpc" id="L28" title="1 of 2 branches missed.">        final Meta validMeta = null == meta ? Meta.DEFAULT : meta;</span>
-        
-<span class="fc bfc" id="L30" title="All 2 branches covered.">        if (shouldProcess(validMeta)) {</span>
-<span class="fc bfc" id="L31" title="All 2 branches covered.">            if (shouldTransmitNow(validMeta)) {</span>
-<span class="fc" id="L32">                transmitNow(validLog, validMeta);</span>
+<span class="fc bfc" id="L32" title="All 2 branches covered.">        if (test(validMeta)) {</span>
+<span class="fc bfc" id="L33" title="All 2 branches covered.">            if (shouldTransmitNow(validMeta)) {</span>
+<span class="fc" id="L34">                return transmitNow(validLog, validMeta);</span>
             } else {
-<span class="fc" id="L34">                relayToDispatcher(validMeta, validLog);</span>
+<span class="fc" id="L36">                return relayToDispatcher(validMeta, validLog);</span>
             }
+        } else {
+<span class="fc" id="L39">            return Outcome.SKIPPED;</span>
         }
-<span class="fc" id="L37">    }</span>
+    }
     
     @Override
-    public void publish(Log log, Consumer&lt;Meta.Builder&lt;?&gt;&gt; builderConsumer) {
-<span class="fc" id="L41">        final Meta.Builder&lt;?&gt; metaBuilder = metaFactory.get();</span>
-<span class="fc" id="L42">        builderConsumerCheck(builderConsumer).accept(metaBuilder);</span>
-<span class="fc" id="L43">        publish(logCheck(log), metaBuilder);</span>
-<span class="fc" id="L44">    }</span>
+    public Outcome publish(Log log, Consumer&lt;Meta.Builder&lt;?&gt;&gt; builderConsumer) {
+<span class="fc" id="L45">        final Meta.Builder&lt;?&gt; metaBuilder = metaFactory.get();</span>
+<span class="fc" id="L46">        builderConsumerCheck(builderConsumer).accept(metaBuilder);</span>
+<span class="fc" id="L47">        return publish(logCheck(log), metaBuilder);</span>
+    }
 
     @Override
     public AutoClose addFilter(Predicate&lt;Meta&gt; filter) {
-<span class="nc" id="L48">        return filters.addFilter(filter);</span>
+<span class="fc" id="L52">        return filters.addFilter(filter);</span>
     }
     
     @Override
     public boolean test(Meta meta) {
-<span class="fc" id="L53">        return filters.test(meta);</span>
+<span class="pc bpc" id="L57" title="1 of 4 branches missed.">        return filters.test(meta) &amp;&amp; subscribers.stream().anyMatch(s -&gt; s.test(meta));</span>
     }
     
     @Override
     public AutoClose subscribe(Subscriber subscriber) {
-<span class="fc" id="L58">        final Subscriber validSubscriber = nullCheck(subscriber, &quot;Subscriber must be present.&quot;);</span>
-<span class="fc" id="L59">        subscribers.add(validSubscriber);</span>
-<span class="fc bfc" id="L60" title="All 2 branches covered.">        return () -&gt; subscribers.removeIf( x -&gt; x == validSubscriber);</span>
+<span class="fc" id="L62">        final Subscriber validSubscriber = subscriberCheck(subscriber);</span>
+<span class="fc" id="L63">        subscribers.add(validSubscriber);</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">        return () -&gt; subscribers.removeIf( x -&gt; x == validSubscriber);</span>
     }
 
     @Override
     public AutoClose open() {
-<span class="pc bpc" id="L65" title="1 of 2 branches missed.">        if (idempotent.transitionToOpening()) {</span>
-<span class="fc" id="L66">            return realOpening();</span>
-        } else {
-<span class="nc" id="L68">            return () -&gt; {}; // all open calls after the first get a do nothing close</span>
-        }
+<span class="fc" id="L69">        return idempotent.transitionToOpened(this::realOpen);</span>
     }
     
 <span class="fc" id="L72">    MetalogImpl(Config config) {</span>
@@ -76,126 +76,117 @@ final class MetalogImpl implements Metalog {
 <span class="fc" id="L76">        bindContracts(config);</span>
 <span class="fc" id="L77">    }</span>
     
-    private AutoClose realOpening() {
-        try {
-<span class="fc" id="L81">            realOpen();</span>
-<span class="fc" id="L82">            idempotent.transitionToOpened();</span>
-<span class="nc" id="L83">        } catch (Exception thrown) {</span>
-<span class="nc" id="L84">            idempotent.transitionToFailed();</span>
-<span class="nc" id="L85">            throw thrown;</span>
-<span class="fc" id="L86">        }</span>
-<span class="fc" id="L87">        return this::close;</span>
+    private AutoClose realOpen() {
+<span class="fc" id="L80">        closeRepository = repository.open();</span>
+<span class="fc" id="L81">        metaFactory = config.contracts().claim(Meta.Builder.FACTORY_CONTRACT);</span>
+<span class="fc" id="L82">        createUnkeyedDispatcher();</span>
+<span class="fc" id="L83">        activateConsole();</span>
+<span class="fc" id="L84">        return this::close;</span>
     }
-    private void realOpen() {
-<span class="fc" id="L90">        closeRepository = repository.open();</span>
-<span class="fc" id="L91">        metaFactory = config.contracts().claim(Meta.Builder.FACTORY_CONTRACT);</span>
-<span class="fc" id="L92">        createUnkeyedDispatcher();</span>
-<span class="fc" id="L93">        activateConsole();</span>
-<span class="fc" id="L94">    }</span>
-    
+
     private void createUnkeyedDispatcher() {
-<span class="fc" id="L97">        final Promisors promisors = config.contracts().claim(Promisors.CONTRACT);</span>
-<span class="fc" id="L98">        final Contract&lt;Dispatcher&gt; contract = Contract.create(Dispatcher.class, n -&gt; n.name(&quot;Unkeyed Dispatcher&quot;));</span>
-<span class="fc" id="L99">        repository.keep(contract, promisors.createLifeCyclePromisor(()-&gt; new UnkeyedDispatcherImpl(config)));</span>
-<span class="fc" id="L100">        dispatchers.put(&quot;&quot;, config.contracts().claim(contract));</span>
-<span class="fc" id="L101">    }</span>
+<span class="fc" id="L88">        final Promisors promisors = config.contracts().claim(Promisors.CONTRACT);</span>
+<span class="fc" id="L89">        final Contract&lt;Dispatcher&gt; contract = Contract.create(Dispatcher.class, n -&gt; n.name(&quot;Unkeyed Dispatcher&quot;));</span>
+<span class="fc" id="L90">        repository.keep(contract, promisors.createLifeCyclePromisor(()-&gt; new UnkeyedDispatcherImpl(config)));</span>
+<span class="fc" id="L91">        dispatchers.put(&quot;&quot;, config.contracts().claim(contract));</span>
+<span class="fc" id="L92">    }</span>
     
     private void activateConsole() {
-<span class="pc bpc" id="L104" title="2 of 4 branches missed.">        if (config.systemOutput() &amp;&amp; config.contracts().isBound(Console.CONTRACT)) {</span>
-<span class="fc" id="L105">            config.contracts().claim(Console.CONTRACT);</span>
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if (config.activeConsole()) {</span>
+<span class="fc" id="L96">            config.contracts().claim(Console.CONTRACT);</span>
         }
-<span class="fc" id="L107">    }</span>
+<span class="fc" id="L98">    }</span>
     
     private void close() {
-<span class="pc bpc" id="L110" title="1 of 2 branches missed.">        if (idempotent.transitionToClosed()) {</span>
-<span class="fc" id="L111">            realClose();</span>
-        }
-<span class="fc" id="L113">    }</span>
+<span class="fc" id="L101">        idempotent.transitionToClosed(this::realClose);</span>
+<span class="fc" id="L102">    }</span>
     
     private void realClose() {
-<span class="fc" id="L116">        ofNullable(closeRepository).ifPresent(close -&gt; {</span>
-<span class="fc" id="L117">            repository = null;</span>
-<span class="fc" id="L118">            closeRepository = null;</span>
-<span class="fc" id="L119">            close.close();</span>
-<span class="fc" id="L120">        });</span>
-<span class="fc" id="L121">    }</span>
+<span class="fc" id="L105">        ofNullable(closeRepository).ifPresent(close -&gt; {</span>
+<span class="fc" id="L106">            repository = null;</span>
+<span class="fc" id="L107">            closeRepository = null;</span>
+<span class="fc" id="L108">            close.close();</span>
+<span class="fc" id="L109">        });</span>
+<span class="fc" id="L110">    }</span>
     
     private boolean shouldTransmitNow(Meta meta) {
-<span class="pc bpc" id="L124" title="1 of 4 branches missed.">        return meta.hasBlock() || onDispatchingThread();</span>
+<span class="pc bpc" id="L113" title="1 of 4 branches missed.">        return meta.isBlocking() || onDispatchingThread();</span>
     }
     
-    private boolean shouldProcess(Meta meta) {
-<span class="pc bpc" id="L128" title="1 of 4 branches missed.">        if (!subscribers.isEmpty() &amp;&amp; test(meta)) {</span>
-<span class="fc" id="L129">            return subscribers.stream().anyMatch(s -&gt; s.test(meta));</span>
-        }
-<span class="fc" id="L131">        return false;</span>
-    }
-    
-    private void relayToDispatcher(Meta meta, Log log) {
-<span class="fc" id="L135">        final Dispatcher dispatcher = chooseDispatcher(meta);</span>
-<span class="fc" id="L136">        subscribers.forEach(subscriber -&gt; {</span>
-<span class="pc bpc" id="L137" title="1 of 2 branches missed.">            if (subscriber.test(meta)) {</span>
-<span class="fc" id="L138">                relayWithContext(subscriber, dispatcher, meta, log);</span>
+    private Outcome relayToDispatcher(Meta meta, Log log) {
+<span class="fc" id="L117">        final Dispatcher dispatcher = chooseDispatcher(meta);</span>
+<span class="fc" id="L118">        final AtomicReference&lt;Outcome&gt; outcomeReference = new AtomicReference&lt;&gt;(Outcome.SKIPPED);</span>
+        
+<span class="fc" id="L120">        subscribers.forEach(subscriber -&gt; {</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">            if (subscriber.test(meta)) {</span>
+<span class="fc" id="L122">                outcomeReference.set(relayWithContext(subscriber, dispatcher, meta, log));</span>
             }
-<span class="fc" id="L140">        });</span>
-<span class="fc" id="L141">    }</span>
+<span class="fc" id="L124">        });</span>
+        
+<span class="fc" id="L126">        return outcomeReference.get();</span>
+    }
     
-    private void relayWithContext(Subscriber subscriber, Dispatcher dispatcher, Meta meta, Log log) {
-<span class="fc" id="L144">        dispatcher.dispatch(meta,  () -&gt; {</span>
-<span class="fc" id="L145">            final Map&lt;String,Object&gt; context = THREAD_CONTEXT.get();</span>
-<span class="fc" id="L146">            final Object oldValue = context.put(DISPATCHING_PROPERTY, true);</span>
+    private Outcome relayWithContext(Subscriber subscriber, Dispatcher dispatcher, Meta meta, Log log) {
+<span class="fc" id="L130">        return dispatcher.dispatch(meta,  () -&gt; {</span>
+<span class="fc" id="L131">            final Map&lt;String,Object&gt; context = THREAD_CONTEXT.get();</span>
+<span class="fc" id="L132">            final Object oldValue = context.put(DISPATCHING_PROPERTY, true);</span>
             try {
-<span class="fc" id="L148">                subscriber.receive(log, meta);</span>
+<span class="fc" id="L134">                subscriber.receive(log, meta);</span>
             } finally {
-<span class="fc" id="L150">                context.put(DISPATCHING_PROPERTY, oldValue);</span>
+<span class="fc" id="L136">                context.put(DISPATCHING_PROPERTY, oldValue);</span>
             }
-<span class="fc" id="L152">        });</span>
-<span class="fc" id="L153">    }</span>
+<span class="fc" id="L138">        });</span>
+    }
     
     private boolean onDispatchingThread() {
-<span class="fc" id="L156">        return Boolean.TRUE.equals(THREAD_CONTEXT.get().get(DISPATCHING_PROPERTY));</span>
+<span class="fc" id="L142">        return Boolean.TRUE.equals(THREAD_CONTEXT.get().get(DISPATCHING_PROPERTY));</span>
     }
     
     private Dispatcher chooseDispatcher(Meta meta) {
-<span class="fc" id="L160">        final String key = meta.getKey().orElse(&quot;&quot;);</span>
-<span class="fc" id="L161">        return dispatchers.computeIfAbsent(key, this::createKeyedDispatcher);</span>
+<span class="fc" id="L146">        final String key = meta.getKey().orElse(&quot;&quot;);</span>
+<span class="fc" id="L147">        return dispatchers.computeIfAbsent(key, this::createKeyedDispatcher);</span>
     }
     
     private Dispatcher createKeyedDispatcher(String key) {
-<span class="fc" id="L165">        final Promisors promisors = config.contracts().claim(Promisors.CONTRACT);</span>
-<span class="fc" id="L166">        final Contract&lt;Dispatcher&gt; contract = Contract.create(Dispatcher.class, n -&gt; n.name(&quot;Keyed Dispatcher &quot; + key));</span>
-<span class="fc" id="L167">        repository.keep(contract, promisors.createLifeCyclePromisor(()-&gt; new KeyedDispatcherImpl(config)));</span>
-<span class="fc" id="L168">        return config.contracts().claim(contract);</span>
+<span class="fc" id="L151">        final Contract&lt;Dispatcher&gt; contract = Contract.create(Dispatcher.class, n -&gt; n.name(&quot;Keyed Dispatcher &quot; + key));</span>
+<span class="fc" id="L152">        repository.keep(contract, lifeCycle(()-&gt; new KeyedDispatcherImpl(config)));</span>
+<span class="fc" id="L153">        return config.contracts().claim(contract);</span>
     }
     
     private void bindContracts(Config config) {
-<span class="fc" id="L172">        final Promisors promisors = config.contracts().claim(Promisors.CONTRACT);</span>
-<span class="fc" id="L173">        repository.keep(Metalog.CONTRACT, () -&gt; this);</span>
-<span class="fc" id="L174">        repository.keep(MetalogFactory.CONTRACT, promisors.createLifeCyclePromisor(MetalogFactoryImpl::new));</span>
-<span class="fc" id="L175">        repository.keep(Entities.Builder.FACTORY_CONTRACT, () -&gt; EntitiesImpl::new);</span>
-<span class="fc" id="L176">        repository.keep(Entity.Builder.FACTORY_CONTRACT, () -&gt; EntityImpl::new);</span>
-<span class="fc" id="L177">        repository.keep(Meta.Builder.FACTORY_CONTRACT, () -&gt; MetaImpl::new);</span>
-<span class="fc" id="L178">        repository.keep(Console.CONTRACT, promisors.createLifeCyclePromisor(() -&gt; new ConsoleImpl(config)));</span>
-<span class="fc" id="L179">    }</span>
+<span class="fc" id="L157">        repository.keep(Metalog.CONTRACT, () -&gt; this);</span>
+<span class="fc" id="L158">        repository.keep(MetalogFactory.CONTRACT, lifeCycle(MetalogFactoryImpl::new));</span>
+<span class="fc" id="L159">        repository.keep(Entities.Builder.FACTORY_CONTRACT, () -&gt; EntitiesImpl::new);</span>
+<span class="fc" id="L160">        repository.keep(Entity.Builder.FACTORY_CONTRACT, () -&gt; EntityImpl::new);</span>
+<span class="fc" id="L161">        repository.keep(Meta.Builder.FACTORY_CONTRACT, () -&gt; MetaImpl::new);</span>
+<span class="fc" id="L162">        repository.keep(Console.CONTRACT, lifeCycle(() -&gt; new ConsoleImpl(config)), IF_NOT_BOUND);</span>
+<span class="fc" id="L163">    }</span>
     
-    private void transmitNow(Log log, Meta meta) {
-<span class="fc" id="L182">        subscribers.forEach(subscriber -&gt; {</span>
-<span class="pc bpc" id="L183" title="1 of 2 branches missed.">            if (subscriber.test(meta)) {</span>
-<span class="fc" id="L184">                subscriber.receive(log, meta);</span>
+    private &lt;T&gt; Promisor&lt;T&gt; lifeCycle(Promisor&lt;T&gt; promisor) {
+<span class="fc" id="L166">        final Promisors promisors = config.contracts().claim(Promisors.CONTRACT);</span>
+<span class="fc" id="L167">        return promisors.createLifeCyclePromisor(promisor);</span>
+    }
+    
+    private Outcome transmitNow(Log log, Meta meta) {
+<span class="fc" id="L171">        final AtomicReference&lt;Outcome&gt; outcomeReference = new AtomicReference&lt;&gt;(Outcome.SKIPPED);</span>
+<span class="fc" id="L172">        subscribers.forEach(subscriber -&gt; {</span>
+<span class="fc bfc" id="L173" title="All 2 branches covered.">            if (subscriber.test(meta)) {</span>
+<span class="fc" id="L174">                outcomeReference.set(subscriber.receive(log, meta));</span>
             }
-<span class="fc" id="L186">        });</span>
-<span class="fc" id="L187">    }</span>
+<span class="fc" id="L176">        });</span>
+<span class="fc" id="L177">        return outcomeReference.get();</span>
+    }
     
-<span class="fc" id="L189">    private static final ThreadLocal&lt;Map&lt;String, Object&gt;&gt; THREAD_CONTEXT = withInitial(LinkedHashMap::new);</span>
+<span class="fc" id="L180">    private static final ThreadLocal&lt;Map&lt;String, Object&gt;&gt; THREAD_CONTEXT = withInitial(LinkedHashMap::new);</span>
     private static final String DISPATCHING_PROPERTY = &quot;dispatching&quot;;
     
     private final Config config;
-<span class="fc" id="L193">    private final IdempotentImpl idempotent = new IdempotentImpl();</span>
+<span class="fc" id="L184">    private final IdempotentImpl idempotent = new IdempotentImpl();</span>
     private Repository repository;
     private AutoClose closeRepository;
-<span class="fc" id="L196">    private final List&lt;Subscriber&gt; subscribers = new CopyOnWriteArrayList&lt;&gt;();</span>
-<span class="fc" id="L197">    private final Filterable filters = new FiltersImpl();</span>
-<span class="fc" id="L198">    private final ConcurrentHashMap&lt;String,Dispatcher&gt; dispatchers = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="fc" id="L187">    private final List&lt;Subscriber&gt; subscribers = new CopyOnWriteArrayList&lt;&gt;();</span>
+<span class="fc" id="L188">    private final Filterable filters = new FiltersImpl();</span>
+<span class="fc" id="L189">    private final ConcurrentHashMap&lt;String,Dispatcher&gt; dispatchers = new ConcurrentHashMap&lt;&gt;();</span>
     private Supplier&lt;Meta.Builder&lt;?&gt;&gt; metaFactory;
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

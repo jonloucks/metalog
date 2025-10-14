@@ -8,10 +8,13 @@ import io.github.jonloucks.metalog.api.MetalogFactory;
  * Creates Metalog instances
  * Opt-in construction via reflection or ServiceLoader
  */
-<span class="fc" id="L11">public final class MetalogFactoryImpl implements MetalogFactory {</span>
+public final class MetalogFactoryImpl implements MetalogFactory {
+<span class="fc" id="L12">    public MetalogFactoryImpl() {</span>
+<span class="fc" id="L13">    }</span>
+    
     @Override
     public Metalog create(Metalog.Config config) {
-<span class="fc" id="L14">        return new MetalogImpl(config);</span>
+<span class="fc" id="L17">        return new MetalogImpl(config);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

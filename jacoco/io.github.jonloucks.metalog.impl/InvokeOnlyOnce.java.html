@@ -6,22 +6,19 @@ import static io.github.jonloucks.metalog.impl.Internal.logCheck;
 
 final class InvokeOnlyOnce implements Log {
     private final Log referent;
+<span class="fc" id="L9">    private boolean firstTime = true;</span>
     
-<span class="fc" id="L10">    InvokeOnlyOnce(Log referent) {</span>
-<span class="fc" id="L11">        this.referent = logCheck(referent);</span>
-<span class="fc" id="L12">    }</span>
+<span class="fc" id="L11">    InvokeOnlyOnce(Log referent) {</span>
+<span class="fc" id="L12">        this.referent = logCheck(referent);</span>
+<span class="fc" id="L13">    }</span>
     
     @Override
-    public CharSequence get() {
-<span class="fc bfc" id="L16" title="All 2 branches covered.">        if (null == cachedText) {</span>
-<span class="fc" id="L17">            synchronized (this) {</span>
-                // double check
-<span class="pc bpc" id="L19" title="1 of 2 branches missed.">                if (null == cachedText) {</span>
-<span class="fc" id="L20">                    cachedText = referent.get();</span>
-                }
-<span class="fc" id="L22">            }</span>
+    public synchronized CharSequence get() {
+<span class="fc bfc" id="L17" title="All 2 branches covered.">        if (firstTime) {</span>
+<span class="fc" id="L18">            firstTime = false;</span>
+<span class="fc" id="L19">            cachedText = referent.get();</span>
         }
-<span class="fc" id="L24">        return cachedText;</span>
+<span class="fc" id="L21">        return cachedText;</span>
     }
     
     private volatile CharSequence cachedText;

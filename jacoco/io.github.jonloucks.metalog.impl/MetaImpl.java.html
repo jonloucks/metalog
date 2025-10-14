@@ -53,7 +53,7 @@ final class MetaImpl implements Meta.Builder&lt;MetaImpl&gt;, Entity.Builder&lt;
     }
     
     @Override
-    public boolean hasBlock() {
+    public boolean isBlocking() {
 <span class="fc" id="L57">        return block;</span>
     }
     
@@ -139,8 +139,8 @@ final class MetaImpl implements Meta.Builder&lt;MetaImpl&gt;, Entity.Builder&lt;
     
     @Override
     public MetaImpl correlation(Entity entity) {
-<span class="nc" id="L142">        thisEntity.correlation(entity);</span>
-<span class="nc" id="L143">        return this;</span>
+<span class="fc" id="L142">        thisEntity.correlation(entity);</span>
+<span class="fc" id="L143">        return this;</span>
     }
     
     @Override
@@ -155,7 +155,7 @@ final class MetaImpl implements Meta.Builder&lt;MetaImpl&gt;, Entity.Builder&lt;
         
 <span class="fc" id="L156">        thisEntity.copy(validFromMeta);</span>
         
-<span class="fc" id="L158">        block(validFromMeta.hasBlock());</span>
+<span class="fc" id="L158">        block(validFromMeta.isBlocking());</span>
 <span class="fc" id="L159">        channel(validFromMeta.getChannel());</span>
 <span class="fc" id="L160">        validFromMeta.getKey().ifPresent(this::key);</span>
         
@@ -179,9 +179,9 @@ final class MetaImpl implements Meta.Builder&lt;MetaImpl&gt;, Entity.Builder&lt;
     
     private &lt;T&gt; MetaImpl setUniqueEntity(String name, T value) {
 <span class="fc bfc" id="L181" title="All 2 branches covered.">        if (value == null) {</span>
-<span class="fc" id="L182">            return correlations( b -&gt; b.removeIf(byName(name).and(byUnique(true))));</span>
+<span class="fc" id="L182">            return correlations( b -&gt; b.removeIf(byName(name).and(byUnique())));</span>
         } else {
-<span class="fc" id="L184">            return correlation(b -&gt; b.unique(true).name(name).value(value));</span>
+<span class="fc" id="L184">            return correlation(b -&gt; b.unique().name(name).value(value));</span>
         }
     }
     
@@ -189,7 +189,7 @@ final class MetaImpl implements Meta.Builder&lt;MetaImpl&gt;, Entity.Builder&lt;
 <span class="fc" id="L189">        final Optional&lt;Entities&gt; optional = getCorrelations();</span>
 <span class="fc bfc" id="L190" title="All 2 branches covered.">        if (optional.isPresent()) {</span>
 <span class="fc" id="L191">            final Entities entities = optional.get();</span>
-<span class="fc" id="L192">            return entities.findFirstValueWithType(byName(name).and(byUnique(true)), typeCheck(type));</span>
+<span class="fc" id="L192">            return entities.findFirstValueWithType(byName(name).and(byUnique()), typeCheck(type));</span>
         }
 <span class="fc" id="L194">        return Optional.empty();</span>
     }
@@ -200,7 +200,7 @@ final class MetaImpl implements Meta.Builder&lt;MetaImpl&gt;, Entity.Builder&lt;
     
     private boolean block;
     private String key;
-<span class="fc" id="L203">    private String channel = &quot;info&quot;;</span>
+<span class="fc" id="L203">    private String channel = Meta.DEFAULT.getChannel();</span>
 <span class="fc" id="L204">    private final EntityImpl thisEntity = new EntityImpl();</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

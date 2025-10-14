@@ -13,8 +13,9 @@ public interface Subscriber extends Predicate&lt;Meta&gt; {
      *
      * @param log the log message
      * @param meta the meta information
+     * @return the outcome of processing the log
      */
-    void receive(Log log, Meta meta);
+    Outcome receive(Log log, Meta meta);
     
     /**
      * Used to short circuit needless processing
@@ -23,7 +24,7 @@ public interface Subscriber extends Predicate&lt;Meta&gt; {
      */
     @Override
     default boolean test(Meta meta) {
-<span class="fc" id="L26">        return true;</span>
+<span class="fc" id="L27">        return true;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -22,7 +22,7 @@ public interface Meta extends Entity {
     /**
      * User defined value to help subscribers determine how to process a log message
      * Common values would be &quot;info&quot;, &quot;warn&quot;, &quot;error&quot;, &quot;trace&quot;, &quot;debug&quot;
-     * In addition System.err and System.out get redirected to System
+     * In addition System err and System out get redirected to System
      * @return the channel
      */
     default String getChannel() {
@@ -48,7 +48,7 @@ public interface Meta extends Entity {
      * &lt;/p&gt;
      * @return true if blocking, the default is false
      */
-    default boolean hasBlock() {
+    default boolean isBlocking() {
 <span class="fc" id="L52">        return false;</span>
     }
     
@@ -132,7 +132,7 @@ public interface Meta extends Entity {
         
         /**
          * Set the block mode for the Meta
-         * @param block true will enable {@link Meta#hasBlock()}
+         * @param block true will enable {@link Meta#isBlocking()}
          * @return this builder
          */
         B block(boolean block);

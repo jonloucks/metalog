@@ -12,23 +12,35 @@ public interface Publisher extends Predicate&lt;Meta&gt; {
      * Publish a log message with the default meta information.
      * This is minimal log message, there will be no timestamp, thread info, etc.
      * @param log the log message to publish
+     * @return the outcome
      */
-    default void publish(Log log) {
-<span class="fc" id="L17">        publish(log, Meta.DEFAULT);</span>
-<span class="fc" id="L18">    }</span>
+    default Outcome publish(Log log) {
+<span class="fc" id="L18">        return publish(log, Meta.DEFAULT);</span>
+    }
     
     /**
      * Publish a log message and it's included meta information.
      * @param log the log message to publish
      * @param meta the meta information for the given log
+     * @return the outcome
      */
-    void publish(Log log, Meta meta);
+    Outcome publish(Log log, Meta meta);
     
     /**
      * Publish a log message with the meta initialized in a callback
      * @param log the log message to publish
      * @param builderConsumer the callback to accept the Meta.Builder
+     * @return the outcome
      */
-    void publish(Log log, Consumer&lt;Meta.Builder&lt;?&gt;&gt; builderConsumer);
+    Outcome publish(Log log, Consumer&lt;Meta.Builder&lt;?&gt;&gt; builderConsumer);
+    
+    /**
+     * Test of Meta matches criteria for logging
+     * @param meta the meta to check
+     * @return true if Meta matches criteria
+     */
+    default boolean test(Meta meta) {
+<span class="fc" id="L43">        return true;</span>
+    }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

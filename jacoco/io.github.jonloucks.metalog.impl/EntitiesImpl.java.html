@@ -18,7 +18,7 @@ final class EntitiesImpl implements Entities.Builder&lt;EntitiesImpl&gt; {
     @Override
     public void visitEach(Visitor&lt;? super Entity&gt; visitor) {
 <span class="fc" id="L20">        final Visitor&lt;? super Entity&gt; validVisitor = visitorCheck(visitor);</span>
-<span class="fc bfc" id="L21" title="All 2 branches covered.">        for (Entity entity : list) {</span>
+<span class="fc bfc" id="L21" title="All 2 branches covered.">        for (Entity entity : entityList) {</span>
 <span class="fc bfc" id="L22" title="All 2 branches covered.">            if (!validVisitor.visit(entity)) {</span>
 <span class="fc" id="L23">                return;</span>
             }
@@ -27,12 +27,12 @@ final class EntitiesImpl implements Entities.Builder&lt;EntitiesImpl&gt; {
 
     @Override
     public Optional&lt;Entity&gt; findFirstIf(Predicate&lt;? super Entity&gt; filter) {
-<span class="fc" id="L30">        return list.stream().filter(filterCheck(filter)).findFirst();</span>
+<span class="fc" id="L30">        return entityList.stream().filter(filterCheck(filter)).findFirst();</span>
     }
 
     @Override
     public List&lt;Entity&gt; findAllIf(Predicate&lt;? super Entity&gt; filter) {
-<span class="fc" id="L35">        return list.stream().filter(filterCheck(filter)).collect(Collectors.toList());</span>
+<span class="fc" id="L35">        return entityList.stream().filter(filterCheck(filter)).collect(Collectors.toList());</span>
     }
     
     @Override
@@ -41,7 +41,7 @@ final class EntitiesImpl implements Entities.Builder&lt;EntitiesImpl&gt; {
 <span class="fc" id="L41">        final Entity validEntity = entityCheck(replacement);</span>
 <span class="fc" id="L42">        int replacedEntities = 0;</span>
         
-<span class="fc" id="L44">        final ListIterator&lt;Entity&gt; iterator = list.listIterator();</span>
+<span class="fc" id="L44">        final ListIterator&lt;Entity&gt; iterator = entityList.listIterator();</span>
 <span class="fc bfc" id="L45" title="All 2 branches covered.">        while (iterator.hasNext()) {</span>
 <span class="fc" id="L46">            final Entity nextEntity = iterator.next();</span>
 <span class="fc bfc" id="L47" title="All 2 branches covered.">            if (validFilter.test(nextEntity)) {</span>
@@ -54,17 +54,17 @@ final class EntitiesImpl implements Entities.Builder&lt;EntitiesImpl&gt; {
     
     @Override
     public boolean removeIf(Predicate&lt;? super Entity&gt; filter) {
-<span class="fc" id="L57">        return list.removeIf(filterCheck(filter));</span>
+<span class="fc" id="L57">        return entityList.removeIf(filterCheck(filter));</span>
     }
     
     @Override
     public boolean isEmpty() {
-<span class="fc" id="L62">        return list.isEmpty();</span>
+<span class="fc" id="L62">        return entityList.isEmpty();</span>
     }
     
     @Override
     public int size() {
-<span class="fc" id="L67">        return list.size();</span>
+<span class="fc" id="L67">        return entityList.size();</span>
     }
 
     @Override
@@ -80,19 +80,19 @@ final class EntitiesImpl implements Entities.Builder&lt;EntitiesImpl&gt; {
 <span class="fc" id="L80">        final Entity validEntity = entityCheck(entity);</span>
 <span class="fc bfc" id="L81" title="All 2 branches covered.">        if (validEntity.isUnique()) {</span>
 <span class="fc" id="L82">            final Optional&lt;String&gt; optionalName = validEntity.getName();</span>
-<span class="pc bpc" id="L83" title="1 of 2 branches missed.">            if (optionalName.isPresent()) {</span>
-<span class="fc bfc" id="L84" title="All 2 branches covered.">                if (replaceIf(byName(optionalName.get()).and(byUnique(true)), validEntity)) {</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">            if (optionalName.isPresent()) {</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">                if (replaceIf(byName(optionalName.get()).and(byUnique()), validEntity)) {</span>
 <span class="fc" id="L85">                    return this;</span>
                 }
             }
         }
-<span class="fc" id="L89">        list.addLast(validEntity);</span>
+<span class="fc" id="L89">        entityList.addLast(validEntity);</span>
 <span class="fc" id="L90">        return this;</span>
     }
   
     @Override
     public List&lt;Entity&gt; asList() {
-<span class="fc" id="L95">        return new ArrayList&lt;&gt;(list);</span>
+<span class="fc" id="L95">        return new ArrayList&lt;&gt;(entityList);</span>
     }
     
     @Override
@@ -104,9 +104,9 @@ final class EntitiesImpl implements Entities.Builder&lt;EntitiesImpl&gt; {
 <span class="fc" id="L104">        visitEach( entity -&gt; {</span>
 <span class="fc" id="L105">            final Optional&lt;Object&gt; optionalValue = entity.getValue();</span>
 <span class="fc bfc" id="L106" title="All 2 branches covered.">            if (validFilter.test(entity)) {</span>
-<span class="pc bpc" id="L107" title="1 of 2 branches missed.">                if (optionalValue.isPresent()) {</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">                if (optionalValue.isPresent()) {</span>
 <span class="fc" id="L108">                    final Object value = optionalValue.get();</span>
-<span class="pc bpc" id="L109" title="2 of 4 branches missed.">                    if (validType.isInstance(value) &amp;&amp; validFilter.test(entity)) {</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">                    if (validType.isInstance(value)) {</span>
 <span class="fc" id="L110">                        result.set(validType.cast(value));</span>
 <span class="fc" id="L111">                        return false;</span>
                     }
@@ -129,7 +129,7 @@ final class EntitiesImpl implements Entities.Builder&lt;EntitiesImpl&gt; {
 <span class="fc bfc" id="L129" title="All 2 branches covered.">            if (validFilter.test(entity)) {</span>
 <span class="fc bfc" id="L130" title="All 2 branches covered.">                if (optionalValue.isPresent()) {</span>
 <span class="fc" id="L131">                    final Object value = optionalValue.get();</span>
-<span class="pc bpc" id="L132" title="1 of 4 branches missed.">                    if (validType.isInstance(value) &amp;&amp; validFilter.test(entity)) {</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">                    if (validType.isInstance(value)) {</span>
 <span class="fc" id="L133">                        matchedList.add(validType.cast(value));</span>
                     }
                 }
@@ -143,7 +143,6 @@ final class EntitiesImpl implements Entities.Builder&lt;EntitiesImpl&gt; {
     
 <span class="fc" id="L144">    }</span>
   
-<span class="fc" id="L146">    private final LinkedList&lt;Entity&gt; list = new LinkedList&lt;&gt;();</span>
-//    private boolean unique;
+<span class="fc" id="L146">    private final LinkedList&lt;Entity&gt; entityList = new LinkedList&lt;&gt;();</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

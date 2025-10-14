@@ -27,7 +27,7 @@ final class MetalogFactoryFinder {
 <span class="fc bfc" id="L27" title="All 2 branches covered.">        if (config.useServiceLoader()) {</span>
             try {
 <span class="fc" id="L29">                return ServiceLoader.load(getServiceFactoryClass()).findFirst();</span>
-<span class="fc" id="L30">            } catch (Throwable thrown) {</span>
+<span class="fc" id="L30">            } catch (Throwable ignored) {</span>
 <span class="fc" id="L31">                return Optional.empty();</span>
             }
         }

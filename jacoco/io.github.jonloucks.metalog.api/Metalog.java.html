@@ -109,7 +109,7 @@ public interface Metalog extends Publisher, Filterable, AutoOpen {
          * For example channels &quot;System.err&quot;, &quot;System.out&quot; and &quot;Console&quot;
          * @return true to activate system output.
          */
-        default boolean systemOutput() {
+        default boolean activeConsole() {
 <span class="fc" id="L113">            return true;</span>
         }
     }

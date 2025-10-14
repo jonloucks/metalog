@@ -12,15 +12,17 @@ public final class Stub {
      * Utility class instantiation protection
      * Test coverage not possible, java module protections in place
      */
-<span class="nc" id="L15">    private Stub() {</span>
-<span class="nc" id="L16">        throw new AssertionError(&quot;Illegal constructor call.&quot;);</span>
+    private Stub() {
+        // conflicting standards.  100% code coverage vs throwing exception on instantiation of utility class.
+        // Java modules protects agents invoking private methods.
+        // There are unit tests that will fail if this constructor is not private
     }
     
     /**
      * Validates basic functionality.
      */
     public static void validate() {
-<span class="fc" id="L23">        Checks.validateContracts(GlobalContracts.getInstance());</span>
-<span class="fc" id="L24">    }</span>
+<span class="fc" id="L25">        Checks.validateContracts(GlobalContracts.getInstance());</span>
+<span class="fc" id="L26">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

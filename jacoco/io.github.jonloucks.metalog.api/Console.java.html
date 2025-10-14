@@ -3,7 +3,7 @@
 import io.github.jonloucks.contracts.api.Contract;
 
 /**
- * Responsible for the special logging case of System.out and System.err
+ * Responsible for the special logging case of System out and System err
  * It is both a Subscriber and Publisher
  */
 public interface Console extends Publisher, Subscriber, Filterable {
@@ -11,20 +11,27 @@ public interface Console extends Publisher, Subscriber, Filterable {
     /**
      * The Contract for the Console.
      * It is replaceable for scenarios where the Console output needs to redirected
-     * from System.err and System.out
+     * from System err and System out
      */
-<span class="fc" id="L16">    Contract&lt;Console&gt; CONTRACT = Contract.create(Console.class, b -&gt; b.replaceable(true));</span>
+<span class="fc" id="L16">    Contract&lt;Console&gt; CONTRACT = Contract.create(Console.class);</span>
     
+    @Override
+    boolean test(Meta meta);
+    
+    @Override
+    Outcome publish(Log log);
     /**
      * Publishes the log with Console info meta
      * @param log the log to publish
+     * @return the outcome
      */
-    void info(Log log);
+    Outcome output(Log log);
     
     /**
      * Publishes the log with Console error meta
      * @param log the log to publish
+     * @return the outcome
      */
-    void error(Log log);
+    Outcome error(Log log);
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

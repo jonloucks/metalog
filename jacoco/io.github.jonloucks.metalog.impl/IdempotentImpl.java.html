@@ -1,113 +1,104 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>IdempotentImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">metalog</a> &gt; <a href="index.source.html" class="el_package">io.github.jonloucks.metalog.impl</a> &gt; <span class="el_source">IdempotentImpl.java</span></div><h1>IdempotentImpl.java</h1><pre class="source lang-java linenums">package io.github.jonloucks.metalog.impl;
 
+import io.github.jonloucks.contracts.api.AutoClose;
+
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 final class IdempotentImpl {
-<span class="fc" id="L6">    IdempotentImpl() {</span>
-<span class="fc" id="L7">    }</span>
+<span class="fc" id="L9">    IdempotentImpl() {</span>
+<span class="fc" id="L10">    }</span>
     
-    boolean transitionToOpening() {
-<span class="fc" id="L10">        return transitionTo(State.OPENING);</span>
-    }
-
-    boolean transitionToOpened() {
-<span class="fc" id="L14">        return transitionTo(State.OPENED);</span>
+    AutoClose transitionToOpened(Supplier&lt;AutoClose&gt; opener) {
+<span class="fc bfc" id="L13" title="All 2 branches covered.">        if (transitionTo(State.OPENING)) {</span>
+            try {
+<span class="fc" id="L15">                final AutoClose autoClose = opener.get();</span>
+<span class="fc" id="L16">                transitionTo(State.OPENED);</span>
+<span class="fc" id="L17">                return autoClose;</span>
+<span class="fc" id="L18">            } catch (Exception thrown) {</span>
+<span class="fc" id="L19">                transitionTo(State.CLOSED);</span>
+<span class="fc" id="L20">                throw thrown;</span>
+            }
+        } else {
+<span class="fc" id="L23">            return AutoClose.NONE;</span>
+        }
     }
     
-    boolean transitionToFailed() {
-<span class="nc" id="L18">        return transitionTo(State.FAILED);</span>
-    }
-    
-    boolean transitionToClosing() {
-<span class="fc" id="L22">        return transitionTo(State.CLOSING);</span>
-    }
-    
-    boolean transitionToClosed() {
-<span class="fc" id="L26">        return transitionTo(State.CLOSED);</span>
-    }
+    void transitionToClosed(Runnable closer) {
+<span class="fc bfc" id="L28" title="All 2 branches covered.">        if (transitionTo(State.CLOSING)) {</span>
+            try {
+<span class="fc" id="L30">                closer.run();</span>
+            } finally {
+<span class="fc" id="L32">                transitionTo(State.CLOSED);</span>
+            }
+        }
+<span class="fc" id="L35">    }</span>
     
     boolean isActive() {
-<span class="fc" id="L30">        return stateReference.get().isActive();</span>
+<span class="fc" id="L38">        return stateReference.get().isActive();</span>
     }
     
     boolean isRejecting() {
-<span class="pc bpc" id="L34" title="1 of 2 branches missed.">        return !isActive();</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        return !isActive();</span>
     }
-    
+
     boolean transitionTo(State state) {
-<span class="fc" id="L38">        final State stateNow = stateReference.get();</span>
-<span class="fc bfc" id="L39" title="All 2 branches covered.">        if (stateNow.canTransitionTo(state)) {</span>
-<span class="fc" id="L40">            return stateReference.compareAndSet(stateNow, state);</span>
+<span class="fc" id="L46">        final State stateNow = stateReference.get();</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">        if (stateNow.canTransitionTo(state)) {</span>
+<span class="fc" id="L48">            return stateReference.compareAndSet(stateNow, state);</span>
         }
-<span class="fc" id="L42">        return false;</span>
+<span class="fc" id="L50">        return false;</span>
     }
   
-<span class="fc" id="L45">    private final AtomicReference&lt;State&gt; stateReference = new AtomicReference&lt;&gt;(State.CREATED);</span>
+<span class="fc" id="L53">    private final AtomicReference&lt;State&gt; stateReference = new AtomicReference&lt;&gt;(State.CREATED);</span>
     
-<span class="fc" id="L47">    private enum State {</span>
-<span class="fc" id="L48">        CREATED {</span>
+
+    
+<span class="fc" id="L57">    enum State {</span>
+<span class="fc" id="L58">        CREATED {</span>
             @Override
             boolean canTransitionTo(State state) {
-<span class="pc bpc" id="L51" title="1 of 4 branches missed.">                return state == OPENED || state == OPENING;</span>
-            }
-            @Override
-            boolean isActive() {
-<span class="nc" id="L55">                return false;</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">                return OPENING == state;</span>
             }
         },
-<span class="fc" id="L58">        OPENING {</span>
+<span class="fc" id="L64">        OPENING {</span>
             @Override
             boolean canTransitionTo(State state) {
-<span class="pc bpc" id="L61" title="1 of 4 branches missed.">                return state == OPENED || state == FAILED;</span>
+<span class="fc bfc" id="L67" title="All 4 branches covered.">                return OPENED == state || CLOSED == state;</span>
             }
             @Override
             boolean isActive() {
-<span class="fc" id="L65">                return true;</span>
+<span class="fc" id="L71">                return true;</span>
             }
         },
-<span class="fc" id="L68">        OPENED() {</span>
+<span class="fc" id="L74">        OPENED() {</span>
             @Override
             boolean canTransitionTo(State state) {
-<span class="pc bpc" id="L71" title="1 of 4 branches missed.">                return CLOSING == state || CLOSED == state;</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">                return CLOSING == state;</span>
             }
             @Override
             boolean isActive() {
-<span class="fc" id="L75">                return true;</span>
+<span class="fc" id="L81">                return true;</span>
             }
         },
-<span class="fc" id="L78">        CLOSING {</span>
+<span class="fc" id="L84">        CLOSING {</span>
             @Override
             boolean canTransitionTo(State state) {
-<span class="pc bpc" id="L81" title="1 of 2 branches missed.">                return state == CLOSED;</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">                return CLOSED == state;</span>
             }
             @Override
             boolean isActive() {
-<span class="nc" id="L85">                return true;</span>
+<span class="fc" id="L91">                return true;</span>
             }
         },
-<span class="fc" id="L88">        CLOSED {</span>
-            @Override
-            boolean canTransitionTo(State state) {
-<span class="nc" id="L91">                return false;</span>
-            }
-            @Override
-            boolean isActive() {
-<span class="nc" id="L95">                return false;</span>
-            }
-        },
-<span class="fc" id="L98">        FAILED {</span>
-            @Override
-            boolean canTransitionTo(State state) {
-<span class="nc" id="L101">                return false;</span>
-            }
-            @Override
-            boolean isActive() {
-<span class="nc" id="L105">                return false;</span>
-            }
-        };
+<span class="fc" id="L94">        CLOSED;</span>
      
-        abstract boolean isActive();
-        abstract boolean canTransitionTo(State state);
+         boolean isActive() {
+<span class="fc" id="L97">             return false;</span>
+         }
+         boolean canTransitionTo(State state) {
+<span class="fc" id="L100">             return false;</span>
+         }
         
         State() {
         }

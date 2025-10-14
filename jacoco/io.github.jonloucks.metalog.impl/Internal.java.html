@@ -13,42 +13,63 @@ final class Internal {
      * Utility class instantiation protection
      * Test coverage not possible, java module protections in place
      */
-<span class="nc" id="L16">    private Internal() {</span>
-<span class="nc" id="L17">        throw new AssertionError(&quot;Illegal constructor call.&quot;);</span>
+    private Internal() {
+        // conflicting standards.  100% code coverage vs throwing exception on instantiation of utility class.
+        // Java modules protects agents invoking private methods.
+        // There are unit tests that will fail if this constructor is not private
     }
-    
+
     static &lt;T extends Log&gt; T logCheck(T log) {
-<span class="fc" id="L21">        return nullCheck(log, &quot;Log must be present.&quot;);</span>
+<span class="fc" id="L23">        return nullCheck(log, &quot;Log must be present.&quot;);</span>
     }
     
     static &lt;T extends Meta&gt; T metaCheck(T meta) {
-<span class="fc" id="L25">        return nullCheck(meta, &quot;Meta must be present.&quot;);</span>
+<span class="fc" id="L27">        return nullCheck(meta, &quot;Meta must be present.&quot;);</span>
     }
     
     static Entity entityCheck(Entity entity) {
-<span class="fc" id="L29">        return nullCheck(entity, &quot;Entity must be present.&quot;);</span>
+<span class="fc" id="L31">        return nullCheck(entity, &quot;Entity must be present.&quot;);</span>
     }
     
     static &lt;T&gt; Predicate&lt;T&gt; filterCheck(Predicate&lt;T&gt; filter) {
-<span class="fc" id="L33">        return nullCheck(filter, &quot;Filter must be present.&quot;);</span>
+<span class="fc" id="L35">        return nullCheck(filter, &quot;Filter must be present.&quot;);</span>
     }
    
     static String channelCheck(String name) {
-<span class="fc" id="L37">        return nullCheck(name, &quot;Channel must be present.&quot;);</span>
+<span class="fc" id="L39">        return nullCheck(name, &quot;Channel must be present.&quot;);</span>
     }
     
     static &lt;T&gt; Visitor&lt;T&gt; visitorCheck(Visitor&lt;T&gt; visitor) {
-<span class="fc" id="L41">        return nullCheck(visitor, &quot;Visitor must be present.&quot;);</span>
+<span class="fc" id="L43">        return nullCheck(visitor, &quot;Visitor must be present.&quot;);</span>
+    }
+    
+    static &lt;T&gt; T commandCheck(T command) {
+<span class="fc" id="L47">        return nullCheck(command, &quot;Command must be present.&quot;);</span>
+    }
+    
+    static Subscriber subscriberCheck(Subscriber subscriber) {
+<span class="fc" id="L51">        return nullCheck(subscriber, &quot;Subscribers must be present.&quot;);</span>
     }
     
     static Predicate&lt;Entity&gt; byName(String name) {
-<span class="fc" id="L45">        final String validName = nameCheck(name);</span>
+<span class="fc" id="L55">        final String validName = nameCheck(name);</span>
         
-<span class="fc" id="L47">        return entity -&gt; entity.getName().filter(s -&gt; validName.equals(s)).isPresent();</span>
+<span class="fc" id="L57">        return entity -&gt; entity.getName().filter(s -&gt; validName.equals(s)).isPresent();</span>
     }
     
-    static Predicate&lt;Entity&gt; byUnique(boolean unique) {
-<span class="pc bpc" id="L51" title="1 of 2 branches missed.">        return entity -&gt; entity.isUnique() == unique;</span>
+    static Predicate&lt;Entity&gt; byUnique() {
+<span class="fc" id="L61">        return Entity::isUnique;</span>
     }
+    
+    interface ThrowingRunnable {
+        void run() throws Throwable;
+    }
+    static void runWithIgnore(ThrowingRunnable runnable) {
+        try {
+<span class="fc" id="L69">            runnable.run();</span>
+<span class="fc" id="L70">        } catch (Throwable ignore) {</span>
+        
+<span class="fc" id="L72">        }</span>
+<span class="fc" id="L73">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

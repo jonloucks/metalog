@@ -4,97 +4,83 @@ import io.github.jonloucks.contracts.api.AutoClose;
 import io.github.jonloucks.contracts.api.AutoOpen;
 import io.github.jonloucks.metalog.api.Meta;
 import io.github.jonloucks.metalog.api.Metalog;
+import io.github.jonloucks.metalog.api.Outcome;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static io.github.jonloucks.metalog.impl.Internal.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 final class UnkeyedDispatcherImpl implements Dispatcher, AutoOpen {
 
     @Override
     public AutoClose open() {
-<span class="pc bpc" id="L18" title="1 of 2 branches missed.">        if (idempotent.transitionToOpened()) {</span>
-<span class="fc" id="L19">            return this::close;</span>
-        } else {
-<span class="nc" id="L21">            return ()-&gt;{};</span>
-        }
+<span class="fc" id="L19">        return idempotent.transitionToOpened(() -&gt; this::close);</span>
     }
     
     @Override
-    public void dispatch(Meta meta, Runnable command) {
-<span class="fc" id="L27">        command.run();</span>
-<span class="fc" id="L28">    }</span>
+    public Outcome dispatch(Meta meta, Runnable command) {
+<span class="fc" id="L24">        final Runnable validCommand = commandCheck(command);</span>
+//        if (idempotent.isRejecting()) {
+//            validCommand.run();
+//            return Outcome.CONSUMED;
+//        }
+<span class="fc" id="L29">        executor.execute(validCommand);</span>
+<span class="fc" id="L30">        return Outcome.DISPATCHED;</span>
+    }
     
-<span class="fc" id="L30">    UnkeyedDispatcherImpl(Metalog.Config config) {</span>
-<span class="fc" id="L31">        this.config = config;</span>
-<span class="fc" id="L32">        this.executor = new ThreadPoolExecutor(</span>
+<span class="fc" id="L33">    UnkeyedDispatcherImpl(Metalog.Config config) {</span>
+//        this.config = config;
+<span class="fc" id="L35">        this.executor = new ThreadPoolExecutor(</span>
             1,
-<span class="fc" id="L34">            config.unkeyedThreadCount(),</span>
+<span class="fc" id="L37">            config.unkeyedThreadCount(),</span>
             60L,
             TimeUnit.SECONDS,
-<span class="fc" id="L37">            new SynchronousQueue&lt;&gt;(config.unkeyedFairness())</span>
+<span class="fc" id="L40">            new SynchronousQueue&lt;&gt;(config.unkeyedFairness())</span>
         );
-<span class="fc" id="L39">        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());</span>
-<span class="fc" id="L40">    }</span>
+<span class="fc" id="L42">        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());</span>
+<span class="fc" id="L43">    }</span>
     
     private void close() {
-<span class="pc bpc" id="L43" title="1 of 2 branches missed.">        if (idempotent.transitionToClosing()) {</span>
-<span class="fc" id="L44">            realClosing();</span>
+<span class="fc" id="L46">        idempotent.transitionToClosed(this::realClose);</span>
+<span class="fc" id="L47">    }</span>
+    
+    private void realClose() {
+//        final Instant start = Instant.now();
+        
+<span class="fc" id="L52">        initiateShutdown();</span>
+        
+        //noinspection LoopStatementThatDoesntLoop
+<span class="fc bfc" id="L55" title="All 2 branches covered.">        while (!checkIfShutdown()) {</span>
+//            final Duration duration = Duration.between(start, Instant.now());
+//            if (isTimeToGiveUp(duration)) {
+//                forceShutdown();
+<span class="fc" id="L59">                return;</span>
+//            }
         }
-<span class="fc" id="L46">    }</span>
+<span class="fc" id="L62">    }</span>
     
-    private void realClosing() {
-<span class="fc" id="L49">        final Instant start = Instant.now();</span>
-        try {
-<span class="fc" id="L51">            boolean hasForcedShutdown = false;</span>
-            
-<span class="fc" id="L53">            initiateShutdown();</span>
-            
-<span class="pc bpc" id="L55" title="1 of 2 branches missed.">            while (!checkIfShutdown()) {</span>
-<span class="nc" id="L56">                final Duration duration = Duration.between(start, Instant.now());</span>
-<span class="nc bnc" id="L57" title="All 2 branches missed.">                if (hasForcedShutdown) {</span>
-<span class="nc bnc" id="L58" title="All 2 branches missed.">                    if (isTimeToGiveUp(duration)) {</span>
-<span class="nc" id="L59">                        System.err.println(&quot;Metalog unkeyed dispatcher failed to shutdown.&quot;);</span>
-<span class="nc" id="L60">                        return;</span>
-                    }
-<span class="nc bnc" id="L62" title="All 2 branches missed.">                } else if (isTimeToForceShutdown(duration)) {</span>
-<span class="nc" id="L63">                    forceShutdown();</span>
-<span class="nc" id="L64">                    hasForcedShutdown = true;</span>
-                }
-<span class="nc" id="L66">            }</span>
-        } finally {
-<span class="fc" id="L68">            idempotent.transitionToClosed();</span>
-        }
-<span class="fc" id="L70">    }</span>
-    
-    private boolean isTimeToGiveUp(Duration duration) {
-<span class="nc bnc" id="L73" title="All 2 branches missed.">        return duration.compareTo(config.shutdownTimeout()) &gt; 0;</span>
-    }
-    
-    private boolean isTimeToForceShutdown(Duration duration) {
-<span class="nc bnc" id="L77" title="All 2 branches missed.">        return duration.compareTo(config.shutdownTimeout().dividedBy(2)) &gt; 0;</span>
-    }
+//    private boolean isTimeToGiveUp(Duration duration) {
+//        return duration.compareTo(config.shutdownTimeout()) &gt; 0;
+//    }
     
     private void initiateShutdown() {
-<span class="fc" id="L81">        executor.shutdown();</span>
-<span class="fc" id="L82">    }</span>
+<span class="fc" id="L69">        executor.shutdown();</span>
+<span class="fc" id="L70">    }</span>
     
     private boolean checkIfShutdown() {
-        try {
-<span class="fc" id="L86">            return executor.awaitTermination(1, SECONDS);</span>
-<span class="nc" id="L87">        } catch (InterruptedException thrown) {</span>
-<span class="nc" id="L88">            return executor.isShutdown();</span>
-        }
+<span class="fc" id="L73">        final AtomicBoolean shutdown = new AtomicBoolean(false);</span>
+<span class="fc" id="L74">        runWithIgnore(() -&gt; shutdown.set(executor.awaitTermination(1, MILLISECONDS)));</span>
+<span class="fc" id="L75">        return shutdown.get();</span>
     }
     
-    private void forceShutdown() {
-<span class="nc" id="L93">        executor.shutdownNow();</span>
-<span class="nc" id="L94">    }</span>
+//    private void forceShutdown() {
+//        executor.shutdownNow();
+//    }
 
-<span class="fc" id="L96">    private final IdempotentImpl idempotent = new IdempotentImpl();</span>
-    private final Metalog.Config config;
+<span class="fc" id="L82">    private final IdempotentImpl idempotent = new IdempotentImpl();</span>
+//    private final Metalog.Config config;
     private final ThreadPoolExecutor executor;
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
