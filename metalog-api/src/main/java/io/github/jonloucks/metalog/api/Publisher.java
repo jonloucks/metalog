@@ -30,4 +30,13 @@ public interface Publisher extends Predicate<Meta> {
      * @param builderConsumer the callback to accept the Meta.Builder
      */
     Outcome publish(Log log, Consumer<Meta.Builder<?>> builderConsumer);
+    
+    /**
+     * Test of Meta matches criteria for logging
+     * @param meta the meta to check
+     * @return true if Meta matches criteria
+     */
+    default boolean test(Meta meta) {
+        return true;
+    }
 }

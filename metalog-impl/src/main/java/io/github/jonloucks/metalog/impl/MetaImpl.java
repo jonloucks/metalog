@@ -53,7 +53,7 @@ final class MetaImpl implements Meta.Builder<MetaImpl>, Entity.Builder<MetaImpl>
     }
     
     @Override
-    public boolean hasBlock() {
+    public boolean isBlocking() {
         return block;
     }
     
@@ -155,7 +155,7 @@ final class MetaImpl implements Meta.Builder<MetaImpl>, Entity.Builder<MetaImpl>
         
         thisEntity.copy(validFromMeta);
         
-        block(validFromMeta.hasBlock());
+        block(validFromMeta.isBlocking());
         channel(validFromMeta.getChannel());
         validFromMeta.getKey().ifPresent(this::key);
         

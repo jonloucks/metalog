@@ -7,10 +7,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import static io.github.jonloucks.contracts.api.BindStrategy.IF_NOT_BOUND;
 import static io.github.jonloucks.contracts.api.Checks.*;
 import static io.github.jonloucks.metalog.impl.Internal.*;
 import static java.lang.ThreadLocal.withInitial;
@@ -27,13 +29,11 @@ final class MetalogImpl implements Metalog {
             return Outcome.REJECTED;
         }
         
-        if (shouldProcess(validMeta)) {
+        if (test(validMeta)) {
             if (shouldTransmitNow(validMeta)) {
-                transmitNow(validLog, validMeta);
-                return Outcome.CONSUMED;
+                return transmitNow(validLog, validMeta);
             } else {
-                relayToDispatcher(validMeta, validLog);
-                return Outcome.DISPATCHED;
+                return relayToDispatcher(validMeta, validLog);
             }
         } else {
             return Outcome.SKIPPED;
@@ -54,7 +54,7 @@ final class MetalogImpl implements Metalog {
     
     @Override
     public boolean test(Meta meta) {
-        return filters.test(meta);
+        return filters.test(meta) && subscribers.stream().anyMatch(s -> s.test(meta));
     }
     
     @Override
@@ -66,11 +66,7 @@ final class MetalogImpl implements Metalog {
 
     @Override
     public AutoClose open() {
-        if (idempotent.transitionToOpening()) {
-            return realOpening();
-        } else {
-            return () -> {}; // all open calls after the first get a do nothing close
-        }
+        return idempotent.transitionToOpened(this::realOpen);
     }
     
     MetalogImpl(Config config) {
@@ -80,23 +76,14 @@ final class MetalogImpl implements Metalog {
         bindContracts(config);
     }
     
-    private AutoClose realOpening() {
-        try {
-            realOpen();
-            idempotent.transitionToOpened();
-        } catch (Exception thrown) {
-            idempotent.transitionToFailed();
-            throw thrown;
-        }
-        return this::close;
-    }
-    private void realOpen() {
+    private AutoClose realOpen() {
         closeRepository = repository.open();
         metaFactory = config.contracts().claim(Meta.Builder.FACTORY_CONTRACT);
         createUnkeyedDispatcher();
         activateConsole();
+        return this::close;
     }
-    
+
     private void createUnkeyedDispatcher() {
         final Promisors promisors = config.contracts().claim(Promisors.CONTRACT);
         final Contract<Dispatcher> contract = Contract.create(Dispatcher.class, n -> n.name("Unkeyed Dispatcher"));
@@ -105,15 +92,13 @@ final class MetalogImpl implements Metalog {
     }
     
     private void activateConsole() {
-        if (config.systemOutput() && config.contracts().isBound(Console.CONTRACT)) {
+        if (config.activeConsole()) {
             config.contracts().claim(Console.CONTRACT);
         }
     }
     
     private void close() {
-        if (idempotent.transitionToClosed()) {
-            realClose();
-        }
+        idempotent.transitionToClosed(this::realClose);
     }
     
     private void realClose() {
@@ -125,27 +110,24 @@ final class MetalogImpl implements Metalog {
     }
     
     private boolean shouldTransmitNow(Meta meta) {
-        return meta.hasBlock() || onDispatchingThread();
+        return meta.isBlocking() || onDispatchingThread();
     }
     
-    private boolean shouldProcess(Meta meta) {
-        if (!subscribers.isEmpty() && test(meta)) {
-            return subscribers.stream().anyMatch(s -> s.test(meta));
-        }
-        return false;
-    }
-    
-    private void relayToDispatcher(Meta meta, Log log) {
+    private Outcome relayToDispatcher(Meta meta, Log log) {
         final Dispatcher dispatcher = chooseDispatcher(meta);
+        final AtomicReference<Outcome> outcomeReference = new AtomicReference<>(Outcome.SKIPPED);
+        
         subscribers.forEach(subscriber -> {
             if (subscriber.test(meta)) {
-                relayWithContext(subscriber, dispatcher, meta, log);
+                outcomeReference.set(relayWithContext(subscriber, dispatcher, meta, log));
             }
         });
+        
+        return outcomeReference.get();
     }
     
-    private void relayWithContext(Subscriber subscriber, Dispatcher dispatcher, Meta meta, Log log) {
-        dispatcher.dispatch(meta,  () -> {
+    private Outcome relayWithContext(Subscriber subscriber, Dispatcher dispatcher, Meta meta, Log log) {
+        return dispatcher.dispatch(meta,  () -> {
             final Map<String,Object> context = THREAD_CONTEXT.get();
             final Object oldValue = context.put(DISPATCHING_PROPERTY, true);
             try {
@@ -166,28 +148,33 @@ final class MetalogImpl implements Metalog {
     }
     
     private Dispatcher createKeyedDispatcher(String key) {
-        final Promisors promisors = config.contracts().claim(Promisors.CONTRACT);
         final Contract<Dispatcher> contract = Contract.create(Dispatcher.class, n -> n.name("Keyed Dispatcher " + key));
-        repository.keep(contract, promisors.createLifeCyclePromisor(()-> new KeyedDispatcherImpl(config)));
+        repository.keep(contract, lifeCycle(()-> new KeyedDispatcherImpl(config)));
         return config.contracts().claim(contract);
     }
     
     private void bindContracts(Config config) {
-        final Promisors promisors = config.contracts().claim(Promisors.CONTRACT);
         repository.keep(Metalog.CONTRACT, () -> this);
-        repository.keep(MetalogFactory.CONTRACT, promisors.createLifeCyclePromisor(MetalogFactoryImpl::new));
+        repository.keep(MetalogFactory.CONTRACT, lifeCycle(MetalogFactoryImpl::new));
         repository.keep(Entities.Builder.FACTORY_CONTRACT, () -> EntitiesImpl::new);
         repository.keep(Entity.Builder.FACTORY_CONTRACT, () -> EntityImpl::new);
         repository.keep(Meta.Builder.FACTORY_CONTRACT, () -> MetaImpl::new);
-        repository.keep(Console.CONTRACT, promisors.createLifeCyclePromisor(() -> new ConsoleImpl(config)));
+        repository.keep(Console.CONTRACT, lifeCycle(() -> new ConsoleImpl(config)), IF_NOT_BOUND);
     }
     
-    private void transmitNow(Log log, Meta meta) {
+    private <T> Promisor<T> lifeCycle(Promisor<T> promisor) {
+        final Promisors promisors = config.contracts().claim(Promisors.CONTRACT);
+        return promisors.createLifeCyclePromisor(promisor);
+    }
+    
+    private Outcome transmitNow(Log log, Meta meta) {
+        final AtomicReference<Outcome> outcomeReference = new AtomicReference<>(Outcome.SKIPPED);
         subscribers.forEach(subscriber -> {
             if (subscriber.test(meta)) {
-                subscriber.receive(log, meta);
+                outcomeReference.set(subscriber.receive(log, meta));
             }
         });
+        return outcomeReference.get();
     }
     
     private static final ThreadLocal<Map<String, Object>> THREAD_CONTEXT = withInitial(LinkedHashMap::new);

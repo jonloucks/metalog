@@ -99,7 +99,7 @@ public final class Tools {
         assertNotNull(meta.getChannel());
         assertEquals("info", meta.getChannel());
         assertEquals(Meta.DEFAULT.getName().isPresent(), meta.getName().isPresent());
-        assertEquals(Meta.DEFAULT.hasBlock(), meta.hasBlock());
+        assertEquals(Meta.DEFAULT.isBlocking(), meta.isBlocking());
         assertEquals(Meta.DEFAULT.getValue().isPresent(), meta.getValue().isPresent());
         assertEquals(Meta.DEFAULT.getId().isPresent(), meta.getId().isPresent());
         assertEquals(Meta.DEFAULT.getThrown().isPresent(), meta.getThrown().isPresent());
@@ -108,6 +108,24 @@ public final class Tools {
         assertEquals(Meta.DEFAULT.getKey().isPresent(), meta.getKey().isPresent());
         assertEquals(Meta.DEFAULT.getCorrelations().isPresent(), meta.getCorrelations().isPresent());
         assertEquals(Meta.DEFAULT.get(), meta.get());
+    }
+    
+    public static void assertOutcomeSuccess(Outcome outcome) {
+        assertNotNull(outcome);
+        assertTrue(outcome == Outcome.DISPATCHED || outcome == Outcome.CONSUMED,
+            "Outcome should have been dispatched or consumed, but was " + outcome);
+    }
+    
+    public static void assertOutcomeRejected(Outcome outcome) {
+        assertEquals(Outcome.REJECTED, outcome, "Outcome should have been rejected");
+    }
+    
+    public static void assertOutcomeConsumed(Outcome outcome) {
+        assertEquals(Outcome.CONSUMED, outcome, "Outcome should have been consumed");
+    }
+    
+    public static void assertOutcomeSkipped(Outcome outcome) {
+        assertEquals(Outcome.SKIPPED, outcome, "Outcome should have been skipped");
     }
     
     public static void withContracts(Consumer<Contracts> block) {

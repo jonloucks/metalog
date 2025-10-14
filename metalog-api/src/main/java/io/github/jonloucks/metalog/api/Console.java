@@ -13,7 +13,10 @@ public interface Console extends Publisher, Subscriber, Filterable {
      * It is replaceable for scenarios where the Console output needs to redirected
      * from System err and System out
      */
-    Contract<Console> CONTRACT = Contract.create(Console.class, b -> b.replaceable(true));
+    Contract<Console> CONTRACT = Contract.create(Console.class);
+    
+    @Override
+    boolean test(Meta meta);
     
     @Override
     Outcome publish(Log log);
@@ -21,11 +24,11 @@ public interface Console extends Publisher, Subscriber, Filterable {
      * Publishes the log with Console info meta
      * @param log the log to publish
      */
-    void output(Log log);
+    Outcome output(Log log);
     
     /**
      * Publishes the log with Console error meta
      * @param log the log to publish
      */
-    void error(Log log);
+    Outcome error(Log log);
 }

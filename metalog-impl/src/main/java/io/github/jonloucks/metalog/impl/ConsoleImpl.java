@@ -4,7 +4,12 @@ import io.github.jonloucks.contracts.api.AutoClose;
 import io.github.jonloucks.contracts.api.AutoOpen;
 import io.github.jonloucks.metalog.api.*;
 
+import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -16,13 +21,13 @@ import static java.util.Optional.ofNullable;
 final class ConsoleImpl implements Console, AutoOpen {
     
     @Override
-    public void output(Log log) {
-        publish(log, OUTPUT_META);
+    public Outcome output(Log log) {
+        return publish(log, OUTPUT_META);
     }
     
     @Override
-    public void error(Log log) {
-        publish(log, ERROR_META);
+    public Outcome error(Log log) {
+        return publish(log, ERROR_META);
     }
     
     @Override
@@ -58,19 +63,20 @@ final class ConsoleImpl implements Console, AutoOpen {
         final Log validLog = logCheck(log);
         final Meta validMeta = metaCheck(meta);
         if (test(validMeta)) {
-            switch (meta.getChannel()) {
-                case CONSOLE_OUTPUT_CHANNEL:
-                case SYSTEM_OUT_CHANNEL:
-                    System.out.println(validLog.get());
-                    return Outcome.CONSUMED;
-                case SYSTEM_ERR_CHANNEL:
-                case CONSOLE_ERROR_CHANNEL:
-                    System.err.println(validLog.get());
-                    return Outcome.CONSUMED;
-                default:
-            }
+            return getPrintStream(validMeta).map(toPrint(validLog)).orElse(Outcome.SKIPPED);
         }
         return Outcome.SKIPPED;
+    }
+    
+    private static Function<PrintStream, Outcome> toPrint(Log log) {
+        return printStream -> {
+            printStream.println(log.get());
+            return Outcome.CONSUMED;
+        };
+    }
+    
+    private Optional<PrintStream> getPrintStream(Meta meta) {
+        return ofNullable(printMap.get(meta.getChannel()));
     }
   
     @Override
@@ -85,15 +91,15 @@ final class ConsoleImpl implements Console, AutoOpen {
     
     @Override
     public AutoClose open() {
-        if (openState.transitionToOpened()) {
-            return realOpen();
-        } else {
-            return () -> {}; // all open calls after the first get a do nothing close
-        }
+        return idempotent.transitionToOpened(this::realOpen);
     }
     
     ConsoleImpl(Metalog.Config config) {
         this.config = config;
+        printMap.put(SYSTEM_OUT_CHANNEL, System.out);
+        printMap.put(SYSTEM_ERR_CHANNEL, System.err);
+        printMap.put(CONSOLE_OUTPUT_CHANNEL, System.out);
+        printMap.put(CONSOLE_ERROR_CHANNEL, System.err);
     }
 
     private AutoClose realOpen() {
@@ -104,24 +110,18 @@ final class ConsoleImpl implements Console, AutoOpen {
     }
     
     private void close() {
-        if (openState.transitionToClosed()) {
-            ofNullable(closeSubscription).ifPresent(close -> {
-                closeSubscription = null;
-                close.close();
-            });
-        }
+        idempotent.transitionToClosed(this::realClose);
+    }
+    
+    private void realClose() {
+        ofNullable(closeSubscription).ifPresent(close -> {
+            closeSubscription = null;
+            close.close();
+        });
     }
     
     private boolean isSupported(Meta meta) {
-        switch (meta.getChannel()) {
-            case SYSTEM_OUT_CHANNEL:
-            case SYSTEM_ERR_CHANNEL:
-            case CONSOLE_ERROR_CHANNEL:
-            case CONSOLE_OUTPUT_CHANNEL:
-                return true;
-            default:
-                return false;
-        }
+        return printMap.containsKey(meta.getChannel());
     }
     
     private static Meta makeMeta(String channel) {
@@ -136,8 +136,9 @@ final class ConsoleImpl implements Console, AutoOpen {
     private static final Meta ERROR_META = makeMeta(CONSOLE_ERROR_CHANNEL);
     private static final Meta OUTPUT_META = makeMeta(CONSOLE_OUTPUT_CHANNEL);
     
+    private final Map<String, PrintStream> printMap = new HashMap<>();
     private final Filterable filters = new FiltersImpl();
-    private final IdempotentImpl openState = new IdempotentImpl();
+    private final IdempotentImpl idempotent = new IdempotentImpl();
     private final Metalog.Config config;
     private Metalog metalog;
     private AutoClose closeSubscription;

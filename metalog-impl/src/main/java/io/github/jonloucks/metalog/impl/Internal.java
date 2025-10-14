@@ -60,4 +60,15 @@ final class Internal {
     static Predicate<Entity> byUnique() {
         return Entity::isUnique;
     }
+    
+    interface ThrowingRunnable {
+        void run() throws Throwable;
+    }
+    static void runWithIgnore(ThrowingRunnable runnable) {
+        try {
+            runnable.run();
+        } catch (Throwable ignore) {
+        
+        }
+    }
 }

@@ -12,7 +12,7 @@ final class InvokeOnlyOnce implements Log {
     }
     
     @Override
-    public CharSequence get() {
+    public synchronized CharSequence get() {
         if (null == cachedText) {
             synchronized (this) {
                 // double check

@@ -4,75 +4,97 @@ import io.github.jonloucks.contracts.api.AutoClose;
 import io.github.jonloucks.contracts.api.AutoOpen;
 import io.github.jonloucks.metalog.api.Meta;
 import io.github.jonloucks.metalog.api.Metalog;
+import io.github.jonloucks.metalog.api.Outcome;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.Semaphore;
+import java.time.Duration;
+import java.util.concurrent.*;
 
 import static io.github.jonloucks.metalog.impl.Internal.commandCheck;
+import static io.github.jonloucks.metalog.impl.Internal.runWithIgnore;
+import static java.util.Optional.ofNullable;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 final class KeyedDispatcherImpl implements Dispatcher, AutoOpen {
     
     @Override
     public AutoClose open() {
-        if (idempotent.transitionToOpening()) {
-            return realOpening();
-        } else {
-            // Possibly impossible to happen, but a good practice
-            return ()->{};
-        }
+        return idempotent.transitionToOpened(this::realOpen);
     }
     
     @Override
-    public void dispatch(Meta meta, Runnable command) {
+    public Outcome dispatch(Meta meta, Runnable command) {
         final Runnable validCommand = commandCheck(command);
-        if (idempotent.isRejecting()) {
-            validCommand.run();
-            return;
-        }
+//        if (idempotent.isRejecting()) {
+//            validCommand.run();
+//            return Outcome.CONSUMED;
+//        }
         inflightSemaphore.acquireUninterruptibly();
         try {
             workQueue.put(validCommand);
         } catch (InterruptedException ignored) {
             inflightSemaphore.release();
         }
+        return Outcome.DISPATCHED;
     }
     
     KeyedDispatcherImpl(Metalog.Config config) {
         this.inflightSemaphore = new Semaphore(config.keyedQueueLimit());
         this.workQueue = new ArrayBlockingQueue<>(config.keyedQueueLimit());
         this.workerThread = new Thread(this::consumeLoop);
+        this.shutdownTimeout = config.shutdownTimeout();
     }
     
-    private AutoClose realOpening() {
+    private AutoClose realOpen() {
         workerThread.start();
-        idempotent.transitionToOpened();
         return this::close;
     }
     
     private void close() {
-        if (idempotent.transitionToClosed()) {
-            workerThread.interrupt();
-            inflightSemaphore.release(workQueue.size());
-            workQueue.clear();
+        idempotent.transitionToClosed(this::realClose);
+    }
+    
+    private void realClose() {
+        triggerWorkerExit.countDown();
+        runWithIgnore(() -> {
+            if (!workerExitedLatch.await(shutdownTimeout.toMillis(), MILLISECONDS)) {
+                workerThread.interrupt();
+            }
+        });
+  
+        // taking over emptying the queue
+        while (!workQueue.isEmpty()) {
+            runQueueJob(workQueue.poll());
         }
     }
     
-    private void consumeLoop() {
-        while (idempotent.isActive()) {
+    private void runQueueJob(Runnable command) {
+        if (ofNullable(command).isPresent()) {
             try {
-                final Runnable command = workQueue.take();
-                try {
-                    command.run();
-                } finally {
-                    inflightSemaphore.release();
-                }
-            }  catch (InterruptedException ignored) {
+                runWithIgnore(command::run);
+            } finally {
+                inflightSemaphore.release();
             }
         }
     }
     
+    private void consumeLoop() {
+        try {
+            runWithIgnore(() -> {
+                while (!triggerWorkerExit.await(1, MILLISECONDS)) {
+                    runQueueJob(workQueue.poll(1, MILLISECONDS));
+                }
+            });
+
+        } finally {
+            workerExitedLatch.countDown();
+        }
+    }
+    
     private final IdempotentImpl idempotent = new IdempotentImpl();
+    private final Duration shutdownTimeout;
     private final Semaphore inflightSemaphore;
     private final Thread workerThread;
     private final ArrayBlockingQueue<Runnable> workQueue;
+    private final CountDownLatch triggerWorkerExit = new CountDownLatch(1);
+    private final CountDownLatch workerExitedLatch = new CountDownLatch(1);
 }

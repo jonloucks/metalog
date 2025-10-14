@@ -2,8 +2,12 @@ package io.github.jonloucks.metalog.impl;
 
 
 import io.github.jonloucks.metalog.api.Meta;
+import io.github.jonloucks.metalog.api.Outcome;
 
+/**
+ *
+ */
 interface Dispatcher {
 
-    void dispatch(Meta meta, Runnable command);
+    Outcome dispatch(Meta meta, Runnable command);
 }

@@ -2,9 +2,7 @@ package io.github.jonloucks.metalog.test;
 
 import io.github.jonloucks.contracts.api.AutoClose;
 import io.github.jonloucks.contracts.api.Contracts;
-import io.github.jonloucks.metalog.api.Console;
-import io.github.jonloucks.metalog.api.Log;
-import io.github.jonloucks.metalog.api.Metalog;
+import io.github.jonloucks.metalog.api.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -13,12 +11,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+import java.util.concurrent.atomic.AtomicReference;
+
+import static io.github.jonloucks.contracts.test.Tools.assertInstantiateThrows;
 import static io.github.jonloucks.contracts.test.Tools.assertThrown;
 import static io.github.jonloucks.metalog.test.ConsoleTests.ConsoleTestsTools.assertIndirectConsole;
 import static io.github.jonloucks.metalog.test.ConsoleTests.ConsoleTestsTools.assertDirectConsole;
-import static io.github.jonloucks.metalog.test.Tools.withMetalog;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static io.github.jonloucks.metalog.test.Tools.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @SuppressWarnings("CodeBlock2Expr")
@@ -31,7 +31,9 @@ public interface ConsoleTests {
         withMetalog((contracts, metalog) -> {
             final Console console = contracts.claim(Console.CONTRACT);
             final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
+             
                 console.output(null);
+           
             });
             assertThrown(thrown);
         });
@@ -41,7 +43,10 @@ public interface ConsoleTests {
     default void console_output_WithLog_Works() {
         withMetalog((contracts, metalog) -> {
             final Console console = contracts.claim(Console.CONTRACT);
-            assertDoesNotThrow( () -> console.output(() -> "Hello"));
+            
+            final Outcome outcome = console.output(() -> "Hello");
+            
+            assertOutcomeSuccess(outcome);
         });
     }
     
@@ -49,7 +54,10 @@ public interface ConsoleTests {
     default void console_publish_WithLog_Works() {
         withMetalog((contracts, metalog) -> {
             final Console console = contracts.claim(Console.CONTRACT);
-            assertDoesNotThrow( () -> console.publish(() -> "Hello"));
+            
+            final Outcome outcome = console.publish(() -> "Hello");
+            
+            assertOutcomeSuccess(outcome);
         });
     }
     
@@ -57,7 +65,21 @@ public interface ConsoleTests {
     default void console_error_WithLog_Works() {
         withMetalog((contracts, metalog) -> {
             final Console console = contracts.claim(Console.CONTRACT);
-            assertDoesNotThrow( () -> console.error(() -> "Hello"));
+            
+            final Outcome outcome = console.error(() -> "Hello");
+            
+            assertOutcomeSuccess(outcome);
+        });
+    }
+    
+    @Test
+    default void console_receive_WithNonConsoleLog_IsSkipped() {
+        withMetalog((contracts, metalog) -> {
+            final Console console = contracts.claim(Console.CONTRACT);
+            
+            final Outcome outcome = console.receive(() -> "xyz", Meta.DEFAULT);
+            
+            assertOutcomeSkipped(outcome);
         });
     }
 
@@ -66,7 +88,9 @@ public interface ConsoleTests {
         withMetalog((contracts, metalog) -> {
             final Console console = contracts.claim(Console.CONTRACT);
             final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
+           
                 console.error(null);
+           
             });
             assertThrown(thrown);
         });
@@ -77,7 +101,9 @@ public interface ConsoleTests {
         withMetalog((contracts, metalog) -> {
             final Console console = contracts.claim(Console.CONTRACT);
             final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
+          
                 console.publish(null);
+         
             });
             assertThrown(thrown);
         });
@@ -87,8 +113,21 @@ public interface ConsoleTests {
     @ValueSource(strings = {"System.out", "System.err", "Console.output", "Console.error"})
     default void console_publish_Indirect_WithSupportedChannel(String channel) {
         withMetalog((contracts, metalog) -> {
-            assertIndirectConsole(metalog, channel, 1);
+      
+            assertOutcomeSuccess(assertIndirectConsole(metalog, channel, 1));
+       
         });
+    }
+    
+    @ParameterizedTest(name = "channel = {0}")
+    @ValueSource(strings = {"System.out", "System.err", "Console.output", "Console.error"})
+    default void console_publish_AfterMetalogShutdown_Works(String channel) {
+        final AtomicReference<Console> consoleRef = new AtomicReference<>();
+        withMetalog((contracts, metalog) -> {
+            consoleRef.set(contracts.claim(Console.CONTRACT));
+        });
+        
+        assertNotNull(consoleRef.get().publish(() -> "Hello"));
     }
     
     @ParameterizedTest(name = "channel = {0}")
@@ -97,12 +136,13 @@ public interface ConsoleTests {
         withMetalog((contracts, metalog) -> {
             final Console console = contracts.claim(Console.CONTRACT);
             
-            try (AutoClose anotherFilter = console.addFilter( m -> true);
-                AutoClose removeFilter = console.addFilter(x -> false)) {
+            try (AutoClose anotherFilter = console.addFilter(m -> true);
+                 AutoClose removeFilter = console.addFilter(x -> false)) {
                 final AutoClose ignore1 = removeFilter, ignore2 = anotherFilter;
-                assertIndirectConsole(metalog, channel, 0);
+                
+                assertOutcomeSkipped(assertIndirectConsole(metalog, channel, 0));
             }
-            assertIndirectConsole(metalog, channel, 1);
+            assertOutcomeSuccess(assertIndirectConsole(metalog, channel, 1));
         });
     }
     
@@ -110,7 +150,25 @@ public interface ConsoleTests {
     @ValueSource(strings = {"Console.error", "Console.output", "System.out", "System.err"})
     default void console_publish_Direct_WithSupportedChannel(String channel) {
         withMetalog((contracts, metalog) -> {
-            assertDirectConsole(contracts, channel, 1);
+            
+            assertOutcomeSuccess(assertDirectConsole(contracts, channel, 1));
+            
+        });
+    }
+    
+    @ParameterizedTest(name = "channel = {0}")
+    @ValueSource(strings = {"System.out", "System.err", "Console.output", "Console.error"})
+    default void console_publish_Direct_WithSupportedChannel_Filtered(String channel) {
+        withMetalog((contracts, metalog) -> {
+            final Console console = contracts.claim(Console.CONTRACT);
+            
+            try (AutoClose anotherFilter = console.addFilter(m -> true);
+                 AutoClose removeFilter = console.addFilter(x -> false)) {
+                final AutoClose ignore1 = removeFilter, ignore2 = anotherFilter;
+                
+                assertOutcomeSkipped(assertDirectConsole(contracts, channel, 0));
+            }
+            assertOutcomeSuccess(assertDirectConsole(contracts, channel, 1));
         });
     }
     
@@ -118,7 +176,9 @@ public interface ConsoleTests {
     @ValueSource(strings = {"error", "info", "warn", "", "unknown"})
     default void console_publish_Direct_UnsupportedChannel(String channel) {
         withMetalog((contracts, metalog) -> {
-            assertDirectConsole(contracts, channel, 0);
+            
+            assertOutcomeSkipped(assertDirectConsole(contracts, channel, 0));
+            
         });
     }
     
@@ -126,8 +186,15 @@ public interface ConsoleTests {
     @ValueSource(strings = {"error", "info", "warn", "", "unknown"})
     default void console_receive_WithUnsupportedChannel(String channel) {
         withMetalog((contracts, metalog) -> {
-            assertIndirectConsole(metalog, channel, 0);
+            
+            assertOutcomeSkipped(assertIndirectConsole(metalog, channel, 0));
+            
         });
+    }
+    
+    @Test
+    default void console_InternalCoverage() {
+        assertInstantiateThrows(ConsoleTestsTools.class);
     }
     
     final class ConsoleTestsTools {
@@ -135,19 +202,24 @@ public interface ConsoleTests {
             throw new IllegalStateException("Utility class.");
         }
    
-        static void assertIndirectConsole(Metalog metalog, String channel, int times) {
+        static Outcome assertIndirectConsole(Metalog metalog, String channel, int times) {
             final Log mockLog = mock(Log.class);
             when(mockLog.get()).thenReturn("hello");
-            metalog.publish(mockLog, b -> b.channel(channel).block());
+            final Outcome outcome = metalog.publish(mockLog, b -> b.channel(channel).block());
+           
             verify(mockLog, times(times)).get();
+            return outcome;
         }
         
-        static void assertDirectConsole(Contracts contracts, String channel, int times) {
+        static Outcome assertDirectConsole(Contracts contracts, String channel, int times) {
             final Console console = contracts.claim(Console.CONTRACT);
             final Log mockLog = mock(Log.class);
             when(mockLog.get()).thenReturn("hello");
-            console.publish(mockLog, b -> b.channel(channel).block());
+            final Outcome outcome = console.publish(mockLog, b -> b.channel(channel).block());
+            
             verify(mockLog, times(times)).get();
+            
+            return outcome;
         }
     }
 }

@@ -117,6 +117,21 @@ public interface EntityTests {
     }
     
     @Test
+    default void entity_correlation_WithEntity_Works() {
+        runWithScenario( builder -> {
+            final Entity entity = createTestEntity("hello");
+            
+            final Entity.Builder<?> returnBuilder = builder.correlation(entity);
+            
+            assertNotNull(returnBuilder);
+            assertTrue(builder.getCorrelations().isPresent());
+            assertFalse(builder.getCorrelations().get().isEmpty());
+            assertEquals(1, builder.getCorrelations().get().size());
+            assertTrue(builder.getCorrelations().get().findFirstIf(p -> p == entity).isPresent());
+        });
+    }
+    
+    @Test
     default void entity_copy_WithNullEntity_Throws() {
         runWithScenario( builder -> {
             final IllegalArgumentException thrown = assertThrows( IllegalArgumentException.class, () -> {

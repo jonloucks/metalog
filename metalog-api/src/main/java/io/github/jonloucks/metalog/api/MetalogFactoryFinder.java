@@ -27,7 +27,7 @@ final class MetalogFactoryFinder {
         if (config.useServiceLoader()) {
             try {
                 return ServiceLoader.load(getServiceFactoryClass()).findFirst();
-            } catch (Throwable thrown) {
+            } catch (Throwable ignored) {
                 return Optional.empty();
             }
         }

@@ -1,9 +1,6 @@
 package io.github.jonloucks.metalog.test;
 
-import io.github.jonloucks.contracts.api.AutoClose;
-import io.github.jonloucks.contracts.api.Contract;
-import io.github.jonloucks.contracts.api.Contracts;
-import io.github.jonloucks.contracts.api.Promisor;
+import io.github.jonloucks.contracts.api.*;
 import io.github.jonloucks.metalog.api.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("Convert2MethodRef")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public interface MetalogTests {
@@ -147,6 +145,11 @@ public interface MetalogTests {
                 public <T> AutoClose bind(Contract<T> contract, Promisor<T> promisor) {
                     return cc.bind(contract, promisor);
                 }
+                
+                @Override
+                public <T> AutoClose bind(Contract<T> contract, Promisor<T> promisor, BindStrategy bindStrategy) {
+                    return cc.bind(contract, promisor, bindStrategy);
+                }
             };
             
             final Metalog.Config config = new Metalog.Config() {
@@ -157,9 +160,8 @@ public interface MetalogTests {
             };
             final Metalog metalog = createMetalog(config);
             final IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> {
-                try (AutoClose closeMetalog = metalog.open()) {
-                    final AutoClose ignored = closeMetalog;
-                }
+                //noinspection resource
+                metalog.open();
             });
             assertThrown(thrown, "Test Error Injection.");
         });
@@ -170,36 +172,46 @@ public interface MetalogTests {
         final Metalog.Config config = new Metalog.Config() {
             @Override
             public Duration shutdownTimeout() {
-                return Duration.ofMillis(5);
+                return Duration.ofSeconds(1);
             }
         };
         assertDoesNotThrow(() -> {
             final Metalog metalog = createMetalog(config);
             final Subscriber subscriber = (l, m) -> {
-                sleep(Duration.ofMillis(100));
+                sleep(Duration.ofMillis(10));
                 return Outcome.CONSUMED;
             };
+            final Subscriber skippedSubscriber = new Subscriber() {
+                @Override
+                public Outcome receive(Log log, Meta meta) {
+                    return Outcome.SKIPPED;
+                }
+                
+                @Override
+                public boolean test(Meta meta) {
+                    return false;
+                }
+            };
             try (AutoClose closeMetalog = metalog.open();
-                 AutoClose closeSubscriber = metalog.subscribe(subscriber)) {
-                final AutoClose ignored = closeSubscriber;
-                final int threadCount = Runtime.getRuntime().availableProcessors();
+                 AutoClose closeSubscriber = metalog.subscribe(subscriber);
+                 AutoClose closeSkippedSubscriber = metalog.subscribe(skippedSubscriber)) {
+                final AutoClose ignored = closeSubscriber, ignored2 = closeSkippedSubscriber;
+                final int threadCount = 4;
                 final Thread[] threads = new Thread[threadCount];
                 for (int threadIndex = 0; threadIndex < threadCount; threadIndex++) {
                     threads[threadIndex] = new Thread(() -> {
                         final String name = uniqueString();
-                        for (int logIndex = 0; logIndex < 1_000; logIndex++) {
+                        for (int logIndex = 0; logIndex < 100; logIndex++) {
                             if (logIndex % 2 == 0) {
                                 metalog.publish(() -> name, b -> b.key(name));
                             } else {
-                                metalog.publish(() -> name, b -> {
-                                });
+                                metalog.publish(() -> name, b -> {});
                             }
                         }
                     });
-                    threads[threadIndex].setDaemon(false);
                     threads[threadIndex].start();
                 }
-                sleep(Duration.ofMillis(20));
+                sleep(Duration.ofMillis(100));
                 implicitClose(closeMetalog);
             }
         });

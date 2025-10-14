@@ -22,6 +22,7 @@ import static io.github.jonloucks.contracts.test.Tools.assertThrown;
 import static io.github.jonloucks.metalog.api.GlobalMetalog.createMetalog;
 import static io.github.jonloucks.metalog.test.MetaTests.MetaTestsTools.newMetaBuilder;
 import static io.github.jonloucks.metalog.test.MetaTests.MetaTestsTools.runWithScenario;
+import static io.github.jonloucks.metalog.test.Tools.createTestEntity;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("CodeBlock2Expr")
@@ -73,7 +74,7 @@ public interface MetaTests {
             assertEquals(timestamp, metaBuilder.getTime().get());
             assertTrue(metaBuilder.getThrown().isPresent());
             assertEquals(thrown, metaBuilder.getThrown().get());
-            assertEquals(fromBuilder.hasBlock(), metaBuilder.hasBlock());
+            assertEquals(fromBuilder.isBlocking(), metaBuilder.isBlocking());
             assertTrue(metaBuilder.getThread().isPresent());
             assertEquals(thread, metaBuilder.getThread().get());
             assertTrue(metaBuilder.isUnique());
@@ -114,7 +115,7 @@ public interface MetaTests {
             assertEquals(timestamp, metaBuilder.getTime().get());
             assertTrue(metaBuilder.getThrown().isPresent());
             assertEquals(thrown, metaBuilder.getThrown().get());
-            assertEquals(fromBuilder.hasBlock(), metaBuilder.hasBlock());
+            assertEquals(fromBuilder.isBlocking(), metaBuilder.isBlocking());
             assertTrue(metaBuilder.getThread().isPresent());
             assertEquals(thread, metaBuilder.getThread().get());
         });
@@ -157,7 +158,7 @@ public interface MetaTests {
             assertEquals(timestamp, metaBuilder.getTime().get());
             assertTrue(metaBuilder.getThrown().isPresent());
             assertEquals(thrown, metaBuilder.getThrown().get());
-            assertFalse(metaBuilder.hasBlock());
+            assertFalse(metaBuilder.isBlocking());
             assertTrue(metaBuilder.getThread().isPresent());
             assertEquals(thread, metaBuilder.getThread().get());
         });
@@ -287,6 +288,21 @@ public interface MetaTests {
                 builder.correlation((Entity) null);
             });
             assertThrown(thrown);
+        });
+    }
+    
+    @Test
+    default void meta_correlation_WithEntity_Works() {
+        runWithScenario(builder -> {
+            final Entity entity = createTestEntity("hello");
+            
+            final Entity.Builder<?> returnBuilder = builder.correlation(entity);
+            
+            assertNotNull(returnBuilder);
+            assertTrue(builder.getCorrelations().isPresent());
+            assertFalse(builder.getCorrelations().get().isEmpty());
+            assertEquals(1, builder.getCorrelations().get().size());
+            assertTrue(builder.getCorrelations().get().findFirstIf(p -> p == entity).isPresent());
         });
     }
     
