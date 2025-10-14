@@ -4,6 +4,6 @@
 module io.github.jonloucks.metalog {
     requires transitive io.github.jonloucks.metalog.api;
     requires transitive io.github.jonloucks.metalog.impl;
-    
+
     exports io.github.jonloucks.metalog;
 }

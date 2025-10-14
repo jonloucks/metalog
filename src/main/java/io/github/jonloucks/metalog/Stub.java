@@ -13,7 +13,9 @@ public final class Stub {
      * Test coverage not possible, java module protections in place
      */
     private Stub() {
-        throw new AssertionError("Illegal constructor call.");
+        // conflicting standards.  100% code coverage vs throwing exception on instantiation of utility class.
+        // Java modules protects agents invoking private methods.
+        // There are unit tests that will fail if this constructor is not private
     }
     
     /**

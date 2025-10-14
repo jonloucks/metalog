@@ -1,29 +1,37 @@
 package io.github.jonloucks.metalog.impl;
 
+import io.github.jonloucks.contracts.api.AutoClose;
+
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 final class IdempotentImpl {
     IdempotentImpl() {
     }
     
-    boolean transitionToOpening() {
-        return transitionTo(State.OPENING);
-    }
-
-    boolean transitionToOpened() {
-        return transitionTo(State.OPENED);
+    AutoClose transitionToOpened(Supplier<AutoClose> opener) {
+        if (transitionTo(State.OPENING)) {
+            try {
+                final AutoClose autoClose = opener.get();
+                transitionTo(State.OPENED);
+                return autoClose;
+            } catch (Exception thrown) {
+                transitionTo(State.CLOSED);
+                throw thrown;
+            }
+        } else {
+            return AutoClose.NONE;
+        }
     }
     
-    boolean transitionToFailed() {
-        return transitionTo(State.FAILED);
-    }
-    
-    boolean transitionToClosing() {
-        return transitionTo(State.CLOSING);
-    }
-    
-    boolean transitionToClosed() {
-        return transitionTo(State.CLOSED);
+    void transitionToClosed(Runnable closer) {
+        if (transitionTo(State.CLOSING)) {
+            try {
+                closer.run();
+            } finally {
+                transitionTo(State.CLOSED);
+            }
+        }
     }
     
     boolean isActive() {
@@ -33,7 +41,7 @@ final class IdempotentImpl {
     boolean isRejecting() {
         return !isActive();
     }
-    
+
     boolean transitionTo(State state) {
         final State stateNow = stateReference.get();
         if (stateNow.canTransitionTo(state)) {
@@ -44,21 +52,19 @@ final class IdempotentImpl {
   
     private final AtomicReference<State> stateReference = new AtomicReference<>(State.CREATED);
     
-    private enum State {
+
+    
+    enum State {
         CREATED {
             @Override
             boolean canTransitionTo(State state) {
-                return state == OPENED || state == OPENING;
-            }
-            @Override
-            boolean isActive() {
-                return false;
+                return OPENING == state;
             }
         },
         OPENING {
             @Override
             boolean canTransitionTo(State state) {
-                return state == OPENED || state == FAILED;
+                return OPENED == state || CLOSED == state;
             }
             @Override
             boolean isActive() {
@@ -68,7 +74,7 @@ final class IdempotentImpl {
         OPENED() {
             @Override
             boolean canTransitionTo(State state) {
-                return CLOSING == state || CLOSED == state;
+                return CLOSING == state;
             }
             @Override
             boolean isActive() {
@@ -78,36 +84,21 @@ final class IdempotentImpl {
         CLOSING {
             @Override
             boolean canTransitionTo(State state) {
-                return state == CLOSED;
+                return CLOSED == state;
             }
             @Override
             boolean isActive() {
                 return true;
             }
         },
-        CLOSED {
-            @Override
-            boolean canTransitionTo(State state) {
-                return false;
-            }
-            @Override
-            boolean isActive() {
-                return false;
-            }
-        },
-        FAILED {
-            @Override
-            boolean canTransitionTo(State state) {
-                return false;
-            }
-            @Override
-            boolean isActive() {
-                return false;
-            }
-        };
+        CLOSED;
      
-        abstract boolean isActive();
-        abstract boolean canTransitionTo(State state);
+         boolean isActive() {
+             return false;
+         }
+         boolean canTransitionTo(State state) {
+             return false;
+         }
         
         State() {
         }

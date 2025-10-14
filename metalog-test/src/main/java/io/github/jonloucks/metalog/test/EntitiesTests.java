@@ -14,6 +14,7 @@ import java.time.Instant;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -45,6 +46,20 @@ public interface EntitiesTests {
             });
             
             assertThrown(thrown);
+        });
+    }
+    
+    @Test
+    default void entities_entity_AsBuilderWithUniqueAndWithoutName_Works() {
+        runWithScenario( entitiesBuilder -> {
+            final Entities.Builder<?> returnBuilder = entitiesBuilder.entity(b -> b.unique());
+     
+            assertNotNull(returnBuilder);
+            assertFalse(entitiesBuilder.isEmpty(), "Entities should not be empty");
+            assertEquals(1, entitiesBuilder.size(), "Entities size ");
+            final Optional<Entity> optionalEntity = entitiesBuilder.findFirstIf(e -> true);
+            assertTrue(optionalEntity.isPresent(), "Entity should be present");
+            assertFalse(optionalEntity.get().getName().isPresent(), "Entity name is present");
         });
     }
     
@@ -112,10 +127,21 @@ public interface EntitiesTests {
             }
             
             final List<Integer> integers = entities.findAllValuesWithType(e->true, Integer.class);
+            final Optional<Integer> optionalInteger = entities.findFirstValueWithType(e->true, Integer.class);
             final List<Instant>  instants = entities.findAllValuesWithType(e->true, Instant.class);
+            final Optional<Instant> optionalInstant = entities.findFirstValueWithType(e->true, Instant.class);
             final List<Boolean> booleans = entities.findAllValuesWithType(e->true, Boolean.class);
+            final Optional<Boolean> optionalBoolean = entities.findFirstValueWithType(e->true, Boolean.class);
             final List<Temporal> temporals = entities.findAllValuesWithType(e->true, Temporal.class);
+            final Optional<Temporal> optionalTemporal = entities.findFirstValueWithType(e->true, Temporal.class);
             final List<Integer> failedIntegers = entities.findAllValuesWithType(e->false, Integer.class);
+            
+            assertAll(
+                () -> assertTrue(optionalInteger.isPresent(), "One of the integer values should be present"),
+                () -> assertTrue(optionalInstant.isPresent(), "One of the instant values should be present"),
+                () -> assertFalse(optionalBoolean.isPresent(), "Zero boolean values should be present"),
+                () -> assertTrue(optionalTemporal.isPresent(), "One of the temporal values should be present")
+            );
             
             assertAll(
                 () -> assertEquals(60, integers.size(), "Integers size "),

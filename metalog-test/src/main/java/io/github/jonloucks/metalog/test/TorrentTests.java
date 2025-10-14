@@ -2,6 +2,7 @@ package io.github.jonloucks.metalog.test;
 
 import io.github.jonloucks.contracts.api.AutoClose;
 import io.github.jonloucks.metalog.api.Metalog;
+import io.github.jonloucks.metalog.api.Outcome;
 import io.github.jonloucks.metalog.api.Subscriber;
 import org.junit.jupiter.api.Test;
 
@@ -11,6 +12,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
+import static io.github.jonloucks.contracts.test.Tools.assertInstantiateThrows;
 import static io.github.jonloucks.contracts.test.Tools.sleep;
 import static io.github.jonloucks.metalog.test.Tools.withMetalog;
 import static io.github.jonloucks.metalog.test.TorrentTests.TorrentTestsTools.runWithScenario;
@@ -45,6 +47,11 @@ public interface TorrentTests {
         });
     }
     
+    @Test
+    default void torrent_InstantiateTorrentTestsTools_Throws() {
+        assertInstantiateThrows(TorrentTestsTools.class);
+    }
+    
     final class TorrentTestsTools {
         private TorrentTestsTools() {
             throw new AssertionError("Illegal constructor call.");
@@ -70,7 +77,7 @@ public interface TorrentTests {
                 
                 final Subscriber subscriber = (l, m) -> {
                     try {
-                        sequencer.receive(l,m);
+                        return sequencer.receive(l,m);
                     } finally {
                         messagesCompletedLatch.countDown();
                     }
@@ -78,7 +85,10 @@ public interface TorrentTests {
                 
                 final BooleanSupplier flipKeyedCoin = () -> scenarioConfig.chanceOfKeyed() != 0 && Math.abs(random.nextInt(100)) <= scenarioConfig.chanceOfKeyed();
                 
-                final Subscriber slowSubscriber = (l, m) -> sleep(Duration.ofMillis(5));
+                final Subscriber slowSubscriber = (l, m) -> {
+                    sleep(Duration.ofMillis(5));
+                    return Outcome.CONSUMED;
+                };
                 
                 try (AutoClose closeSubscription = metalog.subscribe(subscriber);
                      AutoClose closeSlowSubscriber = metalog.subscribe(slowSubscriber)) {

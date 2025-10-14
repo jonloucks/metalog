@@ -9,6 +9,9 @@ import io.github.jonloucks.metalog.api.MetalogFactory;
  * Opt-in construction via reflection or ServiceLoader
  */
 public final class MetalogFactoryImpl implements MetalogFactory {
+    public MetalogFactoryImpl() {
+    }
+    
     @Override
     public Metalog create(Metalog.Config config) {
         return new MetalogImpl(config);

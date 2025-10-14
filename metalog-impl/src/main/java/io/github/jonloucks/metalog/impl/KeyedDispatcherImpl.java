@@ -4,72 +4,97 @@ import io.github.jonloucks.contracts.api.AutoClose;
 import io.github.jonloucks.contracts.api.AutoOpen;
 import io.github.jonloucks.metalog.api.Meta;
 import io.github.jonloucks.metalog.api.Metalog;
+import io.github.jonloucks.metalog.api.Outcome;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.Semaphore;
+import java.time.Duration;
+import java.util.concurrent.*;
 
-import static io.github.jonloucks.contracts.api.Checks.nullCheck;
+import static io.github.jonloucks.metalog.impl.Internal.commandCheck;
+import static io.github.jonloucks.metalog.impl.Internal.runWithIgnore;
+import static java.util.Optional.ofNullable;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 final class KeyedDispatcherImpl implements Dispatcher, AutoOpen {
+    
     @Override
     public AutoClose open() {
-        if (idempotent.transitionToOpening()) {
-            try {
-                worker.start();
-                return this::close;
-            } catch (Exception thrown) {
-                idempotent.transitionToFailed();
-                throw thrown;
-            }
-        } else {
-            return ()->{};
-        }
+        return idempotent.transitionToOpened(this::realOpen);
     }
     
     @Override
-    public void dispatch(Meta meta, Runnable command) {
-        final Runnable validCommand = nullCheck(command, "Command must be present.");
-        if (idempotent.isRejecting()) {
-            throw new IllegalStateException("Executor has been closed.");
-        }
+    public Outcome dispatch(Meta meta, Runnable command) {
+        final Runnable validCommand = commandCheck(command);
+//        if (idempotent.isRejecting()) {
+//            validCommand.run();
+//            return Outcome.CONSUMED;
+//        }
         inflightSemaphore.acquireUninterruptibly();
         try {
-            queue.put(validCommand);
-        } catch (InterruptedException e) {
+            workQueue.put(validCommand);
+        } catch (InterruptedException ignored) {
             inflightSemaphore.release();
         }
+        return Outcome.DISPATCHED;
     }
     
     KeyedDispatcherImpl(Metalog.Config config) {
         this.inflightSemaphore = new Semaphore(config.keyedQueueLimit());
-        this.queue = new ArrayBlockingQueue<>(config.keyedQueueLimit());
-        this.worker = new Thread(this::consumeLoop);
+        this.workQueue = new ArrayBlockingQueue<>(config.keyedQueueLimit());
+        this.workerThread = new Thread(this::consumeLoop);
+        this.shutdownTimeout = config.shutdownTimeout();
+    }
+    
+    private AutoClose realOpen() {
+        workerThread.start();
+        return this::close;
     }
     
     private void close() {
-        if (idempotent.transitionToClosed()) {
-            worker.interrupt();
-            inflightSemaphore.release(queue.size());
-            queue.clear();
+        idempotent.transitionToClosed(this::realClose);
+    }
+    
+    private void realClose() {
+        triggerWorkerExit.countDown();
+        runWithIgnore(() -> {
+            if (!workerExitedLatch.await(shutdownTimeout.toMillis(), MILLISECONDS)) {
+                workerThread.interrupt();
+            }
+        });
+  
+        // taking over emptying the queue
+        while (!workQueue.isEmpty()) {
+            runQueueJob(workQueue.poll());
         }
     }
     
-    private void consumeLoop() {
-        while (idempotent.isActive()) {
+    private void runQueueJob(Runnable command) {
+        if (ofNullable(command).isPresent()) {
             try {
-                final Runnable command = queue.take();
-                try {
-                    command.run();
-                } finally {
-                    inflightSemaphore.release();
-                }
-            }  catch (InterruptedException ignored) {
+                runWithIgnore(command::run);
+            } finally {
+                inflightSemaphore.release();
             }
         }
     }
     
+    private void consumeLoop() {
+        try {
+            runWithIgnore(() -> {
+                while (!triggerWorkerExit.await(1, MILLISECONDS)) {
+                    runQueueJob(workQueue.poll(1, MILLISECONDS));
+                }
+            });
+
+        } finally {
+            workerExitedLatch.countDown();
+        }
+    }
+    
     private final IdempotentImpl idempotent = new IdempotentImpl();
+    private final Duration shutdownTimeout;
     private final Semaphore inflightSemaphore;
-    private final Thread worker;
-    private final ArrayBlockingQueue<Runnable> queue;
+    private final Thread workerThread;
+    private final ArrayBlockingQueue<Runnable> workQueue;
+    private final CountDownLatch triggerWorkerExit = new CountDownLatch(1);
+    private final CountDownLatch workerExitedLatch = new CountDownLatch(1);
 }

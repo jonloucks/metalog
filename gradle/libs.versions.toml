@@ -1,5 +1,5 @@
 [versions]
-contracts-version = "[2.3.0,3.0.0)"
+contracts-version = "[2.4.0,3.0.0)"
 gradle-kit-version = "[0.8.0,1.0.0)"
 
 [libraries]

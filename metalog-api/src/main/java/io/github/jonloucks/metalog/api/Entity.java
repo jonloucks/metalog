@@ -83,11 +83,20 @@ public interface Entity extends Supplier<CharSequence> {
         B name(String name);
         
         /**
-         * Set unique name for the Entity
+         * Set name mode for the Entity
          * @param unique true makes this entity unique
          * @return this builder
          */
         B unique(boolean unique);
+        
+        /**
+         *
+         * Shortcut for unique(true)
+         * @return this builder
+         */
+        default B unique() {
+            return unique(true);
+        }
         
         /**
          * Set the text supplier for the Entity

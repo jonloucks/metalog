@@ -53,7 +53,7 @@ final class MetaImpl implements Meta.Builder<MetaImpl>, Entity.Builder<MetaImpl>
     }
     
     @Override
-    public boolean hasBlock() {
+    public boolean isBlocking() {
         return block;
     }
     
@@ -155,7 +155,7 @@ final class MetaImpl implements Meta.Builder<MetaImpl>, Entity.Builder<MetaImpl>
         
         thisEntity.copy(validFromMeta);
         
-        block(validFromMeta.hasBlock());
+        block(validFromMeta.isBlocking());
         channel(validFromMeta.getChannel());
         validFromMeta.getKey().ifPresent(this::key);
         
@@ -179,9 +179,9 @@ final class MetaImpl implements Meta.Builder<MetaImpl>, Entity.Builder<MetaImpl>
     
     private <T> MetaImpl setUniqueEntity(String name, T value) {
         if (value == null) {
-            return correlations( b -> b.removeIf(byName(name).and(byUnique(true))));
+            return correlations( b -> b.removeIf(byName(name).and(byUnique())));
         } else {
-            return correlation(b -> b.unique(true).name(name).value(value));
+            return correlation(b -> b.unique().name(name).value(value));
         }
     }
     
@@ -189,7 +189,7 @@ final class MetaImpl implements Meta.Builder<MetaImpl>, Entity.Builder<MetaImpl>
         final Optional<Entities> optional = getCorrelations();
         if (optional.isPresent()) {
             final Entities entities = optional.get();
-            return entities.findFirstValueWithType(byName(name).and(byUnique(true)), typeCheck(type));
+            return entities.findFirstValueWithType(byName(name).and(byUnique()), typeCheck(type));
         }
         return Optional.empty();
     }
@@ -200,6 +200,6 @@ final class MetaImpl implements Meta.Builder<MetaImpl>, Entity.Builder<MetaImpl>
     
     private boolean block;
     private String key;
-    private String channel = "info";
+    private String channel = Meta.DEFAULT.getChannel();
     private final EntityImpl thisEntity = new EntityImpl();
 }

@@ -14,9 +14,11 @@ final class Internal {
      * Test coverage not possible, java module protections in place
      */
     private Internal() {
-        throw new AssertionError("Illegal constructor call.");
+        // conflicting standards.  100% code coverage vs throwing exception on instantiation of utility class.
+        // Java modules protects agents invoking private methods.
+        // There are unit tests that will fail if this constructor is not private
     }
-    
+
     static <T extends Log> T logCheck(T log) {
         return nullCheck(log, "Log must be present.");
     }
@@ -41,13 +43,32 @@ final class Internal {
         return nullCheck(visitor, "Visitor must be present.");
     }
     
+    static <T> T commandCheck(T command) {
+        return nullCheck(command, "Command must be present.");
+    }
+    
+    static Subscriber subscriberCheck(Subscriber subscriber) {
+        return nullCheck(subscriber, "Subscribers must be present.");
+    }
+    
     static Predicate<Entity> byName(String name) {
         final String validName = nameCheck(name);
         
         return entity -> entity.getName().filter(s -> validName.equals(s)).isPresent();
     }
     
-    static Predicate<Entity> byUnique(boolean unique) {
-        return entity -> entity.isUnique() == unique;
+    static Predicate<Entity> byUnique() {
+        return Entity::isUnique;
+    }
+    
+    interface ThrowingRunnable {
+        void run() throws Throwable;
+    }
+    static void runWithIgnore(ThrowingRunnable runnable) {
+        try {
+            runnable.run();
+        } catch (Throwable ignore) {
+        
+        }
     }
 }

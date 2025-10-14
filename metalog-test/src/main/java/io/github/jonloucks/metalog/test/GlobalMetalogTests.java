@@ -83,7 +83,7 @@ public interface GlobalMetalogTests {
             () -> assertEquals(10, config.unkeyedThreadCount(), "config.unkeyedThreadCount() default."),
             () -> assertFalse(config.unkeyedFairness(), "config.unkeyedFairness() default."),
             () -> assertEquals(Duration.ofSeconds(60), config.shutdownTimeout(), "config.shutdownTimeout() default."),
-            () -> assertTrue(config.systemOutput(), "config.systemOutput() default.")
+            () -> assertTrue(config.activeConsole(), "config.activeConsole() default.")
         );
     }
     
@@ -105,7 +105,7 @@ public interface GlobalMetalogTests {
             assertTrue(contracts.isBound(Entity.Builder.FACTORY_CONTRACT));
             assertTrue(contracts.isBound(Meta.Builder.FACTORY_CONTRACT));
             
-            if (metalogConfig.systemOutput()) {
+            if (metalogConfig.activeConsole()) {
                 assertTrue(contracts.isBound(Console.CONTRACT));
             }
         }
