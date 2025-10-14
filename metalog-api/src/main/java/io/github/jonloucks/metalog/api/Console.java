@@ -23,12 +23,14 @@ public interface Console extends Publisher, Subscriber, Filterable {
     /**
      * Publishes the log with Console info meta
      * @param log the log to publish
+     * @return the outcome
      */
     Outcome output(Log log);
     
     /**
      * Publishes the log with Console error meta
      * @param log the log to publish
+     * @return the outcome
      */
     Outcome error(Log log);
 }

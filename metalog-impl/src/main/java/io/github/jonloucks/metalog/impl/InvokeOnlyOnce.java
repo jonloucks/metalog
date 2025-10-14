@@ -6,6 +6,7 @@ import static io.github.jonloucks.metalog.impl.Internal.logCheck;
 
 final class InvokeOnlyOnce implements Log {
     private final Log referent;
+    private boolean firstTime = true;
     
     InvokeOnlyOnce(Log referent) {
         this.referent = logCheck(referent);
@@ -13,13 +14,9 @@ final class InvokeOnlyOnce implements Log {
     
     @Override
     public synchronized CharSequence get() {
-        if (null == cachedText) {
-            synchronized (this) {
-                // double check
-                if (null == cachedText) {
-                    cachedText = referent.get();
-                }
-            }
+        if (firstTime) {
+            firstTime = false;
+            cachedText = referent.get();
         }
         return cachedText;
     }

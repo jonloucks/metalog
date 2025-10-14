@@ -10,6 +10,7 @@ public interface Tests extends
     GlobalMetalogTests,
     MetaTests,
     MetalogTests,
+    PublisherTests,
     InternalTests,
     ToolsTests,
     TorrentTests

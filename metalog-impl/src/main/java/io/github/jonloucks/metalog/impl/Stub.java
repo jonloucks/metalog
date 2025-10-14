@@ -2,23 +2,37 @@ package io.github.jonloucks.metalog.impl;
 
 import io.github.jonloucks.contracts.api.AutoClose;
 
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import static io.github.jonloucks.metalog.impl.Internal.runWithIgnore;
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
+import static java.lang.Boolean.*;
 
-@SuppressWarnings("CodeBlock2Expr")
+/**
+ * Provides runtime validation
+ */
 public final class Stub {
     
     private Stub() {
     }
     
+    /**
+     * Provides runtime validation
+     */
     public static void validate() {
+        testAsserts();
         testIdempotentOpen();
         testIdempotentClose();
         testIdempotentFailedOpen();
         testIdempotentFailedClose();
+    }
+    
+    private static void testAsserts() {
+        assertFails(()-> assertFails(()-> {}));
+        assertFails(()-> assertEquals(null, 5));
+        assertFails(()-> assertEquals(5, null));
+        assertFails(()-> assertEquals("green", "blue"));
+        assertFails(()-> assertEquals(TRUE, FALSE));
     }
     
     private static void testIdempotentOpen() {
@@ -42,7 +56,7 @@ public final class Stub {
     private static void testIdempotentClose() {
         final IdempotentImpl idempotent = new IdempotentImpl();
         try (AutoClose close = idempotent.transitionToOpened(OPEN_BLOCK)) {
-            final AutoClose ignore = close;
+            ignore(close);
         }
         idempotent.transitionToClosed(RUNNABLE);
         assertEquals(FALSE, idempotent.isActive());
@@ -55,12 +69,9 @@ public final class Stub {
     
     private static void testIdempotentFailedOpen() {
         final IdempotentImpl idempotent = new IdempotentImpl();
-        runWithIgnore(() -> {
-            //noinspection resource
-            idempotent.transitionToOpened(() -> {
-                throw new IllegalStateException("Oh my.");
-            });
-        });
+        runWithIgnore(() -> ignore(idempotent.transitionToOpened(() -> {
+            throw new IllegalStateException("Oh my.");
+        })));
         assertEquals(FALSE, idempotent.isActive());
         assertEquals(TRUE, idempotent.isRejecting());
     }
@@ -68,7 +79,7 @@ public final class Stub {
     private static void testIdempotentFailedClose() {
         final IdempotentImpl idempotent = new IdempotentImpl();
         try (AutoClose close = idempotent.transitionToOpened(OPEN_BLOCK)){
-            final AutoClose ignore = close;
+            ignore(close);
             runWithIgnore(() -> {
                 idempotent.transitionToClosed(() -> {
                     assertEquals(FALSE, idempotent.transitionTo(IdempotentImpl.State.OPENING));
@@ -81,15 +92,36 @@ public final class Stub {
         assertEquals(TRUE, idempotent.isRejecting());
     }
     
-    @SuppressWarnings("unused")
     private static void assertEquals(Object expected, Object actual) {
-//        if (expected == actual) {
-//            return;
-//        }
-//        if (expected == null || !expected.equals(actual)) {
-//            throw new AssertionError("Failed runtime check.");
-//        }
+        if (expected == actual) {
+            return;
+        }
+        if (expected == null || !expected.equals(actual)) {
+            throw new AssertionError("Failed runtime check.");
+        }
     }
+    
+    @FunctionalInterface
+    interface ThrowingRunnable {
+        void run() throws AssertionError;
+    }
+    
+    private static void assertFails(ThrowingRunnable runnable) {
+        final AtomicReference<AssertionError> throwable = new AtomicReference<>();
+        try {
+            runnable.run();
+           throwable.set(new AssertionError("Failed runtime check."));
+        } catch (AssertionError thrown) {
+            ignore(thrown);
+        }
+        if (throwable.get() != null) {
+            throw throwable.get();
+        }
+    }
+    
+   @SuppressWarnings("unused")
+   private static void ignore(Object ignored) {
+   }
     
     private static final Runnable RUNNABLE = () -> {};
     private static final AutoClose AUTO_CLOSE = () -> {};
