@@ -20,100 +20,148 @@ public interface Idempotent {
      */
 <span class="fc" id="L21">    Contract&lt;Supplier&lt;Idempotent&gt;&gt; FACTORY = Contract.create(&quot;Idempotent Factory&quot;);</span>
     
+    /**
+     * @return Get the current state
+     */
     State getState();
     
+    /**
+     * Transition to a new state
+     * Note: Transitioning to the current state will return false
+     *
+     * @param state the new state
+     * @return true iif the current state allows the transition to the new state
+     */
     boolean transition(State state);
     
-    &lt;T&gt; T transition(Consumer&lt;Transition.Builder&lt;T&gt;&gt; builder);
+    /**
+     * Transition using Transition Builder consumer
+     * @param builderConsumer the builder consumer.
+     * @return the return type of the transition. For example, a Closeable during open.
+     * @param &lt;T&gt; return type of the transition
+     */
+    &lt;T&gt; T transition(Consumer&lt;Transition.Builder&lt;T&gt;&gt; builderConsumer);
     
+    /**
+     * Transition using a Transition
+     * @param transition the transition
+     * @return the return type of the transition. For example, a Closeable during open.
+     * @param &lt;T&gt; return type of the transition
+     */
     &lt;T&gt; T transition(Transition&lt;T&gt; transition);
     
+    /**
+     * @return True if the current state is rejects requests
+     */
     default boolean isRejecting() {
-<span class="fc" id="L32">        return getState().isRejecting();</span>
+<span class="fc" id="L57">        return getState().isRejecting();</span>
     }
-
+    
     default void transitionToClosed(Runnable action) {
-<span class="fc" id="L36">        transition(b -&gt; b</span>
-<span class="fc" id="L37">            .interimState(CLOSING)</span>
-<span class="fc" id="L38">            .goalState(CLOSED)</span>
-<span class="fc" id="L39">            .always(true)</span>
-<span class="fc" id="L40">            .action(action)</span>
+<span class="fc" id="L61">        transition(b -&gt; b</span>
+<span class="fc" id="L62">            .interimState(CLOSING)</span>
+<span class="fc" id="L63">            .goalState(CLOSED)</span>
+<span class="fc" id="L64">            .always(true)</span>
+<span class="fc" id="L65">            .action(action)</span>
         );
-<span class="fc" id="L42">    }</span>
+<span class="fc" id="L67">    }</span>
     
     default AutoClose transitionToOpened(Supplier&lt;AutoClose&gt; opener) {
-<span class="fc" id="L45">        return transition(b -&gt; b</span>
-<span class="fc" id="L46">            .interimState(OPENING)</span>
-<span class="fc" id="L47">            .goalState(OPENED)</span>
-<span class="fc" id="L48">            .action(opener)</span>
-<span class="pc" id="L49">            .orElse(() -&gt; AutoClose.NONE)</span>
+<span class="fc" id="L70">        return transition(b -&gt; b</span>
+<span class="fc" id="L71">            .interimState(OPENING)</span>
+<span class="fc" id="L72">            .goalState(OPENED)</span>
+<span class="fc" id="L73">            .action(opener)</span>
+<span class="pc" id="L74">            .orElse(() -&gt; AutoClose.NONE)</span>
         );
     }
-   
-<span class="fc" id="L53">    enum State {</span>
-<span class="fc" id="L54">        CREATED {</span>
+    
+    /**
+     * The possible states
+     */
+<span class="fc" id="L81">    enum State {</span>
+<span class="fc" id="L82">        CREATED {</span>
             @Override
             public boolean canTransitionTo(State state) {
-<span class="fc bfc" id="L57" title="All 2 branches covered.">                return OPENING == state;</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">                return OPENING == state;</span>
             }
         },
-<span class="fc" id="L60">        OPENING {</span>
+<span class="fc" id="L88">        OPENING {</span>
             @Override
             public boolean canTransitionTo(State state) {
-<span class="fc bfc" id="L63" title="All 4 branches covered.">                return OPENED == state || CREATED == state;</span>
+<span class="fc bfc" id="L91" title="All 4 branches covered.">                return OPENED == state || CREATED == state;</span>
             }
+            
             @Override
             public boolean isRejecting() {
-<span class="nc" id="L67">                return false;</span>
+<span class="nc" id="L96">                return false;</span>
             }
         },
-<span class="fc" id="L70">        OPENED() {</span>
+<span class="fc" id="L99">        OPENED() {</span>
             @Override
             public boolean canTransitionTo(State state) {
-<span class="fc bfc" id="L73" title="All 2 branches covered.">                return CLOSING == state;</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">                return CLOSING == state;</span>
             }
+            
             @Override
             public boolean isRejecting() {
-<span class="fc" id="L77">                return false;</span>
+<span class="fc" id="L107">                return false;</span>
             }
         },
-<span class="fc" id="L80">        CLOSING {</span>
+<span class="fc" id="L110">        CLOSING {</span>
             @Override
             public boolean canTransitionTo(State state) {
-<span class="fc bfc" id="L83" title="All 2 branches covered.">                return CLOSED == state;</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">                return CLOSED == state;</span>
             }
+            
             @Override
             public boolean isRejecting() {
-<span class="fc" id="L87">                return false;</span>
+<span class="fc" id="L118">                return false;</span>
             }
         },
-<span class="fc" id="L90">        CLOSED;</span>
+<span class="fc" id="L121">        CLOSED;</span>
         
         public boolean isRejecting() {
-<span class="fc" id="L93">            return true;</span>
+<span class="fc" id="L124">            return true;</span>
         }
         
         public boolean canTransitionTo(State state) {
-<span class="fc" id="L97">            return false;</span>
+<span class="fc" id="L128">            return false;</span>
         }
         
         State() {
         }
     }
     
+    /**
+     * Defines how a transition between states will be done
+     * @param &lt;T&gt; return type of the transition
+     */
     interface Transition&lt;T&gt; {
         Optional&lt;State&gt; interimState();
+        
         Optional&lt;State&gt; goalState();
+        
         Optional&lt;Supplier&lt;T&gt;&gt; action();
+        
         Optional&lt;Supplier&lt;T&gt;&gt; orElse();
+        
         boolean always();
         
-        interface Builder&lt;T&gt;  extends Transition&lt;T&gt;{
+        /**
+         * Responsible for building a Transition
+         * @param &lt;T&gt; the return type of the transition
+         */
+        interface Builder&lt;T&gt; extends Transition&lt;T&gt; {
             Builder&lt;T&gt; interimState(State stepState);
+            
             Builder&lt;T&gt; goalState(State goalState);
+            
             Builder&lt;T&gt; action(Supplier&lt;T&gt; action);
+            
             Builder&lt;T&gt; action(Runnable action);
+            
             Builder&lt;T&gt; orElse(Supplier&lt;T&gt; orElse);
+            
             Builder&lt;T&gt; always(boolean always);
         }
     }
