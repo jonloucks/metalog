@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Idempotent.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">metalog</a> &gt; <a href="index.source.html" class="el_package">io.github.jonloucks.metalog.impl</a> &gt; <span class="el_source">Idempotent.java</span></div><h1>Idempotent.java</h1><pre class="source lang-java linenums">package io.github.jonloucks.metalog.impl;
+
+import io.github.jonloucks.contracts.api.AutoClose;
+import io.github.jonloucks.contracts.api.Contract;
+
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import static io.github.jonloucks.metalog.impl.Idempotent.State.*;
+
+/**
+ * Note: This an implementation specific interface. A different implementation of Metalog will not provide it
+ * Is exposed for advanced logging and testing
+ */
+public interface Idempotent {
+    
+    /**
+     * The factory contract for creating a new Idempotent
+     */
+<span class="fc" id="L21">    Contract&lt;Supplier&lt;Idempotent&gt;&gt; FACTORY = Contract.create(&quot;Idempotent Factory&quot;);</span>
+    
+    State getState();
+    
+    boolean transition(State state);
+    
+    &lt;T&gt; T transition(Consumer&lt;Transition.Builder&lt;T&gt;&gt; builder);
+    
+    &lt;T&gt; T transition(Transition&lt;T&gt; transition);
+    
+    default boolean isRejecting() {
+<span class="fc" id="L32">        return getState().isRejecting();</span>
+    }
+
+    default void transitionToClosed(Runnable action) {
+<span class="fc" id="L36">        transition(b -&gt; b</span>
+<span class="fc" id="L37">            .interimState(CLOSING)</span>
+<span class="fc" id="L38">            .goalState(CLOSED)</span>
+<span class="fc" id="L39">            .always(true)</span>
+<span class="fc" id="L40">            .action(action)</span>
+        );
+<span class="fc" id="L42">    }</span>
+    
+    default AutoClose transitionToOpened(Supplier&lt;AutoClose&gt; opener) {
+<span class="fc" id="L45">        return transition(b -&gt; b</span>
+<span class="fc" id="L46">            .interimState(OPENING)</span>
+<span class="fc" id="L47">            .goalState(OPENED)</span>
+<span class="fc" id="L48">            .action(opener)</span>
+<span class="pc" id="L49">            .orElse(() -&gt; AutoClose.NONE)</span>
+        );
+    }
+   
+<span class="fc" id="L53">    enum State {</span>
+<span class="fc" id="L54">        CREATED {</span>
+            @Override
+            public boolean canTransitionTo(State state) {
+<span class="fc bfc" id="L57" title="All 2 branches covered.">                return OPENING == state;</span>
+            }
+        },
+<span class="fc" id="L60">        OPENING {</span>
+            @Override
+            public boolean canTransitionTo(State state) {
+<span class="fc bfc" id="L63" title="All 4 branches covered.">                return OPENED == state || CREATED == state;</span>
+            }
+            @Override
+            public boolean isRejecting() {
+<span class="nc" id="L67">                return false;</span>
+            }
+        },
+<span class="fc" id="L70">        OPENED() {</span>
+            @Override
+            public boolean canTransitionTo(State state) {
+<span class="fc bfc" id="L73" title="All 2 branches covered.">                return CLOSING == state;</span>
+            }
+            @Override
+            public boolean isRejecting() {
+<span class="fc" id="L77">                return false;</span>
+            }
+        },
+<span class="fc" id="L80">        CLOSING {</span>
+            @Override
+            public boolean canTransitionTo(State state) {
+<span class="fc bfc" id="L83" title="All 2 branches covered.">                return CLOSED == state;</span>
+            }
+            @Override
+            public boolean isRejecting() {
+<span class="fc" id="L87">                return false;</span>
+            }
+        },
+<span class="fc" id="L90">        CLOSED;</span>
+        
+        public boolean isRejecting() {
+<span class="fc" id="L93">            return true;</span>
+        }
+        
+        public boolean canTransitionTo(State state) {
+<span class="fc" id="L97">            return false;</span>
+        }
+        
+        State() {
+        }
+    }
+    
+    interface Transition&lt;T&gt; {
+        Optional&lt;State&gt; interimState();
+        Optional&lt;State&gt; goalState();
+        Optional&lt;Supplier&lt;T&gt;&gt; action();
+        Optional&lt;Supplier&lt;T&gt;&gt; orElse();
+        boolean always();
+        
+        interface Builder&lt;T&gt;  extends Transition&lt;T&gt;{
+            Builder&lt;T&gt; interimState(State stepState);
+            Builder&lt;T&gt; goalState(State goalState);
+            Builder&lt;T&gt; action(Supplier&lt;T&gt; action);
+            Builder&lt;T&gt; action(Runnable action);
+            Builder&lt;T&gt; orElse(Supplier&lt;T&gt; orElse);
+            Builder&lt;T&gt; always(boolean always);
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

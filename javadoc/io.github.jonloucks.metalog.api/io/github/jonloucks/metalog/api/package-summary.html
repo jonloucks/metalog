@@ -68,7 +68,7 @@ loadScripts(document, 'script');</script>
 <ul class="summary-list">
 <li>
 <div id="class-summary">
-<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="class-summary-tab0" role="tab" aria-selected="true" aria-controls="class-summary.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('class-summary', 'class-summary', 2)" class="active-table-tab">All Classes and Interfaces</button><button id="class-summary-tab1" role="tab" aria-selected="false" aria-controls="class-summary.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('class-summary', 'class-summary-tab1', 2)" class="table-tab">Interfaces</button><button id="class-summary-tab2" role="tab" aria-selected="false" aria-controls="class-summary.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('class-summary', 'class-summary-tab2', 2)" class="table-tab">Classes</button><button id="class-summary-tab3" role="tab" aria-selected="false" aria-controls="class-summary.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('class-summary', 'class-summary-tab3', 2)" class="table-tab">Enum Classes</button></div>
+<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="class-summary-tab0" role="tab" aria-selected="true" aria-controls="class-summary.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('class-summary', 'class-summary', 2)" class="active-table-tab">All Classes and Interfaces</button><button id="class-summary-tab1" role="tab" aria-selected="false" aria-controls="class-summary.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('class-summary', 'class-summary-tab1', 2)" class="table-tab">Interfaces</button><button id="class-summary-tab2" role="tab" aria-selected="false" aria-controls="class-summary.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('class-summary', 'class-summary-tab2', 2)" class="table-tab">Classes</button><button id="class-summary-tab3" role="tab" aria-selected="false" aria-controls="class-summary.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('class-summary', 'class-summary-tab3', 2)" class="table-tab">Enum Classes</button><button id="class-summary-tab5" role="tab" aria-selected="false" aria-controls="class-summary.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('class-summary', 'class-summary-tab5', 2)" class="table-tab">Exceptions</button></div>
 <div id="class-summary.tabpanel" role="tabpanel" aria-labelledby="class-summary-tab0">
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Class</div>
@@ -78,69 +78,79 @@ loadScripts(document, 'script');</script>
 <div class="block">Responsible for the special logging case of System out and System err
  It is both a Subscriber and Publisher</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="Entities.html" title="interface in io.github.jonloucks.metalog.api">Entities</a></div>
+<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="Dispatcher.html" title="interface in io.github.jonloucks.metalog.api">Dispatcher</a></div>
 <div class="col-last odd-row-color class-summary class-summary-tab1">
+<div class="block">Responsible for delegating processing log messages dispatching</div>
+</div>
+<div class="col-first even-row-color class-summary class-summary-tab1"><a href="Entities.html" title="interface in io.github.jonloucks.metalog.api">Entities</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab1">
 <div class="block">Contains zero or more Entity instances
  Supports both unique and duplicate entities, determined by the entity name and unique fields.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab1"><a href="Entities.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entities.Builder</a>&lt;B extends <a href="Entities.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entities.Builder</a>&lt;B&gt;&gt;</div>
-<div class="col-last even-row-color class-summary class-summary-tab1">
+<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="Entities.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entities.Builder</a>&lt;B extends <a href="Entities.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entities.Builder</a>&lt;B&gt;&gt;</div>
+<div class="col-last odd-row-color class-summary class-summary-tab1">
 <div class="block">The Entities Builder</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab1">
+<div class="col-first even-row-color class-summary class-summary-tab1"><a href="Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab1">
 <div class="block">A generalized representation of anything</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab1"><a href="Entity.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entity.Builder</a>&lt;B extends <a href="Entity.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entity.Builder</a>&lt;B&gt;&gt;</div>
-<div class="col-last even-row-color class-summary class-summary-tab1">
+<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="Entity.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entity.Builder</a>&lt;B extends <a href="Entity.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entity.Builder</a>&lt;B&gt;&gt;</div>
+<div class="col-last odd-row-color class-summary class-summary-tab1">
 <div class="block">Responsible for providing an easy way to build a meta instance used when logging</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="Filterable.html" title="interface in io.github.jonloucks.metalog.api">Filterable</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab1">
+<div class="col-first even-row-color class-summary class-summary-tab1"><a href="Filterable.html" title="interface in io.github.jonloucks.metalog.api">Filterable</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab1">
 <div class="block">Responsible for combining many predicates into one</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab2"><a href="GlobalMetalog.html" title="class in io.github.jonloucks.metalog.api">GlobalMetalog</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab2">
+<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="GlobalMetalog.html" title="class in io.github.jonloucks.metalog.api">GlobalMetalog</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab2">
 <div class="block">Globally shared Metalog singleton</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab1">
+<div class="col-first even-row-color class-summary class-summary-tab1"><a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab1">
 <div class="block">Responsible for producing the text for a log message.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab1"><a href="Meta.html" title="interface in io.github.jonloucks.metalog.api">Meta</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab1">
+<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="Meta.html" title="interface in io.github.jonloucks.metalog.api">Meta</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab1">
 <div class="block">The meta information for a log message</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="Meta.Builder.html" title="interface in io.github.jonloucks.metalog.api">Meta.Builder</a>&lt;B extends <a href="Meta.Builder.html" title="interface in io.github.jonloucks.metalog.api">Meta.Builder</a>&lt;B&gt; &amp; <a href="Entity.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entity.Builder</a>&lt;B&gt;&gt;</div>
-<div class="col-last odd-row-color class-summary class-summary-tab1">
+<div class="col-first even-row-color class-summary class-summary-tab1"><a href="Meta.Builder.html" title="interface in io.github.jonloucks.metalog.api">Meta.Builder</a>&lt;B extends <a href="Meta.Builder.html" title="interface in io.github.jonloucks.metalog.api">Meta.Builder</a>&lt;B&gt; &amp; <a href="Entity.Builder.html" title="interface in io.github.jonloucks.metalog.api">Entity.Builder</a>&lt;B&gt;&gt;</div>
+<div class="col-last even-row-color class-summary class-summary-tab1">
 <div class="block">Responsible for providing an easy way to build a meta instance used when logging</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab1"><a href="Metalog.html" title="interface in io.github.jonloucks.metalog.api">Metalog</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab1">
+<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="Metalog.html" title="interface in io.github.jonloucks.metalog.api">Metalog</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab1">
 <div class="block">The Metalog API</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="Metalog.Config.html" title="interface in io.github.jonloucks.metalog.api">Metalog.Config</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab1">
+<div class="col-first even-row-color class-summary class-summary-tab1"><a href="Metalog.Config.html" title="interface in io.github.jonloucks.metalog.api">Metalog.Config</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab1">
 <div class="block">The configuration used to create a new Metalog instance.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab1"><a href="MetalogFactory.html" title="interface in io.github.jonloucks.metalog.api">MetalogFactory</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab1">
+<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="Metalog.Config.Builder.html" title="interface in io.github.jonloucks.metalog.api">Metalog.Config.Builder</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab1">&nbsp;</div>
+<div class="col-first even-row-color class-summary class-summary-tab5"><a href="MetalogException.html" title="class in io.github.jonloucks.metalog.api">MetalogException</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab5">
+<div class="block">Runtime exception thrown for Metalog related problems.</div>
+</div>
+<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="MetalogFactory.html" title="interface in io.github.jonloucks.metalog.api">MetalogFactory</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab1">
 <div class="block">Responsible for creating new instances of Metalog</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab3"><a href="Outcome.html" title="enum class in io.github.jonloucks.metalog.api">Outcome</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab3">
+<div class="col-first even-row-color class-summary class-summary-tab3"><a href="Outcome.html" title="enum class in io.github.jonloucks.metalog.api">Outcome</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab3">
 <div class="block">Publish outcode</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab1"><a href="Publisher.html" title="interface in io.github.jonloucks.metalog.api">Publisher</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab1">
+<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="Publisher.html" title="interface in io.github.jonloucks.metalog.api">Publisher</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab1">
 <div class="block">Responsible for publishing log messages</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="Subscriber.html" title="interface in io.github.jonloucks.metalog.api">Subscriber</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab1">
+<div class="col-first even-row-color class-summary class-summary-tab1"><a href="Subscriber.html" title="interface in io.github.jonloucks.metalog.api">Subscriber</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab1">
 <div class="block">Responsible for consuming published log messages and meta information.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab1"><a href="Visitor.html" title="interface in io.github.jonloucks.metalog.api">Visitor</a>&lt;T&gt;</div>
-<div class="col-last even-row-color class-summary class-summary-tab1">
+<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="Visitor.html" title="interface in io.github.jonloucks.metalog.api">Visitor</a>&lt;T&gt;</div>
+<div class="col-last odd-row-color class-summary class-summary-tab1">
 <div class="block">Like an iterator except there is not a 'remove'</div>
 </div>
 </div>

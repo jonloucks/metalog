@@ -2,10 +2,11 @@
 
 import io.github.jonloucks.contracts.api.AutoClose;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
-import static io.github.jonloucks.contracts.api.Checks.configCheck;
 import static io.github.jonloucks.contracts.api.Checks.nullCheck;
+import static java.util.Optional.ofNullable;
 
 /**
  * Globally shared Metalog singleton
@@ -19,8 +20,8 @@ public final class GlobalMetalog {
      * @see Metalog#publish(Log)
      */
     public static void publish(Log log) {
-<span class="fc" id="L22">        INSTANCE.metalog.publish(log);</span>
-<span class="fc" id="L23">    }</span>
+<span class="fc" id="L23">        INSTANCE.metalog.publish(log);</span>
+<span class="fc" id="L24">    }</span>
 
     /**
      * Publish a log message and it's included meta information.
@@ -29,8 +30,8 @@ public final class GlobalMetalog {
      * @see Metalog#publish(Log, Meta)
      */
     public static void publish(Log log, Meta meta) {
-<span class="fc" id="L32">        INSTANCE.metalog.publish(log, meta);</span>
-<span class="fc" id="L33">    }</span>
+<span class="fc" id="L33">        INSTANCE.metalog.publish(log, meta);</span>
+<span class="fc" id="L34">    }</span>
 
     /**
      * Publish a log message with the meta initialized in a callback
@@ -39,8 +40,8 @@ public final class GlobalMetalog {
      * @see Metalog#publish(Log, Consumer)
      */
     public static void publish(Log log, Consumer&lt;Meta.Builder&lt;?&gt;&gt; builderConsumer) {
-<span class="fc" id="L42">        INSTANCE.metalog.publish(log, builderConsumer);</span>
-<span class="fc" id="L43">    }</span>
+<span class="fc" id="L43">        INSTANCE.metalog.publish(log, builderConsumer);</span>
+<span class="fc" id="L44">    }</span>
 
     /**
      * Add a new log subscription
@@ -49,7 +50,7 @@ public final class GlobalMetalog {
      * @see Metalog#subscribe(Subscriber)
      */
     public static AutoClose subscribe(Subscriber subscriber) {
-<span class="fc" id="L52">        return INSTANCE.metalog.subscribe(subscriber);</span>
+<span class="fc" id="L53">        return INSTANCE.metalog.subscribe(subscriber);</span>
     }
     
     /**
@@ -57,7 +58,7 @@ public final class GlobalMetalog {
      * @return the instance
      */
     public static Metalog getInstance() {
-<span class="fc" id="L60">        return INSTANCE.metalog;</span>
+<span class="fc" id="L61">        return INSTANCE.metalog;</span>
     }
     
     /**
@@ -70,20 +71,27 @@ public final class GlobalMetalog {
      * &lt;/p&gt;
      */
     public static Metalog createMetalog(Metalog.Config config) {
-<span class="fc" id="L73">        final Metalog.Config validConfig = configCheck(config);</span>
-<span class="fc" id="L74">        final MetalogFactoryFinder factoryFinder = new MetalogFactoryFinder(config);</span>
-<span class="fc" id="L75">        final MetalogFactory factory = nullCheck(factoryFinder.find(), &quot;Metalog factory must be present.&quot;);</span>
-<span class="fc" id="L76">        final Metalog metalog = factory.create(validConfig);</span>
-        
-<span class="fc" id="L78">        return nullCheck(metalog, &quot;Metalog could not be created.&quot;);</span>
+<span class="fc" id="L74">        final MetalogFactory factory = findMetalogFactory(config)</span>
+<span class="pc" id="L75">            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Metalog factory must be present.&quot;));</span>
+   
+<span class="fc" id="L77">        return nullCheck(factory.create(config), &quot;Metalog could not be created.&quot;);</span>
     }
     
-<span class="fc" id="L81">    private GlobalMetalog() {</span>
-<span class="fc" id="L82">        this.metalog = createMetalog(Metalog.Config.DEFAULT);</span>
-<span class="fc" id="L83">        this.close = metalog.open();</span>
-<span class="fc" id="L84">    }</span>
+    /**
+     * Finds the MetalogFactory implementation
+     * @param config the configuration used to find the factory
+     * @return the factory if found
+     */
+    public static Optional&lt;MetalogFactory&gt; findMetalogFactory(Metalog.Config config) {
+<span class="fc" id="L86">        return ofNullable(new MetalogFactoryFinder(config).find());</span>
+    }
     
-<span class="fc" id="L86">    private static final GlobalMetalog INSTANCE = new GlobalMetalog();</span>
+<span class="fc" id="L89">    private GlobalMetalog() {</span>
+<span class="fc" id="L90">        this.metalog = createMetalog(Metalog.Config.DEFAULT);</span>
+<span class="fc" id="L91">        this.close = metalog.open();</span>
+<span class="fc" id="L92">    }</span>
+    
+<span class="fc" id="L94">    private static final GlobalMetalog INSTANCE = new GlobalMetalog();</span>
     
     private final Metalog metalog;
     @SuppressWarnings({&quot;FieldCanBeLocal&quot;, &quot;unused&quot;})

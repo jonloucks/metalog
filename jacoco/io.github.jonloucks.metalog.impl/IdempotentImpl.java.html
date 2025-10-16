@@ -1,107 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>IdempotentImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">metalog</a> &gt; <a href="index.source.html" class="el_package">io.github.jonloucks.metalog.impl</a> &gt; <span class="el_source">IdempotentImpl.java</span></div><h1>IdempotentImpl.java</h1><pre class="source lang-java linenums">package io.github.jonloucks.metalog.impl;
 
-import io.github.jonloucks.contracts.api.AutoClose;
-
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-final class IdempotentImpl {
-<span class="fc" id="L9">    IdempotentImpl() {</span>
-<span class="fc" id="L10">    }</span>
+import static io.github.jonloucks.contracts.api.Checks.builderConsumerCheck;
+import static io.github.jonloucks.contracts.api.Checks.nullCheck;
+
+final class IdempotentImpl implements Idempotent {
     
-    AutoClose transitionToOpened(Supplier&lt;AutoClose&gt; opener) {
-<span class="fc bfc" id="L13" title="All 2 branches covered.">        if (transitionTo(State.OPENING)) {</span>
+    @Override
+    public State getState() {
+<span class="fc" id="L14">        return stateReference.get();</span>
+    }
+    
+    @Override
+    public boolean transition(State goalState) {
+<span class="fc" id="L19">        final State validGoalState = stateCheck(goalState);</span>
+<span class="fc" id="L20">        final State currentState = getState();</span>
+<span class="fc bfc" id="L21" title="All 2 branches covered.">        if (currentState.canTransitionTo(validGoalState)) {</span>
+<span class="fc" id="L22">            return stateReference.compareAndSet(currentState, validGoalState);</span>
+        }
+<span class="fc" id="L24">        return false;</span>
+    }
+    
+    @Override
+    public &lt;T&gt; T transition(Consumer&lt;Transition.Builder&lt;T&gt;&gt; builderConsumer) {
+<span class="fc" id="L29">        final Idempotent.Transition.Builder&lt;T&gt; transition = new IdempotentTransitionImpl&lt;&gt;();</span>
+<span class="fc" id="L30">        builderConsumerCheck(builderConsumer).accept(transition);</span>
+<span class="fc" id="L31">        return transition(transition);</span>
+    }
+    
+    @Override
+    public &lt;T&gt; T transition(Transition&lt;T&gt; transition) {
+<span class="fc" id="L36">        final Transition&lt;T&gt; validTransition = nullCheck(transition, &quot;Transition must be present.&quot;);</span>
+<span class="fc" id="L37">        final State goalState = getGoalState(validTransition);</span>
+<span class="fc" id="L38">        final State savedState = getState();</span>
+        
+<span class="fc bfc" id="L40" title="All 2 branches covered.">        if (interimTransition(validTransition, goalState)) {</span>
+<span class="fc" id="L41">            boolean exceptionThrown = false;</span>
             try {
-<span class="fc" id="L15">                final AutoClose autoClose = opener.get();</span>
-<span class="fc" id="L16">                transitionTo(State.OPENED);</span>
-<span class="fc" id="L17">                return autoClose;</span>
-<span class="fc" id="L18">            } catch (Exception thrown) {</span>
-<span class="fc" id="L19">                transitionTo(State.CLOSED);</span>
-<span class="fc" id="L20">                throw thrown;</span>
+<span class="fc" id="L43">                return validTransition.action().map(Supplier::get).orElse(null);</span>
+<span class="fc" id="L44">            } catch (Throwable thrown) {</span>
+<span class="fc" id="L45">                exceptionThrown = true;</span>
+<span class="fc" id="L46">                throw thrown;</span>
+            } finally {
+<span class="fc bfc" id="L48" title="All 4 branches covered.">                if (validTransition.always() || !exceptionThrown) {</span>
+<span class="fc" id="L49">                    transition(goalState);</span>
+                } else {
+<span class="fc" id="L51">                    transition(savedState);</span>
+                }
             }
         } else {
-<span class="fc" id="L23">            return AutoClose.NONE;</span>
+<span class="fc" id="L55">            return validTransition.orElse().map(Supplier::get).orElse(null);</span>
         }
     }
     
-    void transitionToClosed(Runnable closer) {
-<span class="fc bfc" id="L28" title="All 2 branches covered.">        if (transitionTo(State.CLOSING)) {</span>
-            try {
-<span class="fc" id="L30">                closer.run();</span>
-            } finally {
-<span class="fc" id="L32">                transitionTo(State.CLOSED);</span>
-            }
-        }
-<span class="fc" id="L35">    }</span>
+<span class="fc" id="L59">    IdempotentImpl() {</span>
+<span class="fc" id="L60">    }</span>
     
-    boolean isActive() {
-<span class="fc" id="L38">        return stateReference.get().isActive();</span>
+    private static &lt;T&gt; State getGoalState(Transition&lt;T&gt; validTransition) {
+<span class="fc" id="L63">        return validTransition.goalState().orElseThrow(IdempotentImpl::getGoalStateNotPresentException);</span>
     }
     
-    boolean isRejecting() {
-<span class="fc bfc" id="L42" title="All 2 branches covered.">        return !isActive();</span>
+    private static State stateCheck(State state) {
+<span class="fc" id="L67">        return nullCheck(state, &quot;State must be present.&quot;);</span>
     }
-
-    boolean transitionTo(State state) {
-<span class="fc" id="L46">        final State stateNow = stateReference.get();</span>
-<span class="fc bfc" id="L47" title="All 2 branches covered.">        if (stateNow.canTransitionTo(state)) {</span>
-<span class="fc" id="L48">            return stateReference.compareAndSet(stateNow, state);</span>
-        }
-<span class="fc" id="L50">        return false;</span>
-    }
-  
-<span class="fc" id="L53">    private final AtomicReference&lt;State&gt; stateReference = new AtomicReference&lt;&gt;(State.CREATED);</span>
     
-
-    
-<span class="fc" id="L57">    enum State {</span>
-<span class="fc" id="L58">        CREATED {</span>
-            @Override
-            boolean canTransitionTo(State state) {
-<span class="fc bfc" id="L61" title="All 2 branches covered.">                return OPENING == state;</span>
+    private boolean interimTransition(Transition&lt;?&gt; transition, State goalState) {
+<span class="fc bfc" id="L71" title="All 2 branches covered.">        if (transition.interimState().isPresent()) {</span>
+<span class="fc" id="L72">            final State stepState = transition.interimState().get();</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">            if (stepState.canTransitionTo(goalState)) {</span>
+<span class="fc" id="L74">                return transition(stepState);</span>
             }
-        },
-<span class="fc" id="L64">        OPENING {</span>
-            @Override
-            boolean canTransitionTo(State state) {
-<span class="fc bfc" id="L67" title="All 4 branches covered.">                return OPENED == state || CLOSED == state;</span>
-            }
-            @Override
-            boolean isActive() {
-<span class="fc" id="L71">                return true;</span>
-            }
-        },
-<span class="fc" id="L74">        OPENED() {</span>
-            @Override
-            boolean canTransitionTo(State state) {
-<span class="fc bfc" id="L77" title="All 2 branches covered.">                return CLOSING == state;</span>
-            }
-            @Override
-            boolean isActive() {
-<span class="fc" id="L81">                return true;</span>
-            }
-        },
-<span class="fc" id="L84">        CLOSING {</span>
-            @Override
-            boolean canTransitionTo(State state) {
-<span class="fc bfc" id="L87" title="All 2 branches covered.">                return CLOSED == state;</span>
-            }
-            @Override
-            boolean isActive() {
-<span class="fc" id="L91">                return true;</span>
-            }
-        },
-<span class="fc" id="L94">        CLOSED;</span>
-     
-         boolean isActive() {
-<span class="fc" id="L97">             return false;</span>
-         }
-         boolean canTransitionTo(State state) {
-<span class="fc" id="L100">             return false;</span>
-         }
-        
-        State() {
+<span class="fc" id="L76">            throw newStateChangeNotAllowed(stepState, goalState);</span>
+        } else {
+<span class="fc" id="L78">            return true;</span>
         }
     }
+    
+    private static IllegalArgumentException getGoalStateNotPresentException() {
+<span class="fc" id="L83">        return new IllegalArgumentException(&quot;Transition goal state must be present.&quot;);</span>
+    }
+    
+    private static IllegalArgumentException newStateChangeNotAllowed(State stepState, State goalState) {
+<span class="fc" id="L87">        return new IllegalArgumentException(&quot;Idempotent state change not allowed between &quot; + stepState + &quot; and &quot; + goalState + &quot;.&quot;);</span>
+    }
+    
+<span class="fc" id="L90">    private final AtomicReference&lt;State&gt; stateReference = new AtomicReference&lt;&gt;(State.CREATED);</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

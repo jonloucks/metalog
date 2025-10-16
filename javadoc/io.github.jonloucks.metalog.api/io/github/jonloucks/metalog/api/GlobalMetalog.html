@@ -96,31 +96,36 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Metalog.html" title="interface in io.github.jonloucks.metalog.api">Metalog</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#createMetalog(io.github.jonloucks.metalog.api.Metalog.Config)" class="member-name-link">createMetalog</a><wbr>(<a href="Metalog.Config.html" title="interface in io.github.jonloucks.metalog.api">Metalog.Config</a>&nbsp;config)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Metalog.html" title="interface in io.github.jonloucks.metalog.api">Metalog</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getInstance()" class="member-name-link">getInstance</a>()</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="MetalogFactory.html" title="interface in io.github.jonloucks.metalog.api">MetalogFactory</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#findMetalogFactory(io.github.jonloucks.metalog.api.Metalog.Config)" class="member-name-link">findMetalogFactory</a><wbr>(<a href="Metalog.Config.html" title="interface in io.github.jonloucks.metalog.api">Metalog.Config</a>&nbsp;config)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Finds the MetalogFactory implementation</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Metalog.html" title="interface in io.github.jonloucks.metalog.api">Metalog</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getInstance()" class="member-name-link">getInstance</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Return the global instance of Contracts</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#publish(io.github.jonloucks.metalog.api.Log)" class="member-name-link">publish</a><wbr>(<a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a>&nbsp;log)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#publish(io.github.jonloucks.metalog.api.Log)" class="member-name-link">publish</a><wbr>(<a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a>&nbsp;log)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Publish a log message with the default meta information.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#publish(io.github.jonloucks.metalog.api.Log,io.github.jonloucks.metalog.api.Meta)" class="member-name-link">publish</a><wbr>(<a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a>&nbsp;log,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#publish(io.github.jonloucks.metalog.api.Log,io.github.jonloucks.metalog.api.Meta)" class="member-name-link">publish</a><wbr>(<a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a>&nbsp;log,
  <a href="Meta.html" title="interface in io.github.jonloucks.metalog.api">Meta</a>&nbsp;meta)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Publish a log message and it's included meta information.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#publish(io.github.jonloucks.metalog.api.Log,java.util.function.Consumer)" class="member-name-link">publish</a><wbr>(<a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a>&nbsp;log,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#publish(io.github.jonloucks.metalog.api.Log,java.util.function.Consumer)" class="member-name-link">publish</a><wbr>(<a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a>&nbsp;log,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="Meta.Builder.html" title="interface in io.github.jonloucks.metalog.api">Meta.Builder</a>&lt;?&gt;&gt;&nbsp;builderConsumer)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Publish a log message with the meta initialized in a callback</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.github.jonloucks.contracts.api.AutoClose</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#subscribe(io.github.jonloucks.metalog.api.Subscriber)" class="member-name-link">subscribe</a><wbr>(<a href="Subscriber.html" title="interface in io.github.jonloucks.metalog.api">Subscriber</a>&nbsp;subscriber)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.github.jonloucks.contracts.api.AutoClose</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#subscribe(io.github.jonloucks.metalog.api.Subscriber)" class="member-name-link">subscribe</a><wbr>(<a href="Subscriber.html" title="interface in io.github.jonloucks.metalog.api">Subscriber</a>&nbsp;subscriber)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Add a new log subscription</div>
 </div>
 </div>
@@ -244,6 +249,19 @@ loadScripts(document, 'script');</script>
  </p></code></a></li>
 </ul>
 </dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="findMetalogFactory(io.github.jonloucks.metalog.api.Metalog.Config)">
+<h3>findMetalogFactory</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="MetalogFactory.html" title="interface in io.github.jonloucks.metalog.api">MetalogFactory</a>&gt;</span>&nbsp;<span class="element-name">findMetalogFactory</span><wbr><span class="parameters">(<a href="Metalog.Config.html" title="interface in io.github.jonloucks.metalog.api">Metalog.Config</a>&nbsp;config)</span></div>
+<div class="block">Finds the MetalogFactory implementation</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>config</code> - the configuration used to find the factory</dd>
+<dt>Returns:</dt>
+<dd>the factory if found</dd>
 </dl>
 </section>
 </li>

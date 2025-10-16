@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>IdempotentTransitionImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">metalog</a> &gt; <a href="index.source.html" class="el_package">io.github.jonloucks.metalog.impl</a> &gt; <span class="el_source">IdempotentTransitionImpl.java</span></div><h1>IdempotentTransitionImpl.java</h1><pre class="source lang-java linenums">package io.github.jonloucks.metalog.impl;
+
+import io.github.jonloucks.metalog.impl.Idempotent.State;
+
+import java.util.Optional;
+import java.util.function.Supplier;
+
+import static java.util.Optional.ofNullable;
+
+final class IdempotentTransitionImpl&lt;T&gt; implements Idempotent.Transition.Builder&lt;T&gt; {
+
+    @Override
+    public Builder&lt;T&gt; interimState(State interimState) {
+<span class="fc" id="L14">        this.interimState = interimState;</span>
+<span class="fc" id="L15">        return this;</span>
+    }
+    
+    @Override
+    public Builder&lt;T&gt; goalState(State goalState) {
+<span class="fc" id="L20">        this.goalState = goalState;</span>
+<span class="fc" id="L21">        return this;</span>
+    }
+    
+    @Override
+    public Builder&lt;T&gt; action(Supplier&lt;T&gt; action) {
+<span class="fc" id="L26">        this.action = action;</span>
+<span class="fc" id="L27">        return this;</span>
+    }
+    
+    @Override
+    public Builder&lt;T&gt; action(Runnable action) {
+<span class="pc bpc" id="L32" title="1 of 2 branches missed.">        if (null == action) {</span>
+<span class="nc" id="L33">            this.action = null;</span>
+        }  else {
+<span class="fc" id="L35">            this.action = () -&gt; {</span>
+<span class="fc" id="L36">                action.run();</span>
+<span class="fc" id="L37">                return null;</span>
+            };
+        }
+<span class="fc" id="L40">        return this;</span>
+    }
+    
+    @Override
+    public Builder&lt;T&gt; orElse(Supplier&lt;T&gt; orElse) {
+<span class="fc" id="L45">        this.orElse = orElse;</span>
+<span class="fc" id="L46">        return this;</span>
+    }
+    
+    @Override
+    public Builder&lt;T&gt; always(boolean always) {
+<span class="fc" id="L51">        this.always = always;</span>
+<span class="fc" id="L52">        return this;</span>
+    }
+    
+    @Override
+    public Optional&lt;State&gt; interimState() {
+<span class="fc" id="L57">        return ofNullable(interimState);</span>
+    }
+    
+    @Override
+    public Optional&lt;State&gt; goalState() {
+<span class="fc" id="L62">        return ofNullable(goalState);</span>
+    }
+    
+    @Override
+    public Optional&lt;Supplier&lt;T&gt;&gt; action() {
+<span class="fc" id="L67">        return ofNullable(action);</span>
+    }
+    
+    @Override
+    public Optional&lt;Supplier&lt;T&gt;&gt; orElse() {
+<span class="fc" id="L72">        return ofNullable(orElse);</span>
+    }
+    
+    @Override
+    public boolean always() {
+<span class="fc" id="L77">        return this.always;</span>
+    }
+    
+<span class="fc" id="L80">    IdempotentTransitionImpl() {</span>
+    
+<span class="fc" id="L82">    }</span>
+    
+    private State goalState;
+    private boolean always;
+    private State interimState;
+    private Supplier&lt;T&gt; action;
+    private Supplier&lt;T&gt; orElse;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

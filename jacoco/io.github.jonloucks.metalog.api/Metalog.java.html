@@ -3,6 +3,7 @@
 import io.github.jonloucks.contracts.api.*;
 
 import java.time.Duration;
+import java.util.function.Supplier;
 
 /**
  * The Metalog API
@@ -13,7 +14,7 @@ public interface Metalog extends Publisher, Filterable, AutoOpen {
     /**
      * Access the current Metalog implementation
      */
-<span class="fc" id="L16">    Contract&lt;Metalog&gt; CONTRACT = Contract.create(Metalog.class);</span>
+<span class="fc" id="L17">    Contract&lt;Metalog&gt; CONTRACT = Contract.create(Metalog.class);</span>
     
     /**
      * Add a new log subscription
@@ -30,41 +31,41 @@ public interface Metalog extends Publisher, Filterable, AutoOpen {
         /**
          * The default configuration used when creating a new Metalog instance
          */
-<span class="fc" id="L33">        Config DEFAULT = new Config() {};</span>
+<span class="fc" id="L34">        Config DEFAULT = new Config() {};</span>
         
         /**
          * @return if true, reflection might be used to locate the MetalogFactory
          */
         default boolean useReflection() {
-<span class="fc" id="L39">            return true;</span>
+<span class="fc" id="L40">            return true;</span>
         }
         
         /**
          * @return the class name to use if reflection is used to find the MetalogFactory
          */
         default String reflectionClassName() {
-<span class="fc" id="L46">            return &quot;io.github.jonloucks.metalog.impl.MetalogFactoryImpl&quot;;</span>
+<span class="fc" id="L47">            return &quot;io.github.jonloucks.metalog.impl.MetalogFactoryImpl&quot;;</span>
         }
         
         /**
          * @return if true, the ServiceLoader might be used to locate the MetalogFactory
          */
         default boolean useServiceLoader() {
-<span class="fc" id="L53">            return true;</span>
+<span class="fc" id="L54">            return true;</span>
         }
         
         /**
          * @return the class name to load from the ServiceLoader to find the MetalogFactory
          */
         default Class&lt;? extends MetalogFactory&gt; serviceLoaderClass() {
-<span class="fc" id="L60">            return MetalogFactory.class;</span>
+<span class="fc" id="L61">            return MetalogFactory.class;</span>
         }
         
         /**
-         * @return the contracts, custom deployments may choose to not use the {@link GlobalContracts#getInstance()}
+         * @return the contracts, some use case have their own Contracts instance.
          */
         default Contracts contracts() {
-<span class="fc" id="L67">            return GlobalContracts.getInstance();</span>
+<span class="fc" id="L68">            return GlobalContracts.getInstance();</span>
         }
         
         /**
@@ -76,7 +77,7 @@ public interface Metalog extends Publisher, Filterable, AutoOpen {
          * @return the limit.
          */
         default int keyedQueueLimit() {
-<span class="fc" id="L79">            return 1_000;</span>
+<span class="fc" id="L80">            return 1_000;</span>
         }
         
         /**
@@ -84,7 +85,7 @@ public interface Metalog extends Publisher, Filterable, AutoOpen {
          * @return the maximum number of background threads
          */
         default int unkeyedThreadCount() {
-<span class="fc" id="L87">            return 10;</span>
+<span class="fc" id="L88">            return 10;</span>
         }
         
         /**
@@ -92,7 +93,7 @@ public interface Metalog extends Publisher, Filterable, AutoOpen {
          * @return true if all thread log messages are processed in FIFO order
          */
         default boolean unkeyedFairness() {
-<span class="fc" id="L95">            return false;</span>
+<span class="fc" id="L96">            return false;</span>
         }
         
         /**
@@ -100,17 +101,21 @@ public interface Metalog extends Publisher, Filterable, AutoOpen {
          * @return the timeout duration
          */
         default Duration shutdownTimeout() {
-<span class="fc" id="L103">            return Duration.ofSeconds(60);</span>
+<span class="fc" id="L104">            return Duration.ofSeconds(60);</span>
         }
         
-        /**
-         * When true, the default, the system output subscriber is activated and
-         * log messages with channels targeting the system will be published and consumed
-         * For example channels &quot;System.err&quot;, &quot;System.out&quot; and &quot;Console&quot;
-         * @return true to activate system output.
-         */
-        default boolean activeConsole() {
-<span class="fc" id="L113">            return true;</span>
+        interface Builder extends Config {
+<span class="fc" id="L108">            Contract&lt;Supplier&lt;Builder&gt;&gt; FACTORY = Contract.create(&quot;Metalog Config Builder Factory&quot;);</span>
+            
+            Builder useReflection(boolean useReflection);
+            Builder useServiceLoader(boolean useServiceLoader);
+            Builder contracts(Contracts contracts);
+            Builder keyedQueueLimit(int keyedQueueLimit);
+            Builder unkeyedThreadCount(int unkeyedThreadCount);
+            Builder unkeyedFairness(boolean unkeyedFairness);
+            Builder shutdownTimeout(Duration shutdownTimeout);
+            Builder reflectionClassName(String reflectionClassName);
+            Builder serviceLoaderClass(Class&lt;? extends MetalogFactory&gt; serviceLoaderClass);
         }
     }
 }

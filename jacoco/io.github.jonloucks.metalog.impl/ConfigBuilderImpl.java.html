@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ConfigBuilderImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">metalog</a> &gt; <a href="index.source.html" class="el_package">io.github.jonloucks.metalog.impl</a> &gt; <span class="el_source">ConfigBuilderImpl.java</span></div><h1>ConfigBuilderImpl.java</h1><pre class="source lang-java linenums">package io.github.jonloucks.metalog.impl;
+
+import io.github.jonloucks.contracts.api.Contracts;
+import io.github.jonloucks.metalog.api.Metalog;
+import io.github.jonloucks.metalog.api.MetalogFactory;
+
+import java.time.Duration;
+
+import static io.github.jonloucks.contracts.api.Checks.contractsCheck;
+import static io.github.jonloucks.contracts.api.Checks.nullCheck;
+
+final class ConfigBuilderImpl implements Metalog.Config.Builder {
+    @Override
+    public Builder useReflection(boolean useReflection) {
+<span class="fc" id="L15">        this.useReflection = useReflection;</span>
+<span class="fc" id="L16">        return this;</span>
+    }
+    
+    @Override
+    public Builder useServiceLoader(boolean useServiceLoader) {
+<span class="fc" id="L21">        this.useServiceLoader = useServiceLoader;</span>
+<span class="fc" id="L22">        return this;</span>
+    }
+    
+    @Override
+    public Builder contracts(Contracts contracts) {
+<span class="fc" id="L27">        this.contracts = contractsCheck(contracts);</span>
+<span class="fc" id="L28">        return this;</span>
+    }
+    
+    @Override
+    public Builder keyedQueueLimit(int keyedQueueLimit) {
+<span class="fc" id="L33">        this.keyedQueueLimit = keyedQueueLimit;</span>
+<span class="fc" id="L34">        return this;</span>
+    }
+    
+    @Override
+    public Builder unkeyedThreadCount(int unkeyedThreadCount) {
+<span class="fc" id="L39">        this.unkeyedThreadCount = unkeyedThreadCount;</span>
+<span class="fc" id="L40">        return this;</span>
+    }
+    
+    @Override
+    public Builder unkeyedFairness(boolean unkeyedFairness) {
+<span class="fc" id="L45">        this.unkeyedFairness = unkeyedFairness;</span>
+<span class="fc" id="L46">        return this;</span>
+    }
+    
+    @Override
+    public Builder shutdownTimeout(Duration shutdownTimeout) {
+<span class="fc" id="L51">        this.shutdownTimeout = nullCheck(shutdownTimeout, &quot;Shut down timeout must be present.&quot;);</span>
+<span class="fc" id="L52">        return this;</span>
+    }
+ 
+    @Override
+    public Builder reflectionClassName(String reflectionClassName) {
+<span class="fc" id="L57">        this.reflectionClassName = nullCheck(reflectionClassName, &quot;Reflection class name must be present.&quot;);</span>
+<span class="fc" id="L58">        return this;</span>
+    }
+    
+    @Override
+    public Builder serviceLoaderClass(Class&lt;? extends MetalogFactory&gt; serviceLoaderClass) {
+<span class="fc" id="L63">        this.serviceLoaderClass = nullCheck(serviceLoaderClass, &quot;Service loader class must be present.&quot;);</span>
+<span class="fc" id="L64">        return this;</span>
+    }
+    
+    @Override
+    public boolean useReflection() {
+<span class="fc" id="L69">        return useReflection;</span>
+    }
+    
+    @Override
+    public String reflectionClassName() {
+<span class="fc" id="L74">        return reflectionClassName;</span>
+    }
+    
+    @Override
+    public boolean useServiceLoader() {
+<span class="fc" id="L79">        return useServiceLoader;</span>
+    }
+    
+    @Override
+    public Class&lt;? extends MetalogFactory&gt; serviceLoaderClass() {
+<span class="fc" id="L84">        return serviceLoaderClass;</span>
+    }
+    
+    @Override
+    public Contracts contracts() {
+<span class="fc" id="L89">        return contracts;</span>
+    }
+    
+    @Override
+    public int keyedQueueLimit() {
+<span class="fc" id="L94">        return keyedQueueLimit;</span>
+    }
+    
+    @Override
+    public int unkeyedThreadCount() {
+<span class="fc" id="L99">        return unkeyedThreadCount;</span>
+    }
+    
+    @Override
+    public boolean unkeyedFairness() {
+<span class="fc" id="L104">        return unkeyedFairness;</span>
+    }
+    
+    @Override
+    public Duration shutdownTimeout() {
+<span class="fc" id="L109">        return shutdownTimeout;</span>
+    }
+ 
+<span class="fc" id="L112">    ConfigBuilderImpl() {</span>
+    
+<span class="fc" id="L114">    }</span>
+    
+<span class="fc" id="L116">    private boolean useReflection = DEFAULT.useReflection();</span>
+<span class="fc" id="L117">    private boolean useServiceLoader = DEFAULT.useServiceLoader();</span>
+<span class="fc" id="L118">    private Contracts contracts = DEFAULT.contracts();</span>
+<span class="fc" id="L119">    private int keyedQueueLimit = DEFAULT.keyedQueueLimit();</span>
+<span class="fc" id="L120">    private int unkeyedThreadCount = DEFAULT.unkeyedThreadCount();</span>
+<span class="fc" id="L121">    private boolean unkeyedFairness = DEFAULT.unkeyedFairness();</span>
+<span class="fc" id="L122">    private Duration shutdownTimeout = DEFAULT.shutdownTimeout();</span>
+<span class="fc" id="L123">    private String reflectionClassName = DEFAULT.reflectionClassName();</span>
+<span class="fc" id="L124">    private Class&lt;? extends MetalogFactory&gt; serviceLoaderClass = DEFAULT.serviceLoaderClass();</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
