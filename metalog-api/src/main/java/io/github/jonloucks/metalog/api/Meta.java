@@ -100,7 +100,7 @@ public interface Meta extends Entity {
         /**
          * Used to promise and claim the Meta.Builder implementation
          */
-        Contract<Supplier<Meta.Builder<?>>> FACTORY_CONTRACT = Contract.create("Meta Builder Factory");
+        Contract<Supplier<Meta.Builder<?>>> FACTORY = Contract.create("Meta Builder Factory");
         
         /**
          * Set the name for the Meta

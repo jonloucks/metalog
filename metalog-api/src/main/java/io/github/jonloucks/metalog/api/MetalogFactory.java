@@ -1,7 +1,8 @@
 package io.github.jonloucks.metalog.api;
 
-import io.github.jonloucks.contracts.api.AutoOpen;
-import io.github.jonloucks.contracts.api.Contract;
+import io.github.jonloucks.contracts.api.*;
+
+import java.util.function.Consumer;
 
 /**
  * Responsible for creating new instances of Metalog
@@ -22,4 +23,8 @@ public interface MetalogFactory {
      * @return the new Metalog instance
      */
     Metalog create(Metalog.Config config);
+    
+    Metalog create(Consumer<Metalog.Config.Builder> builderConsumer);
+    
+    void install(Metalog.Config config, Repository repository);
 }

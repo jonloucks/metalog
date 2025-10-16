@@ -3,6 +3,7 @@ package io.github.jonloucks.metalog.api;
 import io.github.jonloucks.contracts.api.*;
 
 import java.time.Duration;
+import java.util.function.Supplier;
 
 /**
  * The Metalog API
@@ -61,7 +62,7 @@ public interface Metalog extends Publisher, Filterable, AutoOpen {
         }
         
         /**
-         * @return the contracts, custom deployments may choose to not use the {@link GlobalContracts#getInstance()}
+         * @return the contracts, some use case have their own Contracts instance.
          */
         default Contracts contracts() {
             return GlobalContracts.getInstance();
@@ -103,14 +104,18 @@ public interface Metalog extends Publisher, Filterable, AutoOpen {
             return Duration.ofSeconds(60);
         }
         
-        /**
-         * When true, the default, the system output subscriber is activated and
-         * log messages with channels targeting the system will be published and consumed
-         * For example channels "System.err", "System.out" and "Console"
-         * @return true to activate system output.
-         */
-        default boolean activeConsole() {
-            return true;
+        interface Builder extends Config {
+            Contract<Supplier<Builder>> FACTORY = Contract.create("Metalog Config Builder Factory");
+            
+            Builder useReflection(boolean useReflection);
+            Builder useServiceLoader(boolean useServiceLoader);
+            Builder contracts(Contracts contracts);
+            Builder keyedQueueLimit(int keyedQueueLimit);
+            Builder unkeyedThreadCount(int unkeyedThreadCount);
+            Builder unkeyedFairness(boolean unkeyedFairness);
+            Builder shutdownTimeout(Duration shutdownTimeout);
+            Builder reflectionClassName(String reflectionClassName);
+            Builder serviceLoaderClass(Class<? extends MetalogFactory> serviceLoaderClass);
         }
     }
 }

@@ -1,9 +1,7 @@
 package io.github.jonloucks.metalog.test;
 
-import io.github.jonloucks.contracts.api.AutoClose;
 import io.github.jonloucks.metalog.api.Entities;
 import io.github.jonloucks.metalog.api.Entity;
-import io.github.jonloucks.metalog.api.Metalog;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -18,12 +16,9 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import static io.github.jonloucks.contracts.api.GlobalContracts.claimContract;
 import static io.github.jonloucks.contracts.test.Tools.*;
-import static io.github.jonloucks.metalog.api.GlobalMetalog.createMetalog;
 import static io.github.jonloucks.metalog.test.EntitiesTests.EntitiesTestsTools.runWithScenario;
-import static io.github.jonloucks.metalog.test.Tools.createTestEntity;
-import static io.github.jonloucks.metalog.test.Tools.createUniqueTestEntity;
+import static io.github.jonloucks.metalog.test.Tools.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings({"Convert2MethodRef", "CodeBlock2Expr"})
@@ -269,17 +264,12 @@ public interface EntitiesTests {
         
         @FunctionalInterface
         interface ScenarioConfig extends Consumer<Entities.Builder<?>> {
-            default Metalog.Config getMetalogConfig() {
-                return Metalog.Config.DEFAULT;
-            }
         }
         
         static void runWithScenario(ScenarioConfig scenarioConfig) {
-            final Metalog metalog = createMetalog(scenarioConfig.getMetalogConfig());
-            try (AutoClose closeLogs = metalog.open()) {
-                AutoClose ignoreWarning = closeLogs;
-                scenarioConfig.accept(claimContract(Entities.Builder.FACTORY_CONTRACT).get());
-            }
+            withMetalog((contracts, metalog) -> {
+                scenarioConfig.accept(contracts.claim(Entities.Builder.FACTORY).get());
+            });
         }
     }
 }

@@ -2,6 +2,7 @@ package io.github.jonloucks.metalog.impl;
 
 import io.github.jonloucks.contracts.api.AutoClose;
 import io.github.jonloucks.contracts.api.AutoOpen;
+import io.github.jonloucks.metalog.api.Dispatcher;
 import io.github.jonloucks.metalog.api.Meta;
 import io.github.jonloucks.metalog.api.Metalog;
 import io.github.jonloucks.metalog.api.Outcome;
@@ -20,12 +21,12 @@ final class UnkeyedDispatcherImpl implements Dispatcher, AutoOpen {
     }
     
     @Override
-    public Outcome dispatch(Meta meta, Runnable command) {
-        final Runnable validCommand = commandCheck(command);
-//        if (idempotent.isRejecting()) {
-//            validCommand.run();
-//            return Outcome.CONSUMED;
-//        }
+    public Outcome dispatch(Meta meta, Runnable work) {
+        final Runnable validCommand = commandCheck(work);
+        if (idempotent.isRejecting()) {
+            validCommand.run();
+            return Outcome.CONSUMED;
+        }
         executor.execute(validCommand);
         return Outcome.DISPATCHED;
     }
@@ -40,6 +41,7 @@ final class UnkeyedDispatcherImpl implements Dispatcher, AutoOpen {
             new SynchronousQueue<>(config.unkeyedFairness())
         );
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        idempotent = config.contracts().claim(Idempotent.FACTORY).get();
     }
     
     private void close() {
@@ -79,7 +81,7 @@ final class UnkeyedDispatcherImpl implements Dispatcher, AutoOpen {
 //        executor.shutdownNow();
 //    }
 
-    private final IdempotentImpl idempotent = new IdempotentImpl();
+    private final Idempotent idempotent;
 //    private final Metalog.Config config;
     private final ThreadPoolExecutor executor;
 }

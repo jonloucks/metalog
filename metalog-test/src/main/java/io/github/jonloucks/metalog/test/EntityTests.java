@@ -1,8 +1,7 @@
 package io.github.jonloucks.metalog.test;
 
-import io.github.jonloucks.contracts.api.AutoClose;
+import io.github.jonloucks.contracts.api.Contracts;
 import io.github.jonloucks.metalog.api.Entity;
-import io.github.jonloucks.metalog.api.Metalog;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -11,13 +10,11 @@ import org.mockito.quality.Strictness;
 
 import java.util.function.Consumer;
 
-import static io.github.jonloucks.contracts.api.GlobalContracts.claimContract;
-import static io.github.jonloucks.contracts.test.Tools.assertInstantiateThrows;
-import static io.github.jonloucks.contracts.test.Tools.assertThrown;
-import static io.github.jonloucks.metalog.api.GlobalMetalog.createMetalog;
+import static io.github.jonloucks.contracts.test.Tools.*;
 import static io.github.jonloucks.metalog.test.EntityTests.EntityTestsTools.newEntityBuilder;
 import static io.github.jonloucks.metalog.test.EntityTests.EntityTestsTools.runWithScenario;
 import static io.github.jonloucks.metalog.test.Tools.createTestEntity;
+import static io.github.jonloucks.metalog.test.Tools.withMetalog;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("CodeBlock2Expr")
@@ -269,21 +266,19 @@ public interface EntityTests {
         
         @FunctionalInterface
         interface ScenarioConfig extends Consumer<Entity.Builder<?>> {
-            default Metalog.Config getMetalogConfig() {
-                return Metalog.Config.DEFAULT;
-            }
         }
         
         static Entity.Builder<?> newEntityBuilder() {
-            return claimContract(Entity.Builder.FACTORY_CONTRACT).get();
+            return CONTRACTS.claim(Entity.Builder.FACTORY).get();
         }
         
+        private static Contracts CONTRACTS;
+        
         static void runWithScenario(ScenarioConfig scenarioConfig) {
-            final Metalog metalog = createMetalog(scenarioConfig.getMetalogConfig());
-            try (AutoClose closeLogs = metalog.open()) {
-                AutoClose ignoreWarning = closeLogs;
-                scenarioConfig.accept(newEntityBuilder());
-            }
+            withMetalog(b -> {}, (contracts, metalog) -> {
+                CONTRACTS = contracts;
+                scenarioConfig.accept(CONTRACTS.claim(Entity.Builder.FACTORY).get());
+            });
         }
     }
 }

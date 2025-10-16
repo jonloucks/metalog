@@ -14,6 +14,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static io.github.jonloucks.contracts.api.Checks.builderConsumerCheck;
+import static io.github.jonloucks.contracts.api.Checks.configCheck;
 import static io.github.jonloucks.metalog.impl.Internal.logCheck;
 import static io.github.jonloucks.metalog.impl.Internal.metaCheck;
 import static java.util.Optional.ofNullable;
@@ -22,17 +23,17 @@ final class ConsoleImpl implements Console, AutoOpen {
     
     @Override
     public Outcome output(Log log) {
-        return publish(log, OUTPUT_META);
+        return publish(log, outputMeta);
     }
     
     @Override
     public Outcome error(Log log) {
-        return publish(log, ERROR_META);
+        return publish(log, errorMeta);
     }
     
     @Override
     public Outcome publish(Log log) {
-        return publish(log, OUTPUT_META);
+        return publish(log, outputMeta);
     }
 
     @Override
@@ -76,7 +77,7 @@ final class ConsoleImpl implements Console, AutoOpen {
     }
     
     private Optional<PrintStream> getPrintStream(Meta meta) {
-        return ofNullable(printMap.get(meta.getChannel()));
+        return ofNullable(channelPrintStreamMap.get(meta.getChannel()));
     }
   
     @Override
@@ -95,16 +96,23 @@ final class ConsoleImpl implements Console, AutoOpen {
     }
     
     ConsoleImpl(Metalog.Config config) {
-        this.config = config;
-        printMap.put(SYSTEM_OUT_CHANNEL, System.out);
-        printMap.put(SYSTEM_ERR_CHANNEL, System.err);
-        printMap.put(CONSOLE_OUTPUT_CHANNEL, System.out);
-        printMap.put(CONSOLE_ERROR_CHANNEL, System.err);
+        this.config = configCheck(config);
+        this.metaFactory = config.contracts().claim(Meta.Builder.FACTORY);
+        this.errorMeta = metaFactory.get().key(CONSOLE_KEY).channel(CONSOLE_ERROR_CHANNEL);
+        this.outputMeta = metaFactory.get().key(CONSOLE_KEY).channel(CONSOLE_OUTPUT_CHANNEL);
+        this.idempotent = config.contracts().claim(Idempotent.FACTORY).get();
+        fillChannelPrintStreamMap();
     }
-
+    
+    private void fillChannelPrintStreamMap() {
+        channelPrintStreamMap.put(SYSTEM_OUT_CHANNEL, System.out);
+        channelPrintStreamMap.put(SYSTEM_ERR_CHANNEL, System.err);
+        channelPrintStreamMap.put(CONSOLE_OUTPUT_CHANNEL, System.out);
+        channelPrintStreamMap.put(CONSOLE_ERROR_CHANNEL, System.err);
+    }
+    
     private AutoClose realOpen() {
         metalog = config.contracts().claim(Metalog.CONTRACT);
-        metaFactory = config.contracts().claim(Meta.Builder.FACTORY_CONTRACT);
         closeSubscription = config.contracts().claim(Metalog.CONTRACT).subscribe(this);
         return this::close;
     }
@@ -121,11 +129,7 @@ final class ConsoleImpl implements Console, AutoOpen {
     }
     
     private boolean isSupported(Meta meta) {
-        return printMap.containsKey(meta.getChannel());
-    }
-    
-    private static Meta makeMeta(String channel) {
-        return new MetaImpl().key(CONSOLE_KEY).channel(channel);
+        return channelPrintStreamMap.containsKey(meta.getChannel());
     }
     
     private static final String CONSOLE_KEY = "Console";
@@ -133,14 +137,14 @@ final class ConsoleImpl implements Console, AutoOpen {
     private static final String CONSOLE_ERROR_CHANNEL = "Console.error";
     private static final String SYSTEM_ERR_CHANNEL = "System.err";
     private static final String SYSTEM_OUT_CHANNEL = "System.out";
-    private static final Meta ERROR_META = makeMeta(CONSOLE_ERROR_CHANNEL);
-    private static final Meta OUTPUT_META = makeMeta(CONSOLE_OUTPUT_CHANNEL);
     
-    private final Map<String, PrintStream> printMap = new HashMap<>();
+    private final Map<String, PrintStream> channelPrintStreamMap = new HashMap<>();
     private final Filterable filters = new FiltersImpl();
-    private final IdempotentImpl idempotent = new IdempotentImpl();
+    private final Idempotent idempotent;
     private final Metalog.Config config;
+    private final Meta errorMeta;
+    private final Meta outputMeta;
     private Metalog metalog;
     private AutoClose closeSubscription;
-    private Supplier<Meta.Builder<?>> metaFactory;
+    private final Supplier<Meta.Builder<?>> metaFactory;
 }

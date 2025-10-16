@@ -1,7 +1,6 @@
 package io.github.jonloucks.metalog.test;
 
 import io.github.jonloucks.contracts.api.AutoClose;
-import io.github.jonloucks.metalog.api.Metalog;
 import io.github.jonloucks.metalog.api.Outcome;
 import io.github.jonloucks.metalog.api.Subscriber;
 import org.junit.jupiter.api.Test;
@@ -58,9 +57,6 @@ public interface TorrentTests {
         }
         
         interface ScenarioConfig {
-            default Metalog.Config getMetalogConfig() {
-                return Metalog.Config.DEFAULT;
-            }
             
             default int chanceOfKeyed() {
                 return 50;
@@ -68,7 +64,7 @@ public interface TorrentTests {
         }
         
         static void runWithScenario(ScenarioConfig scenarioConfig) {
-            withMetalog(scenarioConfig.getMetalogConfig(),(contracts, metalog) -> {
+            withMetalog(b -> {} ,(contracts, metalog) -> {
                 final int producerThreads = 123;
                 final int messagesPerThread = 321;
                 final CountDownLatch messagesCompletedLatch = new CountDownLatch(producerThreads * messagesPerThread);

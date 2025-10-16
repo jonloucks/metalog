@@ -1,7 +1,5 @@
 package io.github.jonloucks.metalog.api;
 
-import io.github.jonloucks.contracts.api.ContractException;
-
 import java.util.Optional;
 import java.util.ServiceLoader;
 
@@ -57,8 +55,8 @@ final class MetalogFactoryFinder {
         return ofNullable(config.reflectionClassName()).filter(x -> !x.isEmpty());
     }
     
-    private ContractException newNotFoundException() {
-        return new ContractException("Unable to find Metalog factory.");
+    private MetalogException newNotFoundException() {
+        return new MetalogException("Unable to find Metalog factory.");
     }
     
     private final Metalog.Config config;

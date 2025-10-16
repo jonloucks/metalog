@@ -13,14 +13,12 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import java.time.Duration;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static io.github.jonloucks.contracts.test.Tools.*;
-import static io.github.jonloucks.metalog.test.Tools.metaWithId;
-import static io.github.jonloucks.metalog.test.Tools.uniqueString;
-import static java.util.Optional.ofNullable;
+import static io.github.jonloucks.metalog.test.Tools.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.*;
 
 @SuppressWarnings("CodeBlock2Expr")
@@ -37,7 +35,7 @@ public interface GlobalMetalogTests {
     default void globalMetalog_getInstance_Works() {
         assertObject(GlobalMetalog.getInstance());
     }
- 
+    
     @Test
     default void globalMetalog_LogWithBuild_RoundTrip(@Mock Subscriber subscriber, @Mock Log log) {
         final String text = uniqueString();
@@ -71,7 +69,8 @@ public interface GlobalMetalogTests {
     
     @Test
     default void globalMetalog_DefaultConfig() {
-        final Metalog.Config config = new Metalog.Config() {};
+        final Metalog.Config config = new Metalog.Config() {
+        };
         
         assertAll(
             () -> assertTrue(config.useReflection(), "config.useReflection() default."),
@@ -82,40 +81,34 @@ public interface GlobalMetalogTests {
             () -> assertEquals(1_000, config.keyedQueueLimit(), "config.keyedQueueLimit() default."),
             () -> assertEquals(10, config.unkeyedThreadCount(), "config.unkeyedThreadCount() default."),
             () -> assertFalse(config.unkeyedFairness(), "config.unkeyedFairness() default."),
-            () -> assertEquals(Duration.ofSeconds(60), config.shutdownTimeout(), "config.shutdownTimeout() default."),
-            () -> assertTrue(config.activeConsole(), "config.activeConsole() default.")
+            () -> assertEquals(Duration.ofSeconds(60), config.shutdownTimeout(), "config.shutdownTimeout() default.")
         );
     }
     
     @ParameterizedTest
     @MethodSource("io.github.jonloucks.metalog.test.GlobalMetalogTests$GlobalMetalogTestsTools#validConfigs")
-    default void globalMetalog_HappyPath(Metalog.Config metalogConfig) {
-        final Metalog metalog = GlobalMetalog.createMetalog(metalogConfig);
+    default void globalMetalog_findMetalogFactory(Metalog.Config config) {
+        final Optional<MetalogFactory> factory = GlobalMetalog.findMetalogFactory(config);
         
-        assumeTrue(ofNullable(metalog).isPresent(), "createContracts failed");
-        
-        try (AutoClose closeMetalog = metalog.open()) {
-            final AutoClose ignored = closeMetalog;
-            
-            final Contracts contracts = metalogConfig.contracts();
-            
-            assertTrue(contracts.isBound(Metalog.CONTRACT));
-            assertTrue(contracts.isBound(MetalogFactory.CONTRACT));
-            assertTrue(contracts.isBound(Entities.Builder.FACTORY_CONTRACT));
-            assertTrue(contracts.isBound(Entity.Builder.FACTORY_CONTRACT));
-            assertTrue(contracts.isBound(Meta.Builder.FACTORY_CONTRACT));
-            
-            if (metalogConfig.activeConsole()) {
-                assertTrue(contracts.isBound(Console.CONTRACT));
-            }
-        }
+        assertTrue(factory.isPresent());
+        assertObject(factory.get());
     }
     
     @ParameterizedTest
     @MethodSource("io.github.jonloucks.metalog.test.GlobalMetalogTests$GlobalMetalogTestsTools#invalidConfigs")
-    default void globalMetalog_SadPath(Metalog.Config metalogConfig) {
-        final ContractException thrown = assertThrows(ContractException.class, () -> {
-            GlobalMetalog.createMetalog(metalogConfig);
+    default void globalMetalog_createMetalog_Invalid(Metalog.Config config) {
+        final MetalogException thrown = assertThrows(MetalogException.class, () -> {
+            GlobalMetalog.createMetalog(config);
+        });
+        
+        assertThrown(thrown);
+    }
+    
+    @ParameterizedTest
+    @MethodSource("io.github.jonloucks.metalog.test.GlobalMetalogTests$GlobalMetalogTestsTools#invalidConfigs")
+    default void globalMetalog_SadPath(Metalog.Config config) {
+        final MetalogException thrown = assertThrows(MetalogException.class, () -> {
+            GlobalMetalog.createMetalog(config);
         });
         
         assertThrown(thrown);
@@ -128,17 +121,20 @@ public interface GlobalMetalogTests {
     
     final class GlobalMetalogTestsTools {
         private GlobalMetalogTestsTools() {
-            throw new AssertionError("Illegal constructor");
+            throw new AssertionError("Illegal constructor.");
         }
+        
         @SuppressWarnings("RedundantMethodOverride")
         static Stream<Arguments> validConfigs() {
             return Stream.of(
-                Arguments.of(new Metalog.Config() {}),
+                Arguments.of(new Metalog.Config() {
+                }),
                 Arguments.of(new Metalog.Config() {
                     @Override
                     public boolean useServiceLoader() {
                         return false;
                     }
+                    
                     @Override
                     public boolean useReflection() {
                         return true;
@@ -149,6 +145,7 @@ public interface GlobalMetalogTests {
                     public boolean useServiceLoader() {
                         return true;
                     }
+                    
                     @Override
                     public boolean useReflection() {
                         return false;
@@ -165,6 +162,7 @@ public interface GlobalMetalogTests {
                     public boolean useServiceLoader() {
                         return false;
                     }
+                    
                     @Override
                     public boolean useReflection() {
                         return false;
@@ -175,10 +173,12 @@ public interface GlobalMetalogTests {
                     public boolean useServiceLoader() {
                         return true;
                     }
+                    
                     @Override
                     public boolean useReflection() {
                         return false;
                     }
+                    
                     @Override
                     public Class<? extends MetalogFactory> serviceLoaderClass() {
                         return BadMetalogFactory.class;
@@ -189,10 +189,12 @@ public interface GlobalMetalogTests {
                     public boolean useServiceLoader() {
                         return false;
                     }
+                    
                     @Override
                     public boolean useReflection() {
                         return true;
                     }
+                    
                     @Override
                     public String reflectionClassName() {
                         return BadMetalogFactory.class.getName();
@@ -203,10 +205,12 @@ public interface GlobalMetalogTests {
                     public boolean useServiceLoader() {
                         return false;
                     }
+                    
                     @Override
                     public boolean useReflection() {
                         return true;
                     }
+                    
                     @Override
                     public String reflectionClassName() {
                         return "";

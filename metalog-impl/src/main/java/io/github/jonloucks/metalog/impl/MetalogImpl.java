@@ -12,7 +12,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import static io.github.jonloucks.contracts.api.BindStrategy.IF_NOT_BOUND;
 import static io.github.jonloucks.contracts.api.Checks.*;
 import static io.github.jonloucks.metalog.impl.Internal.*;
 import static java.lang.ThreadLocal.withInitial;
@@ -69,32 +68,30 @@ final class MetalogImpl implements Metalog {
         return idempotent.transitionToOpened(this::realOpen);
     }
     
-    MetalogImpl(Config config) {
+    MetalogImpl(Config config, Repository repository) {
         this.config = configCheck(config);
-        this.repository = config.contracts().claim(Repository.FACTORY).get();
-        
-        bindContracts(config);
+        this.repository = nullCheck(repository, "Repository must be present.");
+        this.closeRepository = repository.open();
+        this.idempotent = config.contracts().claim(Idempotent.FACTORY).get();
     }
     
     private AutoClose realOpen() {
-        closeRepository = repository.open();
-        metaFactory = config.contracts().claim(Meta.Builder.FACTORY_CONTRACT);
+        metaFactory = config.contracts().claim(Meta.Builder.FACTORY);
         createUnkeyedDispatcher();
         activateConsole();
         return this::close;
     }
 
     private void createUnkeyedDispatcher() {
-        final Promisors promisors = config.contracts().claim(Promisors.CONTRACT);
+        final Contracts contracts = config.contracts();
+        final Promisors promisors = contracts.claim(Promisors.CONTRACT);
         final Contract<Dispatcher> contract = Contract.create(Dispatcher.class, n -> n.name("Unkeyed Dispatcher"));
-        repository.keep(contract, promisors.createLifeCyclePromisor(()-> new UnkeyedDispatcherImpl(config)));
-        dispatchers.put("", config.contracts().claim(contract));
+        repository.keep(contract, promisors.createLifeCyclePromisor(()->contracts.claim(Dispatcher.UNKEYED_FACTORY).get()));
+        dispatchers.put("", contracts.claim(contract));
     }
     
     private void activateConsole() {
-        if (config.activeConsole()) {
-            config.contracts().claim(Console.CONTRACT);
-        }
+        config.contracts().claim(Console.CONTRACT);
     }
     
     private void close() {
@@ -149,19 +146,10 @@ final class MetalogImpl implements Metalog {
     
     private Dispatcher createKeyedDispatcher(String key) {
         final Contract<Dispatcher> contract = Contract.create(Dispatcher.class, n -> n.name("Keyed Dispatcher " + key));
-        repository.keep(contract, lifeCycle(()-> new KeyedDispatcherImpl(config)));
+        repository.keep(contract, lifeCycle(()-> config.contracts().claim(Dispatcher.KEYED_FACTORY).get()));
         return config.contracts().claim(contract);
     }
-    
-    private void bindContracts(Config config) {
-        repository.keep(Metalog.CONTRACT, () -> this);
-        repository.keep(MetalogFactory.CONTRACT, lifeCycle(MetalogFactoryImpl::new));
-        repository.keep(Entities.Builder.FACTORY_CONTRACT, () -> EntitiesImpl::new);
-        repository.keep(Entity.Builder.FACTORY_CONTRACT, () -> EntityImpl::new);
-        repository.keep(Meta.Builder.FACTORY_CONTRACT, () -> MetaImpl::new);
-        repository.keep(Console.CONTRACT, lifeCycle(() -> new ConsoleImpl(config)), IF_NOT_BOUND);
-    }
-    
+
     private <T> Promisor<T> lifeCycle(Promisor<T> promisor) {
         final Promisors promisors = config.contracts().claim(Promisors.CONTRACT);
         return promisors.createLifeCyclePromisor(promisor);
@@ -181,7 +169,7 @@ final class MetalogImpl implements Metalog {
     private static final String DISPATCHING_PROPERTY = "dispatching";
     
     private final Config config;
-    private final IdempotentImpl idempotent = new IdempotentImpl();
+    private final Idempotent idempotent;
     private Repository repository;
     private AutoClose closeRepository;
     private final List<Subscriber> subscribers = new CopyOnWriteArrayList<>();
