@@ -12,9 +12,14 @@ import static io.github.jonloucks.contracts.api.Checks.*;
 
 /**
  * Creates Metalog instances
- * Opt-in construction via reflection or ServiceLoader
+ * Opt-in construction via reflection, ServiceLoader or directly.
  */
 public final class MetalogFactoryImpl implements MetalogFactory {
+    
+    /**
+     * Publicly accessible constructor as an entry point into this library.
+     * It can be invoked via reflection, ServiceLoader or directly.
+     */
     public MetalogFactoryImpl() {
     }
     
