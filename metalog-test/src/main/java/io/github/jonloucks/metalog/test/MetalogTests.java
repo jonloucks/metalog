@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-@SuppressWarnings("Convert2MethodRef")
+@SuppressWarnings("ALL")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public interface MetalogTests {
@@ -120,7 +120,7 @@ public interface MetalogTests {
     
     @Test
     default void metalog_WhenConsoleFails() {
-        Tools.withContracts(cc -> {
+        withContracts(cc -> {
             
             final Contracts contracts = new Contracts() {
                 @Override
@@ -169,51 +169,57 @@ public interface MetalogTests {
     
     @Test
     default void metalog_CloseWhileBusy() {
-        final Metalog.Config config = new Metalog.Config() {
-            @Override
-            public Duration shutdownTimeout() {
-                return Duration.ofSeconds(1);
-            }
-        };
-        assertDoesNotThrow(() -> {
-            final Metalog metalog = createMetalog(config);
-            final Subscriber subscriber = (l, m) -> {
-                sleep(Duration.ofMillis(10));
-                return Outcome.CONSUMED;
-            };
-            final Subscriber skippedSubscriber = new Subscriber() {
+        withContracts(contracts -> {
+            final Metalog.Config config = new Metalog.Config() {
                 @Override
-                public Outcome receive(Log log, Meta meta) {
-                    return Outcome.SKIPPED;
+                public Contracts contracts() {
+                    return contracts;
                 }
-                
                 @Override
-                public boolean test(Meta meta) {
-                    return false;
+                public Duration shutdownTimeout() {
+                    return Duration.ofSeconds(1);
                 }
             };
-            try (AutoClose closeMetalog = metalog.open();
-                 AutoClose closeSubscriber = metalog.subscribe(subscriber);
-                 AutoClose closeSkippedSubscriber = metalog.subscribe(skippedSubscriber)) {
-                final AutoClose ignored = closeSubscriber, ignored2 = closeSkippedSubscriber;
-                final int threadCount = 4;
-                final Thread[] threads = new Thread[threadCount];
-                for (int threadIndex = 0; threadIndex < threadCount; threadIndex++) {
-                    threads[threadIndex] = new Thread(() -> {
-                        final String name = uniqueString();
-                        for (int logIndex = 0; logIndex < 100; logIndex++) {
-                            if (logIndex % 2 == 0) {
-                                metalog.publish(() -> name, b -> b.key(name));
-                            } else {
-                                metalog.publish(() -> name, b -> {});
+            assertDoesNotThrow(() -> {
+                final Metalog metalog = createMetalog(config);
+                final Subscriber subscriber = (l, m) -> {
+                    sleep(Duration.ofMillis(10));
+                    return Outcome.CONSUMED;
+                };
+                final Subscriber skippedSubscriber = new Subscriber() {
+                    @Override
+                    public Outcome receive(Log log, Meta meta) {
+                        return Outcome.SKIPPED;
+                    }
+                    
+                    @Override
+                    public boolean test(Meta meta) {
+                        return false;
+                    }
+                };
+                try (AutoClose closeMetalog = metalog.open();
+                     AutoClose closeSubscriber = metalog.subscribe(subscriber);
+                     AutoClose closeSkippedSubscriber = metalog.subscribe(skippedSubscriber)) {
+                    final AutoClose ignored = closeSubscriber, ignored2 = closeSkippedSubscriber;
+                    final int threadCount = 4;
+                    final Thread[] threads = new Thread[threadCount];
+                    for (int threadIndex = 0; threadIndex < threadCount; threadIndex++) {
+                        threads[threadIndex] = new Thread(() -> {
+                            final String name = uniqueString();
+                            for (int logIndex = 0; logIndex < 100; logIndex++) {
+                                if (logIndex % 2 == 0) {
+                                    metalog.publish(() -> name, b -> b.key(name));
+                                } else {
+                                    metalog.publish(() -> name, b -> {});
+                                }
                             }
-                        }
-                    });
-                    threads[threadIndex].start();
+                        });
+                        threads[threadIndex].start();
+                    }
+                    sleep(Duration.ofMillis(100));
+                    implicitClose(closeMetalog);
                 }
-                sleep(Duration.ofMillis(100));
-                implicitClose(closeMetalog);
-            }
+            });
         });
     }
     
@@ -228,17 +234,12 @@ public interface MetalogTests {
         }
 
         interface ScenarioConfig extends Consumer<Metalog>{
-            default Metalog.Config getMetalogConfig() {
-                return Metalog.Config.DEFAULT;
-            }
         }
         
         static void runWithScenario(ScenarioConfig scenarioConfig) {
-            final Metalog metalog = createMetalog(scenarioConfig.getMetalogConfig());
-            try (AutoClose closeLogs = metalog.open()) {
-                AutoClose ignoreWarning = closeLogs;
+            withMetalog((contracts,metalog) -> {
                 scenarioConfig.accept(metalog);
-            }
+            });
         }
     }
 }

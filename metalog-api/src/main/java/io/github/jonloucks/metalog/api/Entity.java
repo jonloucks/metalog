@@ -66,7 +66,7 @@ public interface Entity extends Supplier<CharSequence> {
         /**
          * Used to promise and claim the Entity.Builder implementation
          */
-        Contract<Supplier<Entity.Builder<?>>> FACTORY_CONTRACT = Contract.create("Entity Builder Factory");
+        Contract<Supplier<Entity.Builder<?>>> FACTORY = Contract.create("Entity Builder Factory");
         
         /**
          * Set the id for the Entity

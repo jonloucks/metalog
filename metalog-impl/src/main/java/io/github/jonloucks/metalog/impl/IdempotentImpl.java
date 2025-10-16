@@ -1,106 +1,91 @@
 package io.github.jonloucks.metalog.impl;
 
-import io.github.jonloucks.contracts.api.AutoClose;
-
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-final class IdempotentImpl {
-    IdempotentImpl() {
-    }
-    
-    AutoClose transitionToOpened(Supplier<AutoClose> opener) {
-        if (transitionTo(State.OPENING)) {
-            try {
-                final AutoClose autoClose = opener.get();
-                transitionTo(State.OPENED);
-                return autoClose;
-            } catch (Exception thrown) {
-                transitionTo(State.CLOSED);
-                throw thrown;
-            }
-        } else {
-            return AutoClose.NONE;
-        }
-    }
-    
-    void transitionToClosed(Runnable closer) {
-        if (transitionTo(State.CLOSING)) {
-            try {
-                closer.run();
-            } finally {
-                transitionTo(State.CLOSED);
-            }
-        }
-    }
-    
-    boolean isActive() {
-        return stateReference.get().isActive();
-    }
-    
-    boolean isRejecting() {
-        return !isActive();
-    }
+import static io.github.jonloucks.contracts.api.Checks.builderConsumerCheck;
+import static io.github.jonloucks.contracts.api.Checks.nullCheck;
 
-    boolean transitionTo(State state) {
-        final State stateNow = stateReference.get();
-        if (stateNow.canTransitionTo(state)) {
-            return stateReference.compareAndSet(stateNow, state);
+final class IdempotentImpl implements Idempotent {
+    
+    @Override
+    public State getState() {
+        return stateReference.get();
+    }
+    
+    @Override
+    public boolean transition(State goalState) {
+        final State validGoalState = stateCheck(goalState);
+        final State currentState = getState();
+        if (currentState.canTransitionTo(validGoalState)) {
+            return stateReference.compareAndSet(currentState, validGoalState);
         }
         return false;
     }
-  
-    private final AtomicReference<State> stateReference = new AtomicReference<>(State.CREATED);
     
-
+    @Override
+    public <T> T transition(Consumer<Transition.Builder<T>> builderConsumer) {
+        final Idempotent.Transition.Builder<T> transition = new IdempotentTransitionImpl<>();
+        builderConsumerCheck(builderConsumer).accept(transition);
+        return transition(transition);
+    }
     
-    enum State {
-        CREATED {
-            @Override
-            boolean canTransitionTo(State state) {
-                return OPENING == state;
-            }
-        },
-        OPENING {
-            @Override
-            boolean canTransitionTo(State state) {
-                return OPENED == state || CLOSED == state;
-            }
-            @Override
-            boolean isActive() {
-                return true;
-            }
-        },
-        OPENED() {
-            @Override
-            boolean canTransitionTo(State state) {
-                return CLOSING == state;
-            }
-            @Override
-            boolean isActive() {
-                return true;
-            }
-        },
-        CLOSING {
-            @Override
-            boolean canTransitionTo(State state) {
-                return CLOSED == state;
-            }
-            @Override
-            boolean isActive() {
-                return true;
-            }
-        },
-        CLOSED;
-     
-         boolean isActive() {
-             return false;
-         }
-         boolean canTransitionTo(State state) {
-             return false;
-         }
+    @Override
+    public <T> T transition(Transition<T> transition) {
+        final Transition<T> validTransition = nullCheck(transition, "Transition must be present.");
+        final State goalState = getGoalState(validTransition);
+        final State savedState = getState();
         
-        State() {
+        if (interimTransition(validTransition, goalState)) {
+            boolean exceptionThrown = false;
+            try {
+                return validTransition.action().map(Supplier::get).orElse(null);
+            } catch (Throwable thrown) {
+                exceptionThrown = true;
+                throw thrown;
+            } finally {
+                if (validTransition.always() || !exceptionThrown) {
+                    transition(goalState);
+                } else {
+                    transition(savedState);
+                }
+            }
+        } else {
+            return validTransition.orElse().map(Supplier::get).orElse(null);
         }
     }
+    
+    IdempotentImpl() {
+    }
+    
+    private static <T> State getGoalState(Transition<T> validTransition) {
+        return validTransition.goalState().orElseThrow(IdempotentImpl::getGoalStateNotPresentException);
+    }
+    
+    private static State stateCheck(State state) {
+        return nullCheck(state, "State must be present.");
+    }
+    
+    private boolean interimTransition(Transition<?> transition, State goalState) {
+        if (transition.interimState().isPresent()) {
+            final State stepState = transition.interimState().get();
+            if (stepState.canTransitionTo(goalState)) {
+                return transition(stepState);
+            }
+            throw newStateChangeNotAllowed(stepState, goalState);
+        } else {
+            return true;
+        }
+    }
+    
+    private static IllegalArgumentException getGoalStateNotPresentException() {
+        return new IllegalArgumentException("Transition goal state must be present.");
+    }
+    
+    private static IllegalArgumentException newStateChangeNotAllowed(State stepState, State goalState) {
+        return new IllegalArgumentException("Idempotent state change not allowed between " + stepState + " and " + goalState + ".");
+    }
+    
+    private final AtomicReference<State> stateReference = new AtomicReference<>(State.CREATED);
 }

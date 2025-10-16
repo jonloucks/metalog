@@ -79,7 +79,7 @@ public interface Entities {
         /**
          * Entities Builder Factory Contract
          */
-        Contract<Supplier<Entities.Builder<?>>> FACTORY_CONTRACT = Contract.create("Entities Builder Factory");
+        Contract<Supplier<Builder<?>>> FACTORY = Contract.create("Entities Builder Factory");
         
         /**
          * Replaces each entity that matches a filter with a replacement entity

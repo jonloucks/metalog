@@ -8,11 +8,12 @@ import java.util.function.Consumer;
 
 import io.github.jonloucks.contracts.api.AutoClose;
 import io.github.jonloucks.contracts.api.Contracts;
-import io.github.jonloucks.contracts.api.GlobalContracts;
 import io.github.jonloucks.metalog.api.*;
+import org.opentest4j.TestAbortedException;
 
-import static io.github.jonloucks.contracts.api.Checks.nullCheck;
 import static io.github.jonloucks.contracts.test.Tools.sanitize;
+import static io.github.jonloucks.contracts.test.Tools.withContracts;
+import static io.github.jonloucks.metalog.api.GlobalMetalog.findMetalogFactory;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.AdditionalMatchers.and;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -115,62 +116,46 @@ public final class Tools {
         assertTrue(outcome == Outcome.DISPATCHED || outcome == Outcome.CONSUMED,
             "Outcome should have been dispatched or consumed, but was " + outcome);
     }
-    
-    public static void assertOutcomeRejected(Outcome outcome) {
-        assertEquals(Outcome.REJECTED, outcome, "Outcome should have been rejected");
-    }
-    
-    public static void assertOutcomeConsumed(Outcome outcome) {
-        assertEquals(Outcome.CONSUMED, outcome, "Outcome should have been consumed");
-    }
-    
+
     public static void assertOutcomeSkipped(Outcome outcome) {
         assertEquals(Outcome.SKIPPED, outcome, "Outcome should have been skipped");
     }
     
-    public static void withContracts(Consumer<Contracts> block) {
-        final Contracts.Config config = new Contracts.Config() {
-            @Override
-            public boolean useShutdownHooks() {
-                return false;
-            }
-        };
-        withContracts(config, block);
-    }
-    
-    public static void withContracts(Contracts.Config config, Consumer<Contracts> block) {
-        final Contracts.Config validConfig = nullCheck(config, "Config must be present.");
-        final Consumer<Contracts> validBlock = nullCheck(block, "Block must be present.");
-        final Contracts contracts = GlobalContracts.createContracts(validConfig);
-        
-        try (AutoClose closeContracts = contracts.open()) {
-            final AutoClose ignored = closeContracts;
-            validBlock.accept(contracts);
-        }
-    }
-    
-    public static void withMetalog(BiConsumer<Contracts,Metalog> block) {
+    public static void withMetalog(Consumer<Metalog.Config.Builder> builderConsumer, BiConsumer<Contracts,Metalog> block) {
         withContracts(contracts -> {
-            final Metalog.Config config = new Metalog.Config() {
-                @Override
-                public Contracts contracts() {
-                    return contracts;
-                }
-            };
-            withMetalog(config, block);
+            final MetalogFactory factory = getMetalogFactory();
+            final Metalog metalog = factory.create(b -> {
+                b.contracts(contracts);
+                builderConsumer.accept(b);
+            });
+            try (AutoClose closeMetalog = metalog.open()) {
+                ignore(closeMetalog);
+                block.accept(contracts, metalog);
+            }
         });
+    }
 
+    public static void withMetalog(BiConsumer<Contracts,Metalog> block) {
+        withMetalog( b->{}, block);
     }
     
-    public static void withMetalog(Metalog.Config config, BiConsumer<Contracts,Metalog> block) {
-        final Metalog.Config validConfig = nullCheck(config, "Config must be present.");
-        final BiConsumer<Contracts, Metalog> validBlock = nullCheck(block, "Block must be present.");
-        final Metalog metalog = GlobalMetalog.createMetalog(validConfig);
-        
-        try (AutoClose closeMetalog = metalog.open()) {
-            final AutoClose ignored = closeMetalog;
-            validBlock.accept(config.contracts(), metalog);
-        }
+    public static MetalogFactory getMetalogFactory() {
+        return getMetalogFactory(Metalog.Config.DEFAULT);
+    }
+    
+    public static MetalogFactory getMetalogFactory(Metalog.Config config) {
+        return findMetalogFactory(config)
+            .orElseThrow(() -> new TestAbortedException("Metalog Factory not found."));
+    }
+    
+    public static void withMetalogInstalled(Consumer<Contracts> block) {
+        withMetalog(b -> {}, (contracts, metalog) -> {
+            block.accept(contracts);
+        });
+    }
+    
+    @SuppressWarnings("EmptyMethod")
+    public static void ignore(Object ignored) {
     }
 
     /**

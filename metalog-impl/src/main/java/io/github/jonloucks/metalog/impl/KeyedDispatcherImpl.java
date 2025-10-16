@@ -2,6 +2,7 @@ package io.github.jonloucks.metalog.impl;
 
 import io.github.jonloucks.contracts.api.AutoClose;
 import io.github.jonloucks.contracts.api.AutoOpen;
+import io.github.jonloucks.metalog.api.Dispatcher;
 import io.github.jonloucks.metalog.api.Meta;
 import io.github.jonloucks.metalog.api.Metalog;
 import io.github.jonloucks.metalog.api.Outcome;
@@ -22,12 +23,12 @@ final class KeyedDispatcherImpl implements Dispatcher, AutoOpen {
     }
     
     @Override
-    public Outcome dispatch(Meta meta, Runnable command) {
-        final Runnable validCommand = commandCheck(command);
-//        if (idempotent.isRejecting()) {
-//            validCommand.run();
-//            return Outcome.CONSUMED;
-//        }
+    public Outcome dispatch(Meta meta, Runnable work) {
+        final Runnable validCommand = commandCheck(work);
+        if (idempotent.isRejecting()) {
+            validCommand.run();
+            return Outcome.CONSUMED;
+        }
         inflightSemaphore.acquireUninterruptibly();
         try {
             workQueue.put(validCommand);
@@ -42,6 +43,7 @@ final class KeyedDispatcherImpl implements Dispatcher, AutoOpen {
         this.workQueue = new ArrayBlockingQueue<>(config.keyedQueueLimit());
         this.workerThread = new Thread(this::consumeLoop);
         this.shutdownTimeout = config.shutdownTimeout();
+        this.idempotent = config.contracts().claim(Idempotent.FACTORY).get();
     }
     
     private AutoClose realOpen() {
@@ -90,7 +92,7 @@ final class KeyedDispatcherImpl implements Dispatcher, AutoOpen {
         }
     }
     
-    private final IdempotentImpl idempotent = new IdempotentImpl();
+    private final Idempotent idempotent;
     private final Duration shutdownTimeout;
     private final Semaphore inflightSemaphore;
     private final Thread workerThread;

@@ -2,10 +2,11 @@ package io.github.jonloucks.metalog.api;
 
 import io.github.jonloucks.contracts.api.AutoClose;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
-import static io.github.jonloucks.contracts.api.Checks.configCheck;
 import static io.github.jonloucks.contracts.api.Checks.nullCheck;
+import static java.util.Optional.ofNullable;
 
 /**
  * Globally shared Metalog singleton
@@ -70,12 +71,19 @@ public final class GlobalMetalog {
      * </p>
      */
     public static Metalog createMetalog(Metalog.Config config) {
-        final Metalog.Config validConfig = configCheck(config);
-        final MetalogFactoryFinder factoryFinder = new MetalogFactoryFinder(config);
-        final MetalogFactory factory = nullCheck(factoryFinder.find(), "Metalog factory must be present.");
-        final Metalog metalog = factory.create(validConfig);
-        
-        return nullCheck(metalog, "Metalog could not be created.");
+        final MetalogFactory factory = findMetalogFactory(config)
+            .orElseThrow(() -> new IllegalArgumentException("Metalog factory must be present."));
+   
+        return nullCheck(factory.create(config), "Metalog could not be created.");
+    }
+    
+    /**
+     * Finds the MetalogFactory implementation
+     * @param config the configuration used to find the factory
+     * @return the factory if found
+     */
+    public static Optional<MetalogFactory> findMetalogFactory(Metalog.Config config) {
+        return ofNullable(new MetalogFactoryFinder(config).find());
     }
     
     private GlobalMetalog() {
