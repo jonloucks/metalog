@@ -13,9 +13,9 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static io.github.jonloucks.contracts.api.Checks.*;
+import static io.github.jonloucks.contracts.api.GlobalContracts.lifeCycle;
 import static io.github.jonloucks.metalog.impl.Internal.*;
 import static java.lang.ThreadLocal.withInitial;
-import static java.util.Optional.ofNullable;
 
 final class MetalogImpl implements Metalog {
     
@@ -68,15 +68,17 @@ final class MetalogImpl implements Metalog {
         return idempotent.transitionToOpened(this::realOpen);
     }
     
-    MetalogImpl(Config config, Repository repository) {
+    MetalogImpl(Config config, Repository repository, boolean openRepository) {
         this.config = configCheck(config);
         this.repository = nullCheck(repository, "Repository must be present.");
-        this.closeRepository = repository.open();
+        this.closeRepository = openRepository ? repository.open() : AutoClose.NONE;
         this.idempotent = config.contracts().claim(Idempotent.FACTORY).get();
     }
     
     private AutoClose realOpen() {
         metaFactory = config.contracts().claim(Meta.Builder.FACTORY);
+        keyedDispatcherFactory = config.contracts().claim(Dispatcher.KEYED_FACTORY);
+        unkeyedDispatcherFactory = config.contracts().claim(Dispatcher.UNKEYED_FACTORY);
         createUnkeyedDispatcher();
         activateConsole();
         return this::close;
@@ -84,10 +86,9 @@ final class MetalogImpl implements Metalog {
 
     private void createUnkeyedDispatcher() {
         final Contracts contracts = config.contracts();
-        final Promisors promisors = contracts.claim(Promisors.CONTRACT);
         final Contract<Dispatcher> contract = Contract.create(Dispatcher.class, n -> n.name("Unkeyed Dispatcher"));
-        repository.keep(contract, promisors.createLifeCyclePromisor(()->contracts.claim(Dispatcher.UNKEYED_FACTORY).get()));
-        dispatchers.put("", contracts.claim(contract));
+        repository.keep(contract, lifeCycle(unkeyedDispatcherFactory::get));
+        dispatchers.put(UNKEYED, contracts.claim(contract));
     }
     
     private void activateConsole() {
@@ -99,11 +100,7 @@ final class MetalogImpl implements Metalog {
     }
     
     private void realClose() {
-        ofNullable(closeRepository).ifPresent(close -> {
-            repository = null;
-            closeRepository = null;
-            close.close();
-        });
+        closeRepository.close();
     }
     
     private boolean shouldTransmitNow(Meta meta) {
@@ -146,13 +143,8 @@ final class MetalogImpl implements Metalog {
     
     private Dispatcher createKeyedDispatcher(String key) {
         final Contract<Dispatcher> contract = Contract.create(Dispatcher.class, n -> n.name("Keyed Dispatcher " + key));
-        repository.keep(contract, lifeCycle(()-> config.contracts().claim(Dispatcher.KEYED_FACTORY).get()));
+        repository.keep(contract, lifeCycle(keyedDispatcherFactory::get));
         return config.contracts().claim(contract);
-    }
-
-    private <T> Promisor<T> lifeCycle(Promisor<T> promisor) {
-        final Promisors promisors = config.contracts().claim(Promisors.CONTRACT);
-        return promisors.createLifeCyclePromisor(promisor);
     }
     
     private Outcome transmitNow(Log log, Meta meta) {
@@ -167,13 +159,16 @@ final class MetalogImpl implements Metalog {
     
     private static final ThreadLocal<Map<String, Object>> THREAD_CONTEXT = withInitial(LinkedHashMap::new);
     private static final String DISPATCHING_PROPERTY = "dispatching";
+    private static final String UNKEYED = "";
     
     private final Config config;
     private final Idempotent idempotent;
-    private Repository repository;
-    private AutoClose closeRepository;
+    private final Repository repository;
+    private final AutoClose closeRepository;
     private final List<Subscriber> subscribers = new CopyOnWriteArrayList<>();
     private final Filterable filters = new FiltersImpl();
     private final ConcurrentHashMap<String,Dispatcher> dispatchers = new ConcurrentHashMap<>();
     private Supplier<Meta.Builder<?>> metaFactory;
+    private Supplier<Dispatcher> keyedDispatcherFactory;
+    private Supplier<Dispatcher> unkeyedDispatcherFactory;
 }

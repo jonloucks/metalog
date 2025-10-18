@@ -3,7 +3,7 @@ Metalog.  A low impact and highly performant structured meta logging library for
 #### 1. Log messages are only generated if consumed
 #### 2. If consumed by multiple subscribers, the generation only occurs once.
 #### 3. Messages are based on CharSequence so everything does not have to be converted to a string
-#### 4. By default log messages are consumed on worker threads
+#### 4. By default, log messages are consumed on worker threads
 #### 5. Channels represent things like 'info', 'debug', etc
 #### 6. Opt-in sequencing keys to maintain order of messages and provide dedicated consumption thread
 ###  7. Opt-out of worker threads and do processing on current thread.
@@ -24,7 +24,6 @@ publish(() -> "Hello World");
             .thrown(e) // retain exception
             .thread() // retain current thread information
             .time()); // retain current time
-```
 ```
 ```
 // hidden heavy

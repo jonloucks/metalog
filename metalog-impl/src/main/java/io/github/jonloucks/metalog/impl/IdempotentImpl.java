@@ -1,5 +1,6 @@
 package io.github.jonloucks.metalog.impl;
 
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -68,8 +69,9 @@ final class IdempotentImpl implements Idempotent {
     }
     
     private boolean interimTransition(Transition<?> transition, State goalState) {
-        if (transition.interimState().isPresent()) {
-            final State stepState = transition.interimState().get();
+        final Optional<State> interimState = transition.interimState();
+        if (interimState.isPresent()) {
+            final State stepState = interimState.get();
             if (stepState.canTransitionTo(goalState)) {
                 return transition(stepState);
             }
