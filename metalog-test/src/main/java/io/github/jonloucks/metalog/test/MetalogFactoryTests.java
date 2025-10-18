@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 
 import static io.github.jonloucks.contracts.test.Tools.*;
 import static io.github.jonloucks.metalog.test.Tools.*;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SuppressWarnings("CodeBlock2Expr")

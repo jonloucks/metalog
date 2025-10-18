@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import static io.github.jonloucks.contracts.api.BindStrategy.ALWAYS;
 import static io.github.jonloucks.contracts.api.BindStrategy.IF_NOT_BOUND;
 import static io.github.jonloucks.contracts.api.Checks.*;
+import static io.github.jonloucks.contracts.api.GlobalContracts.lifeCycle;
 
 /**
  * Creates Metalog instances
@@ -30,7 +31,7 @@ public final class MetalogFactoryImpl implements MetalogFactory {
         
         installCore(validConfig, repository);
         
-        final MetalogImpl metalog = new MetalogImpl(validConfig, repository);
+        final MetalogImpl metalog = new MetalogImpl(validConfig, repository, true);
         repository.keep(Metalog.CONTRACT, () -> metalog);
         return metalog;
     }
@@ -52,7 +53,9 @@ public final class MetalogFactoryImpl implements MetalogFactory {
         
         installCore(validConfig, validRepository);
         
-        validRepository.keep(Metalog.CONTRACT, () -> new MetalogImpl(validConfig, validRepository), ALWAYS);
+        final Promisor<Metalog> metalogPromisor = lifeCycle(() -> new MetalogImpl(validConfig, validRepository, false));
+        
+        validRepository.keep(Metalog.CONTRACT, metalogPromisor, ALWAYS);
     }
   
     private Metalog.Config enhancedConfigCheck(Metalog.Config config) {
@@ -67,7 +70,7 @@ public final class MetalogFactoryImpl implements MetalogFactory {
     }
     
     private void installCore(Metalog.Config config, Repository repository) {
-        final Promisors promisors = config.contracts().claim(Promisors.CONTRACT);
+        repository.require(Repository.FACTORY);
         
         repository.keep(Idempotent.FACTORY, () -> IdempotentImpl::new, IF_NOT_BOUND);
         repository.keep(Metalog.Config.Builder.FACTORY, () -> ConfigBuilderImpl::new, IF_NOT_BOUND);
@@ -75,9 +78,9 @@ public final class MetalogFactoryImpl implements MetalogFactory {
         repository.keep(Entity.Builder.FACTORY, () -> EntityImpl::new, IF_NOT_BOUND);
         repository.keep(Meta.Builder.FACTORY, () -> MetaImpl::new, IF_NOT_BOUND);
         
-        repository.keep(MetalogFactory.CONTRACT, promisors.createLifeCyclePromisor(MetalogFactoryImpl::new), IF_NOT_BOUND);
+        repository.keep(MetalogFactory.CONTRACT, lifeCycle(MetalogFactoryImpl::new), IF_NOT_BOUND);
         repository.keep(Dispatcher.KEYED_FACTORY, () -> () -> new KeyedDispatcherImpl(config), IF_NOT_BOUND);
         repository.keep(Dispatcher.UNKEYED_FACTORY, () -> ()-> new UnkeyedDispatcherImpl(config), IF_NOT_BOUND);
-        repository.keep(Console.CONTRACT, promisors.createLifeCyclePromisor(() -> new ConsoleImpl(config)), IF_NOT_BOUND);
+        repository.keep(Console.CONTRACT, lifeCycle(() -> new ConsoleImpl(config)), IF_NOT_BOUND);
     }
 }

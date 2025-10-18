@@ -11,8 +11,7 @@ import io.github.jonloucks.contracts.api.Contracts;
 import io.github.jonloucks.metalog.api.*;
 import org.opentest4j.TestAbortedException;
 
-import static io.github.jonloucks.contracts.test.Tools.sanitize;
-import static io.github.jonloucks.contracts.test.Tools.withContracts;
+import static io.github.jonloucks.contracts.test.Tools.*;
 import static io.github.jonloucks.metalog.api.GlobalMetalog.findMetalogFactory;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.AdditionalMatchers.and;
@@ -154,10 +153,6 @@ public final class Tools {
         });
     }
     
-    @SuppressWarnings("EmptyMethod")
-    public static void ignore(Object ignored) {
-    }
-
     /**
      * Utility class instantiation protection
      */
