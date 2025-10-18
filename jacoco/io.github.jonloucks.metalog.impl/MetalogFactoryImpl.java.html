@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import static io.github.jonloucks.contracts.api.BindStrategy.ALWAYS;
 import static io.github.jonloucks.contracts.api.BindStrategy.IF_NOT_BOUND;
 import static io.github.jonloucks.contracts.api.Checks.*;
+import static io.github.jonloucks.contracts.api.GlobalContracts.lifeCycle;
 
 /**
  * Creates Metalog instances
@@ -20,65 +21,67 @@ public final class MetalogFactoryImpl implements MetalogFactory {
      * Publicly accessible constructor as an entry point into this library.
      * It can be invoked via reflection, ServiceLoader or directly.
      */
-<span class="fc" id="L23">    public MetalogFactoryImpl() {</span>
-<span class="fc" id="L24">    }</span>
+<span class="fc" id="L24">    public MetalogFactoryImpl() {</span>
+<span class="fc" id="L25">    }</span>
     
     @Override
     public Metalog create(Metalog.Config config) {
-<span class="fc" id="L28">        final Metalog.Config validConfig = enhancedConfigCheck(config);</span>
-<span class="fc" id="L29">        final Repository repository = validConfig.contracts().claim(Repository.FACTORY).get();</span>
+<span class="fc" id="L29">        final Metalog.Config validConfig = enhancedConfigCheck(config);</span>
+<span class="fc" id="L30">        final Repository repository = validConfig.contracts().claim(Repository.FACTORY).get();</span>
         
-<span class="fc" id="L31">        installCore(validConfig, repository);</span>
+<span class="fc" id="L32">        installCore(validConfig, repository);</span>
         
-<span class="fc" id="L33">        final MetalogImpl metalog = new MetalogImpl(validConfig, repository);</span>
-<span class="fc" id="L34">        repository.keep(Metalog.CONTRACT, () -&gt; metalog);</span>
-<span class="fc" id="L35">        return metalog;</span>
+<span class="fc" id="L34">        final MetalogImpl metalog = new MetalogImpl(validConfig, repository, true);</span>
+<span class="fc" id="L35">        repository.keep(Metalog.CONTRACT, () -&gt; metalog);</span>
+<span class="fc" id="L36">        return metalog;</span>
     }
     
     @Override
     public Metalog create(Consumer&lt;Metalog.Config.Builder&gt; builderConsumer) {
-<span class="fc" id="L40">        final Consumer&lt;Metalog.Config.Builder&gt; validBuilderConsumer = builderConsumerCheck(builderConsumer);</span>
-<span class="fc" id="L41">        final ConfigBuilderImpl builder = new ConfigBuilderImpl();</span>
+<span class="fc" id="L41">        final Consumer&lt;Metalog.Config.Builder&gt; validBuilderConsumer = builderConsumerCheck(builderConsumer);</span>
+<span class="fc" id="L42">        final ConfigBuilderImpl builder = new ConfigBuilderImpl();</span>
         
-<span class="fc" id="L43">        validBuilderConsumer.accept(builder);</span>
+<span class="fc" id="L44">        validBuilderConsumer.accept(builder);</span>
         
-<span class="fc" id="L45">        return create(builder);</span>
+<span class="fc" id="L46">        return create(builder);</span>
     }
     
     @Override
     public void install(Metalog.Config config, Repository repository) {
-<span class="fc" id="L50">        final Metalog.Config validConfig = enhancedConfigCheck(config);</span>
-<span class="fc" id="L51">        final Repository validRepository = nullCheck(repository, &quot;Repository must be present.&quot;);</span>
+<span class="fc" id="L51">        final Metalog.Config validConfig = enhancedConfigCheck(config);</span>
+<span class="fc" id="L52">        final Repository validRepository = nullCheck(repository, &quot;Repository must be present.&quot;);</span>
         
-<span class="fc" id="L53">        installCore(validConfig, validRepository);</span>
+<span class="fc" id="L54">        installCore(validConfig, validRepository);</span>
         
-<span class="fc" id="L55">        validRepository.keep(Metalog.CONTRACT, () -&gt; new MetalogImpl(validConfig, validRepository), ALWAYS);</span>
-<span class="fc" id="L56">    }</span>
+<span class="fc" id="L56">        final Promisor&lt;Metalog&gt; metalogPromisor = lifeCycle(() -&gt; new MetalogImpl(validConfig, validRepository, false));</span>
+        
+<span class="fc" id="L58">        validRepository.keep(Metalog.CONTRACT, metalogPromisor, ALWAYS);</span>
+<span class="fc" id="L59">    }</span>
   
     private Metalog.Config enhancedConfigCheck(Metalog.Config config) {
-<span class="fc" id="L59">        final Metalog.Config candidateConfig = configCheck(config);</span>
-<span class="fc" id="L60">        final Contracts contracts = contractsCheck(candidateConfig.contracts());</span>
+<span class="fc" id="L62">        final Metalog.Config candidateConfig = configCheck(config);</span>
+<span class="fc" id="L63">        final Contracts contracts = contractsCheck(candidateConfig.contracts());</span>
         
-<span class="fc bfc" id="L62" title="All 2 branches covered.">        if (contracts.isBound(Metalog.CONTRACT)) {</span>
-<span class="fc" id="L63">            throw new MetalogException(&quot;Metalog is already bound.&quot;);</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        if (contracts.isBound(Metalog.CONTRACT)) {</span>
+<span class="fc" id="L66">            throw new MetalogException(&quot;Metalog is already bound.&quot;);</span>
         }
         
-<span class="fc" id="L66">        return candidateConfig;</span>
+<span class="fc" id="L69">        return candidateConfig;</span>
     }
     
     private void installCore(Metalog.Config config, Repository repository) {
-<span class="fc" id="L70">        final Promisors promisors = config.contracts().claim(Promisors.CONTRACT);</span>
+<span class="fc" id="L73">        repository.require(Repository.FACTORY);</span>
         
-<span class="fc" id="L72">        repository.keep(Idempotent.FACTORY, () -&gt; IdempotentImpl::new, IF_NOT_BOUND);</span>
-<span class="fc" id="L73">        repository.keep(Metalog.Config.Builder.FACTORY, () -&gt; ConfigBuilderImpl::new, IF_NOT_BOUND);</span>
-<span class="fc" id="L74">        repository.keep(Entities.Builder.FACTORY, () -&gt; EntitiesImpl::new, IF_NOT_BOUND);</span>
-<span class="fc" id="L75">        repository.keep(Entity.Builder.FACTORY, () -&gt; EntityImpl::new, IF_NOT_BOUND);</span>
-<span class="fc" id="L76">        repository.keep(Meta.Builder.FACTORY, () -&gt; MetaImpl::new, IF_NOT_BOUND);</span>
+<span class="fc" id="L75">        repository.keep(Idempotent.FACTORY, () -&gt; IdempotentImpl::new, IF_NOT_BOUND);</span>
+<span class="fc" id="L76">        repository.keep(Metalog.Config.Builder.FACTORY, () -&gt; ConfigBuilderImpl::new, IF_NOT_BOUND);</span>
+<span class="fc" id="L77">        repository.keep(Entities.Builder.FACTORY, () -&gt; EntitiesImpl::new, IF_NOT_BOUND);</span>
+<span class="fc" id="L78">        repository.keep(Entity.Builder.FACTORY, () -&gt; EntityImpl::new, IF_NOT_BOUND);</span>
+<span class="fc" id="L79">        repository.keep(Meta.Builder.FACTORY, () -&gt; MetaImpl::new, IF_NOT_BOUND);</span>
         
-<span class="fc" id="L78">        repository.keep(MetalogFactory.CONTRACT, promisors.createLifeCyclePromisor(MetalogFactoryImpl::new), IF_NOT_BOUND);</span>
-<span class="fc" id="L79">        repository.keep(Dispatcher.KEYED_FACTORY, () -&gt; () -&gt; new KeyedDispatcherImpl(config), IF_NOT_BOUND);</span>
-<span class="fc" id="L80">        repository.keep(Dispatcher.UNKEYED_FACTORY, () -&gt; ()-&gt; new UnkeyedDispatcherImpl(config), IF_NOT_BOUND);</span>
-<span class="fc" id="L81">        repository.keep(Console.CONTRACT, promisors.createLifeCyclePromisor(() -&gt; new ConsoleImpl(config)), IF_NOT_BOUND);</span>
-<span class="fc" id="L82">    }</span>
+<span class="fc" id="L81">        repository.keep(MetalogFactory.CONTRACT, lifeCycle(MetalogFactoryImpl::new), IF_NOT_BOUND);</span>
+<span class="fc" id="L82">        repository.keep(Dispatcher.KEYED_FACTORY, () -&gt; () -&gt; new KeyedDispatcherImpl(config), IF_NOT_BOUND);</span>
+<span class="fc" id="L83">        repository.keep(Dispatcher.UNKEYED_FACTORY, () -&gt; ()-&gt; new UnkeyedDispatcherImpl(config), IF_NOT_BOUND);</span>
+<span class="fc" id="L84">        repository.keep(Console.CONTRACT, lifeCycle(() -&gt; new ConsoleImpl(config)), IF_NOT_BOUND);</span>
+<span class="fc" id="L85">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
