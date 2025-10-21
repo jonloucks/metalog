@@ -14,6 +14,8 @@ plugins {
 
 apply from: "${rootDir}/gradle/java-publishing.gradle"
 
+defaultTasks 'check', 'jacocoTestReport', 'jacocoTestCoverageVerification', 'spotbugsMain', 'publishToMavenLocal'
+
 repositories {
     mavenCentral()
     mavenLocal()
@@ -24,9 +26,13 @@ dependencies {
     api project(':metalog-impl')
     api project(':metalog-test')
     api libs.contracts.api
+    api libs.concurrency.api
 
     testImplementation libs.contracts.test
     testImplementation libs.contracts
+
+    testImplementation libs.concurrency.test
+    testImplementation libs.concurrency
 
     testImplementation project(':metalog-test')
 }

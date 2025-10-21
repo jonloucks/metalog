@@ -13,8 +13,11 @@ dependencies {
     api project(':metalog-api')
     api libs.contracts.test
     api libs.contracts.api
+    api libs.concurrency.test
+    api libs.concurrency.api
 
     testImplementation libs.contracts
+    testImplementation libs.concurrency
 }
 
 repositories {

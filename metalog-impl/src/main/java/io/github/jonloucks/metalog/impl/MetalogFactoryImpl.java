@@ -1,12 +1,14 @@
 package io.github.jonloucks.metalog.impl;
 
 
+import io.github.jonloucks.concurrency.api.*;
 import io.github.jonloucks.contracts.api.*;
 import io.github.jonloucks.metalog.api.*;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
-import static io.github.jonloucks.contracts.api.BindStrategy.ALWAYS;
+import static io.github.jonloucks.concurrency.api.GlobalConcurrency.findConcurrencyFactory;
 import static io.github.jonloucks.contracts.api.BindStrategy.IF_NOT_BOUND;
 import static io.github.jonloucks.contracts.api.Checks.*;
 import static io.github.jonloucks.contracts.api.GlobalContracts.lifeCycle;
@@ -29,6 +31,7 @@ public final class MetalogFactoryImpl implements MetalogFactory {
         final Metalog.Config validConfig = enhancedConfigCheck(config);
         final Repository repository = validConfig.contracts().claim(Repository.FACTORY).get();
         
+        installConcurrency(validConfig, repository);
         installCore(validConfig, repository);
         
         final MetalogImpl metalog = new MetalogImpl(validConfig, repository, true);
@@ -51,13 +54,33 @@ public final class MetalogFactoryImpl implements MetalogFactory {
         final Metalog.Config validConfig = enhancedConfigCheck(config);
         final Repository validRepository = nullCheck(repository, "Repository must be present.");
         
+        installConcurrency(validConfig, validRepository);
         installCore(validConfig, validRepository);
         
         final Promisor<Metalog> metalogPromisor = lifeCycle(() -> new MetalogImpl(validConfig, validRepository, false));
         
-        validRepository.keep(Metalog.CONTRACT, metalogPromisor, ALWAYS);
+        validRepository.keep(Metalog.CONTRACT, metalogPromisor, IF_NOT_BOUND);
     }
-  
+    
+    private void installConcurrency(Metalog.Config config, Repository repository) {
+        if (config.contracts().isBound(Concurrency.CONTRACT)) {
+            return;
+        }
+        
+        if (config.contracts().isBound(StateMachineFactory.CONTRACT)) {
+            return;
+        }
+        final Concurrency.Config concurrencyConfig = new Concurrency.Config() {
+            @Override
+            public Contracts contracts() {
+                return config.contracts();
+            }
+        };
+        final Optional<ConcurrencyFactory> optionalFactory = findConcurrencyFactory(concurrencyConfig);
+        
+        optionalFactory.ifPresent(f -> f.install(concurrencyConfig, repository));
+    }
+    
     private Metalog.Config enhancedConfigCheck(Metalog.Config config) {
         final Metalog.Config candidateConfig = configCheck(config);
         final Contracts contracts = contractsCheck(candidateConfig.contracts());
@@ -70,9 +93,11 @@ public final class MetalogFactoryImpl implements MetalogFactory {
     }
     
     private void installCore(Metalog.Config config, Repository repository) {
+  
         repository.require(Repository.FACTORY);
+        repository.require(WaitableFactory.CONTRACT);
+        repository.require(StateMachineFactory.CONTRACT);
         
-        repository.keep(Idempotent.FACTORY, () -> IdempotentImpl::new, IF_NOT_BOUND);
         repository.keep(Metalog.Config.Builder.FACTORY, () -> ConfigBuilderImpl::new, IF_NOT_BOUND);
         repository.keep(Entities.Builder.FACTORY, () -> EntitiesImpl::new, IF_NOT_BOUND);
         repository.keep(Entity.Builder.FACTORY, () -> EntityImpl::new, IF_NOT_BOUND);

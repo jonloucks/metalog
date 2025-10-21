@@ -1,5 +1,7 @@
 package io.github.jonloucks.metalog.impl;
 
+import io.github.jonloucks.concurrency.api.Idempotent;
+import io.github.jonloucks.concurrency.api.StateMachine;
 import io.github.jonloucks.contracts.api.AutoClose;
 import io.github.jonloucks.contracts.api.AutoOpen;
 import io.github.jonloucks.metalog.api.Dispatcher;
@@ -10,6 +12,8 @@ import io.github.jonloucks.metalog.api.Outcome;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static io.github.jonloucks.concurrency.api.Idempotent.withClose;
+import static io.github.jonloucks.concurrency.api.Idempotent.withOpen;
 import static io.github.jonloucks.metalog.impl.Internal.*;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
@@ -17,13 +21,13 @@ final class UnkeyedDispatcherImpl implements Dispatcher, AutoOpen {
 
     @Override
     public AutoClose open() {
-        return idempotent.transitionToOpened(() -> this::close);
+        return withOpen(stateMachine, ()-> this::close);
     }
     
     @Override
     public Outcome dispatch(Meta meta, Runnable work) {
         final Runnable validCommand = commandCheck(work);
-        if (idempotent.isRejecting()) {
+        if (stateMachine.getState().isRejecting()) {
             validCommand.run();
             return Outcome.CONSUMED;
         }
@@ -41,11 +45,12 @@ final class UnkeyedDispatcherImpl implements Dispatcher, AutoOpen {
             new SynchronousQueue<>(config.unkeyedFairness())
         );
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        idempotent = config.contracts().claim(Idempotent.FACTORY).get();
+        stateMachine = Idempotent.createStateMachine(config.contracts());
+        
     }
     
     private void close() {
-        idempotent.transitionToClosed(this::realClose);
+        withClose(stateMachine, this::realClose);
     }
     
     private void realClose() {
@@ -81,7 +86,7 @@ final class UnkeyedDispatcherImpl implements Dispatcher, AutoOpen {
 //        executor.shutdownNow();
 //    }
 
-    private final Idempotent idempotent;
+    private final StateMachine<Idempotent> stateMachine;
 //    private final Metalog.Config config;
     private final ThreadPoolExecutor executor;
 }

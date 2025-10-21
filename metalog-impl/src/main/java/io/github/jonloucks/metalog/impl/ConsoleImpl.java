@@ -1,5 +1,7 @@
 package io.github.jonloucks.metalog.impl;
 
+import io.github.jonloucks.concurrency.api.Idempotent;
+import io.github.jonloucks.concurrency.api.StateMachine;
 import io.github.jonloucks.contracts.api.AutoClose;
 import io.github.jonloucks.contracts.api.AutoOpen;
 import io.github.jonloucks.metalog.api.*;
@@ -13,6 +15,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import static io.github.jonloucks.concurrency.api.Idempotent.withClose;
+import static io.github.jonloucks.concurrency.api.Idempotent.withOpen;
 import static io.github.jonloucks.contracts.api.Checks.builderConsumerCheck;
 import static io.github.jonloucks.contracts.api.Checks.configCheck;
 import static io.github.jonloucks.metalog.impl.Internal.logCheck;
@@ -92,15 +96,15 @@ final class ConsoleImpl implements Console, AutoOpen {
     
     @Override
     public AutoClose open() {
-        return idempotent.transitionToOpened(this::realOpen);
+        return withOpen(stateMachine, this::realOpen);
     }
     
     ConsoleImpl(Metalog.Config config) {
         this.config = configCheck(config);
+        this.stateMachine = Idempotent.createStateMachine(config.contracts());
         this.metaFactory = config.contracts().claim(Meta.Builder.FACTORY);
         this.errorMeta = metaFactory.get().key(CONSOLE_KEY).channel(CONSOLE_ERROR_CHANNEL);
         this.outputMeta = metaFactory.get().key(CONSOLE_KEY).channel(CONSOLE_OUTPUT_CHANNEL);
-        this.idempotent = config.contracts().claim(Idempotent.FACTORY).get();
         fillChannelPrintStreamMap();
     }
     
@@ -118,10 +122,10 @@ final class ConsoleImpl implements Console, AutoOpen {
     }
     
     private void close() {
-        idempotent.transitionToClosed(this::realClose);
+        withClose(stateMachine, this::realClose);
     }
-    
-    private void realClose() {
+       
+   private void realClose() {
         ofNullable(closeSubscription).ifPresent(close -> {
             closeSubscription = null;
             close.close();
@@ -140,7 +144,7 @@ final class ConsoleImpl implements Console, AutoOpen {
     
     private final Map<String, PrintStream> channelPrintStreamMap = new HashMap<>();
     private final Filterable filters = new FiltersImpl();
-    private final Idempotent idempotent;
+    private final StateMachine<Idempotent> stateMachine;
     private final Metalog.Config config;
     private final Meta errorMeta;
     private final Meta outputMeta;
