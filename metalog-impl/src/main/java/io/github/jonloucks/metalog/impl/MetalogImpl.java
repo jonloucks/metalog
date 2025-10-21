@@ -1,5 +1,7 @@
 package io.github.jonloucks.metalog.impl;
 
+import io.github.jonloucks.concurrency.api.Idempotent;
+import io.github.jonloucks.concurrency.api.StateMachine;
 import io.github.jonloucks.contracts.api.*;
 import io.github.jonloucks.metalog.api.*;
 
@@ -12,6 +14,8 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import static io.github.jonloucks.concurrency.api.Idempotent.withClose;
+import static io.github.jonloucks.concurrency.api.Idempotent.withOpen;
 import static io.github.jonloucks.contracts.api.Checks.*;
 import static io.github.jonloucks.contracts.api.GlobalContracts.lifeCycle;
 import static io.github.jonloucks.metalog.impl.Internal.*;
@@ -24,7 +28,7 @@ final class MetalogImpl implements Metalog {
         final Log validLog = new InvokeOnlyOnce(log);
         final Meta validMeta = metaCheck(meta);
         
-        if (idempotent.isRejecting()) {
+        if (stateMachine.getState().isRejecting()) {
             return Outcome.REJECTED;
         }
         
@@ -65,14 +69,14 @@ final class MetalogImpl implements Metalog {
 
     @Override
     public AutoClose open() {
-        return idempotent.transitionToOpened(this::realOpen);
+        return withOpen(stateMachine, this::realOpen);
     }
     
     MetalogImpl(Config config, Repository repository, boolean openRepository) {
         this.config = configCheck(config);
         this.repository = nullCheck(repository, "Repository must be present.");
         this.closeRepository = openRepository ? repository.open() : AutoClose.NONE;
-        this.idempotent = config.contracts().claim(Idempotent.FACTORY).get();
+        this.stateMachine = Idempotent.createStateMachine(config.contracts());
     }
     
     private AutoClose realOpen() {
@@ -96,7 +100,7 @@ final class MetalogImpl implements Metalog {
     }
     
     private void close() {
-        idempotent.transitionToClosed(this::realClose);
+        withClose(stateMachine, this::realClose);
     }
     
     private void realClose() {
@@ -162,7 +166,7 @@ final class MetalogImpl implements Metalog {
     private static final String UNKEYED = "";
     
     private final Config config;
-    private final Idempotent idempotent;
+    private final StateMachine<Idempotent> stateMachine;
     private final Repository repository;
     private final AutoClose closeRepository;
     private final List<Subscriber> subscribers = new CopyOnWriteArrayList<>();

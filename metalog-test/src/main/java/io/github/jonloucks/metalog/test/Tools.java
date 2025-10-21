@@ -147,12 +147,6 @@ public final class Tools {
             .orElseThrow(() -> new TestAbortedException("Metalog Factory not found."));
     }
     
-    public static void withMetalogInstalled(Consumer<Contracts> block) {
-        withMetalog(b -> {}, (contracts, metalog) -> {
-            block.accept(contracts);
-        });
-    }
-    
     /**
      * Utility class instantiation protection
      */

@@ -8,6 +8,9 @@ apply from: "${rootDir}/gradle/java-publishing.gradle"
 dependencies {
     api project(":metalog-api")
 
+    implementation libs.concurrency.api
+    implementation libs.concurrency
+
     testImplementation project(":metalog-test")
     testImplementation libs.contracts
 }

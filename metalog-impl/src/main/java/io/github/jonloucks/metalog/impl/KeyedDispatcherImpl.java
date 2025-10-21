@@ -1,5 +1,7 @@
 package io.github.jonloucks.metalog.impl;
 
+import io.github.jonloucks.concurrency.api.Idempotent;
+import io.github.jonloucks.concurrency.api.StateMachine;
 import io.github.jonloucks.contracts.api.AutoClose;
 import io.github.jonloucks.contracts.api.AutoOpen;
 import io.github.jonloucks.metalog.api.Dispatcher;
@@ -10,6 +12,8 @@ import io.github.jonloucks.metalog.api.Outcome;
 import java.time.Duration;
 import java.util.concurrent.*;
 
+import static io.github.jonloucks.concurrency.api.Idempotent.withClose;
+import static io.github.jonloucks.concurrency.api.Idempotent.withOpen;
 import static io.github.jonloucks.metalog.impl.Internal.commandCheck;
 import static io.github.jonloucks.metalog.impl.Internal.runWithIgnore;
 import static java.util.Optional.ofNullable;
@@ -19,13 +23,13 @@ final class KeyedDispatcherImpl implements Dispatcher, AutoOpen {
     
     @Override
     public AutoClose open() {
-        return idempotent.transitionToOpened(this::realOpen);
+        return withOpen(stateMachine, this::realOpen);
     }
     
     @Override
     public Outcome dispatch(Meta meta, Runnable work) {
         final Runnable validCommand = commandCheck(work);
-        if (idempotent.isRejecting()) {
+        if (stateMachine.getState().isRejecting()) {
             validCommand.run();
             return Outcome.CONSUMED;
         }
@@ -43,7 +47,7 @@ final class KeyedDispatcherImpl implements Dispatcher, AutoOpen {
         this.workQueue = new ArrayBlockingQueue<>(config.keyedQueueLimit());
         this.workerThread = new Thread(this::consumeLoop);
         this.shutdownTimeout = config.shutdownTimeout();
-        this.idempotent = config.contracts().claim(Idempotent.FACTORY).get();
+        this.stateMachine = Idempotent.createStateMachine(config.contracts());
     }
     
     private AutoClose realOpen() {
@@ -52,7 +56,7 @@ final class KeyedDispatcherImpl implements Dispatcher, AutoOpen {
     }
     
     private void close() {
-        idempotent.transitionToClosed(this::realClose);
+        withClose(stateMachine, this::realClose);
     }
     
     private void realClose() {
@@ -92,7 +96,7 @@ final class KeyedDispatcherImpl implements Dispatcher, AutoOpen {
         }
     }
     
-    private final Idempotent idempotent;
+    private final StateMachine<Idempotent> stateMachine;
     private final Duration shutdownTimeout;
     private final Semaphore inflightSemaphore;
     private final Thread workerThread;

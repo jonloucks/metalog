@@ -1,8 +1,12 @@
 [versions]
 contracts-version = "[2.4.1,3.0.0)"
+concurrency-version = "[1.0.0,2.0.0)"
 gradle-kit-version = "[0.8.0,1.0.0)"
 
 [libraries]
 contracts-api = { module = "io.github.jonloucks.contracts:contracts-api", version.ref = "contracts-version" }
 contracts-test = { module = "io.github.jonloucks.contracts:contracts-test", version.ref = "contracts-version" }
 contracts = { module = "io.github.jonloucks.contracts:contracts", version.ref = "contracts-version" }
+concurrency-api = { module = "io.github.jonloucks.concurrency:concurrency-api", version.ref = "concurrency-version" }
+concurrency-test = { module = "io.github.jonloucks.concurrency:concurrency-test", version.ref = "concurrency-version" }
+concurrency = { module = "io.github.jonloucks.concurrency:concurrency", version.ref = "concurrency-version" }
