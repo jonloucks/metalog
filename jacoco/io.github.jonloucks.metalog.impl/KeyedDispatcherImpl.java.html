@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>KeyedDispatcherImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">metalog</a> &gt; <a href="index.source.html" class="el_package">io.github.jonloucks.metalog.impl</a> &gt; <span class="el_source">KeyedDispatcherImpl.java</span></div><h1>KeyedDispatcherImpl.java</h1><pre class="source lang-java linenums">package io.github.jonloucks.metalog.impl;
 
+import io.github.jonloucks.concurrency.api.Idempotent;
+import io.github.jonloucks.concurrency.api.StateMachine;
 import io.github.jonloucks.contracts.api.AutoClose;
 import io.github.jonloucks.contracts.api.AutoOpen;
 import io.github.jonloucks.metalog.api.Dispatcher;
@@ -10,6 +12,8 @@ import io.github.jonloucks.metalog.api.Outcome;
 import java.time.Duration;
 import java.util.concurrent.*;
 
+import static io.github.jonloucks.concurrency.api.Idempotent.withClose;
+import static io.github.jonloucks.concurrency.api.Idempotent.withOpen;
 import static io.github.jonloucks.metalog.impl.Internal.commandCheck;
 import static io.github.jonloucks.metalog.impl.Internal.runWithIgnore;
 import static java.util.Optional.ofNullable;
@@ -19,85 +23,85 @@ final class KeyedDispatcherImpl implements Dispatcher, AutoOpen {
     
     @Override
     public AutoClose open() {
-<span class="fc" id="L22">        return idempotent.transitionToOpened(this::realOpen);</span>
+<span class="fc" id="L26">        return withOpen(stateMachine, this::realOpen);</span>
     }
     
     @Override
     public Outcome dispatch(Meta meta, Runnable work) {
-<span class="fc" id="L27">        final Runnable validCommand = commandCheck(work);</span>
-<span class="fc bfc" id="L28" title="All 2 branches covered.">        if (idempotent.isRejecting()) {</span>
-<span class="fc" id="L29">            validCommand.run();</span>
-<span class="fc" id="L30">            return Outcome.CONSUMED;</span>
+<span class="fc" id="L31">        final Runnable validCommand = commandCheck(work);</span>
+<span class="fc bfc" id="L32" title="All 2 branches covered.">        if (stateMachine.getState().isRejecting()) {</span>
+<span class="fc" id="L33">            validCommand.run();</span>
+<span class="fc" id="L34">            return Outcome.CONSUMED;</span>
         }
-<span class="fc" id="L32">        inflightSemaphore.acquireUninterruptibly();</span>
+<span class="fc" id="L36">        inflightSemaphore.acquireUninterruptibly();</span>
         try {
-<span class="fc" id="L34">            workQueue.put(validCommand);</span>
-<span class="nc" id="L35">        } catch (InterruptedException ignored) {</span>
-<span class="nc" id="L36">            inflightSemaphore.release();</span>
-<span class="fc" id="L37">        }</span>
-<span class="fc" id="L38">        return Outcome.DISPATCHED;</span>
+<span class="fc" id="L38">            workQueue.put(validCommand);</span>
+<span class="nc" id="L39">        } catch (InterruptedException ignored) {</span>
+<span class="nc" id="L40">            inflightSemaphore.release();</span>
+<span class="fc" id="L41">        }</span>
+<span class="fc" id="L42">        return Outcome.DISPATCHED;</span>
     }
     
-<span class="fc" id="L41">    KeyedDispatcherImpl(Metalog.Config config) {</span>
-<span class="fc" id="L42">        this.inflightSemaphore = new Semaphore(config.keyedQueueLimit());</span>
-<span class="fc" id="L43">        this.workQueue = new ArrayBlockingQueue&lt;&gt;(config.keyedQueueLimit());</span>
-<span class="fc" id="L44">        this.workerThread = new Thread(this::consumeLoop);</span>
-<span class="fc" id="L45">        this.shutdownTimeout = config.shutdownTimeout();</span>
-<span class="fc" id="L46">        this.idempotent = config.contracts().claim(Idempotent.FACTORY).get();</span>
-<span class="fc" id="L47">    }</span>
+<span class="fc" id="L45">    KeyedDispatcherImpl(Metalog.Config config) {</span>
+<span class="fc" id="L46">        this.inflightSemaphore = new Semaphore(config.keyedQueueLimit());</span>
+<span class="fc" id="L47">        this.workQueue = new ArrayBlockingQueue&lt;&gt;(config.keyedQueueLimit());</span>
+<span class="fc" id="L48">        this.workerThread = new Thread(this::consumeLoop);</span>
+<span class="fc" id="L49">        this.shutdownTimeout = config.shutdownTimeout();</span>
+<span class="fc" id="L50">        this.stateMachine = Idempotent.createStateMachine(config.contracts());</span>
+<span class="fc" id="L51">    }</span>
     
     private AutoClose realOpen() {
-<span class="fc" id="L50">        workerThread.start();</span>
-<span class="fc" id="L51">        return this::close;</span>
+<span class="fc" id="L54">        workerThread.start();</span>
+<span class="fc" id="L55">        return this::close;</span>
     }
     
     private void close() {
-<span class="fc" id="L55">        idempotent.transitionToClosed(this::realClose);</span>
-<span class="fc" id="L56">    }</span>
+<span class="fc" id="L59">        withClose(stateMachine, this::realClose);</span>
+<span class="fc" id="L60">    }</span>
     
     private void realClose() {
-<span class="fc" id="L59">        triggerWorkerExit.countDown();</span>
-<span class="fc" id="L60">        runWithIgnore(() -&gt; {</span>
-<span class="pc bpc" id="L61" title="1 of 2 branches missed.">            if (!workerExitedLatch.await(shutdownTimeout.toMillis(), MILLISECONDS)) {</span>
-<span class="nc" id="L62">                workerThread.interrupt();</span>
+<span class="fc" id="L63">        triggerWorkerExit.countDown();</span>
+<span class="fc" id="L64">        runWithIgnore(() -&gt; {</span>
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">            if (!workerExitedLatch.await(shutdownTimeout.toMillis(), MILLISECONDS)) {</span>
+<span class="nc" id="L66">                workerThread.interrupt();</span>
             }
-<span class="fc" id="L64">        });</span>
+<span class="fc" id="L68">        });</span>
   
         // taking over emptying the queue
-<span class="fc bfc" id="L67" title="All 2 branches covered.">        while (!workQueue.isEmpty()) {</span>
-<span class="fc" id="L68">            runQueueJob(workQueue.poll());</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">        while (!workQueue.isEmpty()) {</span>
+<span class="fc" id="L72">            runQueueJob(workQueue.poll());</span>
         }
-<span class="fc" id="L70">    }</span>
+<span class="fc" id="L74">    }</span>
     
     private void runQueueJob(Runnable command) {
-<span class="fc bfc" id="L73" title="All 2 branches covered.">        if (ofNullable(command).isPresent()) {</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        if (ofNullable(command).isPresent()) {</span>
             try {
-<span class="fc" id="L75">                runWithIgnore(command::run);</span>
+<span class="fc" id="L79">                runWithIgnore(command::run);</span>
             } finally {
-<span class="fc" id="L77">                inflightSemaphore.release();</span>
+<span class="fc" id="L81">                inflightSemaphore.release();</span>
             }
         }
-<span class="fc" id="L80">    }</span>
+<span class="fc" id="L84">    }</span>
     
     private void consumeLoop() {
         try {
-<span class="fc" id="L84">            runWithIgnore(() -&gt; {</span>
-<span class="fc bfc" id="L85" title="All 2 branches covered.">                while (!triggerWorkerExit.await(1, MILLISECONDS)) {</span>
-<span class="fc" id="L86">                    runQueueJob(workQueue.poll(1, MILLISECONDS));</span>
+<span class="fc" id="L88">            runWithIgnore(() -&gt; {</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">                while (!triggerWorkerExit.await(1, MILLISECONDS)) {</span>
+<span class="fc" id="L90">                    runQueueJob(workQueue.poll(1, MILLISECONDS));</span>
                 }
-<span class="fc" id="L88">            });</span>
+<span class="fc" id="L92">            });</span>
 
         } finally {
-<span class="fc" id="L91">            workerExitedLatch.countDown();</span>
+<span class="fc" id="L95">            workerExitedLatch.countDown();</span>
         }
-<span class="fc" id="L93">    }</span>
+<span class="fc" id="L97">    }</span>
     
-    private final Idempotent idempotent;
+    private final StateMachine&lt;Idempotent&gt; stateMachine;
     private final Duration shutdownTimeout;
     private final Semaphore inflightSemaphore;
     private final Thread workerThread;
     private final ArrayBlockingQueue&lt;Runnable&gt; workQueue;
-<span class="fc" id="L100">    private final CountDownLatch triggerWorkerExit = new CountDownLatch(1);</span>
-<span class="fc" id="L101">    private final CountDownLatch workerExitedLatch = new CountDownLatch(1);</span>
+<span class="fc" id="L104">    private final CountDownLatch triggerWorkerExit = new CountDownLatch(1);</span>
+<span class="fc" id="L105">    private final CountDownLatch workerExitedLatch = new CountDownLatch(1);</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

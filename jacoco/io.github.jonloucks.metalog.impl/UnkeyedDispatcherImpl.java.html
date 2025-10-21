@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UnkeyedDispatcherImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">metalog</a> &gt; <a href="index.source.html" class="el_package">io.github.jonloucks.metalog.impl</a> &gt; <span class="el_source">UnkeyedDispatcherImpl.java</span></div><h1>UnkeyedDispatcherImpl.java</h1><pre class="source lang-java linenums">package io.github.jonloucks.metalog.impl;
 
+import io.github.jonloucks.concurrency.api.Idempotent;
+import io.github.jonloucks.concurrency.api.StateMachine;
 import io.github.jonloucks.contracts.api.AutoClose;
 import io.github.jonloucks.contracts.api.AutoOpen;
 import io.github.jonloucks.metalog.api.Dispatcher;
@@ -10,6 +12,8 @@ import io.github.jonloucks.metalog.api.Outcome;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static io.github.jonloucks.concurrency.api.Idempotent.withClose;
+import static io.github.jonloucks.concurrency.api.Idempotent.withOpen;
 import static io.github.jonloucks.metalog.impl.Internal.*;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
@@ -17,71 +21,72 @@ final class UnkeyedDispatcherImpl implements Dispatcher, AutoOpen {
 
     @Override
     public AutoClose open() {
-<span class="fc" id="L20">        return idempotent.transitionToOpened(() -&gt; this::close);</span>
+<span class="fc" id="L24">        return withOpen(stateMachine, ()-&gt; this::close);</span>
     }
     
     @Override
     public Outcome dispatch(Meta meta, Runnable work) {
-<span class="fc" id="L25">        final Runnable validCommand = commandCheck(work);</span>
-<span class="fc bfc" id="L26" title="All 2 branches covered.">        if (idempotent.isRejecting()) {</span>
-<span class="fc" id="L27">            validCommand.run();</span>
-<span class="fc" id="L28">            return Outcome.CONSUMED;</span>
+<span class="fc" id="L29">        final Runnable validCommand = commandCheck(work);</span>
+<span class="fc bfc" id="L30" title="All 2 branches covered.">        if (stateMachine.getState().isRejecting()) {</span>
+<span class="fc" id="L31">            validCommand.run();</span>
+<span class="fc" id="L32">            return Outcome.CONSUMED;</span>
         }
-<span class="fc" id="L30">        executor.execute(validCommand);</span>
-<span class="fc" id="L31">        return Outcome.DISPATCHED;</span>
+<span class="fc" id="L34">        executor.execute(validCommand);</span>
+<span class="fc" id="L35">        return Outcome.DISPATCHED;</span>
     }
     
-<span class="fc" id="L34">    UnkeyedDispatcherImpl(Metalog.Config config) {</span>
+<span class="fc" id="L38">    UnkeyedDispatcherImpl(Metalog.Config config) {</span>
 //        this.config = config;
-<span class="fc" id="L36">        this.executor = new ThreadPoolExecutor(</span>
+<span class="fc" id="L40">        this.executor = new ThreadPoolExecutor(</span>
             1,
-<span class="fc" id="L38">            config.unkeyedThreadCount(),</span>
+<span class="fc" id="L42">            config.unkeyedThreadCount(),</span>
             60L,
             TimeUnit.SECONDS,
-<span class="fc" id="L41">            new SynchronousQueue&lt;&gt;(config.unkeyedFairness())</span>
+<span class="fc" id="L45">            new SynchronousQueue&lt;&gt;(config.unkeyedFairness())</span>
         );
-<span class="fc" id="L43">        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());</span>
-<span class="fc" id="L44">        idempotent = config.contracts().claim(Idempotent.FACTORY).get();</span>
-<span class="fc" id="L45">    }</span>
+<span class="fc" id="L47">        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());</span>
+<span class="fc" id="L48">        stateMachine = Idempotent.createStateMachine(config.contracts());</span>
+        
+<span class="fc" id="L50">    }</span>
     
     private void close() {
-<span class="fc" id="L48">        idempotent.transitionToClosed(this::realClose);</span>
-<span class="fc" id="L49">    }</span>
+<span class="fc" id="L53">        withClose(stateMachine, this::realClose);</span>
+<span class="fc" id="L54">    }</span>
     
     private void realClose() {
 //        final Instant start = Instant.now();
         
-<span class="fc" id="L54">        initiateShutdown();</span>
+<span class="fc" id="L59">        initiateShutdown();</span>
         
         //noinspection LoopStatementThatDoesntLoop
-<span class="fc bfc" id="L57" title="All 2 branches covered.">        while (!checkIfShutdown()) {</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        while (!checkIfShutdown()) {</span>
 //            final Duration duration = Duration.between(start, Instant.now());
 //            if (isTimeToGiveUp(duration)) {
 //                forceShutdown();
-<span class="fc" id="L61">                return;</span>
+<span class="fc" id="L66">                return;</span>
 //            }
         }
-<span class="fc" id="L64">    }</span>
+<span class="fc" id="L69">    }</span>
     
 //    private boolean isTimeToGiveUp(Duration duration) {
 //        return duration.compareTo(config.shutdownTimeout()) &gt; 0;
 //    }
     
     private void initiateShutdown() {
-<span class="fc" id="L71">        executor.shutdown();</span>
-<span class="fc" id="L72">    }</span>
+<span class="fc" id="L76">        executor.shutdown();</span>
+<span class="fc" id="L77">    }</span>
     
     private boolean checkIfShutdown() {
-<span class="fc" id="L75">        final AtomicBoolean shutdown = new AtomicBoolean(false);</span>
-<span class="fc" id="L76">        runWithIgnore(() -&gt; shutdown.set(executor.awaitTermination(1, MILLISECONDS)));</span>
-<span class="fc" id="L77">        return shutdown.get();</span>
+<span class="fc" id="L80">        final AtomicBoolean shutdown = new AtomicBoolean(false);</span>
+<span class="fc" id="L81">        runWithIgnore(() -&gt; shutdown.set(executor.awaitTermination(1, MILLISECONDS)));</span>
+<span class="fc" id="L82">        return shutdown.get();</span>
     }
     
 //    private void forceShutdown() {
 //        executor.shutdownNow();
 //    }
 
-    private final Idempotent idempotent;
+    private final StateMachine&lt;Idempotent&gt; stateMachine;
 //    private final Metalog.Config config;
     private final ThreadPoolExecutor executor;
 }

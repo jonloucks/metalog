@@ -24,8 +24,23 @@ public interface MetalogFactory {
      */
     Metalog create(Metalog.Config config);
     
+    /**
+     * Create a new instance of Metalog
+     *
+     * @param builderConsumer the config builder consumer callback
+     * @return the new Metalog instance
+     * @throws IllegalArgumentException if builderConsumer is null or when configuration is invalid
+     */
     Metalog create(Consumer&lt;Metalog.Config.Builder&gt; builderConsumer);
     
+    /**
+     * Install all the requirements and promises to the given Metalog Repository.
+     * Include Metalog#CONTRACT which will private a unique
+     *
+     * @param config the Metalog config
+     * @param repository the repository to add requirements and promises to
+     * @throws IllegalArgumentException if config is null, config is invalid, or repository is null
+     */
     void install(Metalog.Config config, Repository repository);
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
