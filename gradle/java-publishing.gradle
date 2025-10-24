@@ -47,6 +47,14 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
             pom {
                 name = 'Metalog'
                 description = 'Metalog Logging Framework. A low impact and highly performant structured meta logging library for Java.' +
@@ -77,7 +85,6 @@ publishing {
                     url = 'https://github.com/jonloucks/metalog'
                 }
                 issueManagement {
-                    name = 'Metalog Github Issues'
                     url = 'https://github.com/jonloucks/metalog/issues'
                 }
             }
