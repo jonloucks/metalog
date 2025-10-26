@@ -1,4 +1,4 @@
-# Metalog v1.1.1
+# Metalog v1.1.2
 
 Recommended upgrade for issue #33
 
