@@ -91,6 +91,16 @@ public interface Meta extends Entity {
         return empty();
     }
     
+    
+    /**
+     * If true, subscriber should add a new line after the log message
+     * Prompting from command line would be an example where new line might be disabled
+     * @return true if new inline is enabled
+     */
+    default boolean newLine() {
+        return true;
+    }
+    
     /**
      * Responsible for providing an easy way to build a meta instance used when logging
      * @param <B> the builder type
@@ -181,6 +191,13 @@ public interface Meta extends Entity {
         default B thread() {
             return thread(Thread.currentThread());
         }
+        
+        /**
+         * Enable or disable auto new line after the log message is output
+         * @param newLine true enables trailing new line (the default)
+         * @return this builder
+         */
+        B newLine(boolean newLine);
         
         /**
          * Copy the non-empty values from the given Meta

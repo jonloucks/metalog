@@ -68,14 +68,19 @@ final class ConsoleImpl implements Console, AutoOpen {
         final Log validLog = logCheck(log);
         final Meta validMeta = metaCheck(meta);
         if (test(validMeta)) {
-            return getPrintStream(validMeta).map(toPrint(validLog)).orElse(Outcome.SKIPPED);
+            return getPrintStream(validMeta).map(toPrint(validLog, validMeta)).orElse(Outcome.SKIPPED);
         }
         return Outcome.SKIPPED;
     }
     
-    private static Function<PrintStream, Outcome> toPrint(Log log) {
+    private static Function<PrintStream, Outcome> toPrint(Log log, Meta meta) {
         return printStream -> {
-            printStream.println(log.get());
+            final CharSequence text = log.get();
+            if (meta.newLine()) {
+                printStream.println(text);
+            } else {
+                printStream.print(text);
+            }
             return Outcome.CONSUMED;
         };
     }

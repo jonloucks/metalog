@@ -43,6 +43,12 @@ final class MetaImpl implements Meta.Builder<MetaImpl>, Entity.Builder<MetaImpl>
     }
     
     @Override
+    public MetaImpl newLine(boolean newLine) {
+        this.newLine = newLine;
+        return this;
+    }
+    
+    @Override
     public MetaImpl thrown(Throwable thrown) {
         return setUniqueEntity(THROWN_ENTITY_NAME, thrown);
     }
@@ -70,6 +76,11 @@ final class MetaImpl implements Meta.Builder<MetaImpl>, Entity.Builder<MetaImpl>
     @Override
     public Optional<Thread> getThread() {
         return getUniqueEntity(THREAD_ENTITY_NAME, Thread.class);
+    }
+    
+    @Override
+    public boolean newLine() {
+        return newLine;
     }
     
     @Override
@@ -155,8 +166,10 @@ final class MetaImpl implements Meta.Builder<MetaImpl>, Entity.Builder<MetaImpl>
         
         thisEntity.copy(validFromMeta);
         
+        // id, name, thread, thrown, and time are stored in thisEntity
         block(validFromMeta.isBlocking());
         channel(validFromMeta.getChannel());
+        newLine(validFromMeta.newLine());
         validFromMeta.getKey().ifPresent(this::key);
         
         return this;
@@ -202,4 +215,5 @@ final class MetaImpl implements Meta.Builder<MetaImpl>, Entity.Builder<MetaImpl>
     private String key;
     private String channel = Meta.DEFAULT.getChannel();
     private final EntityImpl thisEntity = new EntityImpl();
+    private boolean newLine = Meta.DEFAULT.newLine();
 }

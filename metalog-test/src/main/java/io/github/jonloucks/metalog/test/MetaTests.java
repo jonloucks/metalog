@@ -93,9 +93,11 @@ public interface MetaTests {
                 .block(true)
                 .thread(thread)
                 .thrown(thrown)
-                .time(timestamp);
+                .time(timestamp)
+                .newLine(true);
             
             final Meta.Builder<?> fromBuilder = newMetaBuilder();
+            fromBuilder.newLine(false);
             
             metaBuilder.copy(fromBuilder);
             
@@ -116,8 +118,10 @@ public interface MetaTests {
             assertEquals(fromBuilder.isBlocking(), metaBuilder.isBlocking());
             assertTrue(metaBuilder.getThread().isPresent());
             assertEquals(thread, metaBuilder.getThread().get());
+            assertEquals(false, metaBuilder.newLine());
         });
     }
+    
     @Test
     default void meta_copy_WithEntity_Works() {
         runWithScenario(metaBuilder -> {
@@ -137,7 +141,8 @@ public interface MetaTests {
                 .block(true)
                 .thread(thread)
                 .thrown(thrown)
-                .time(timestamp);
+                .time(timestamp)
+                .newLine(false);
             
             metaBuilder.copy((Entity.Builder<?>)fromBuilder);
             
@@ -159,6 +164,7 @@ public interface MetaTests {
             assertFalse(metaBuilder.isBlocking());
             assertTrue(metaBuilder.getThread().isPresent());
             assertEquals(thread, metaBuilder.getThread().get());
+            assertEquals(true, metaBuilder.newLine());
         });
     }
     
