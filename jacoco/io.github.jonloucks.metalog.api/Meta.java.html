@@ -91,6 +91,16 @@ public interface Meta extends Entity {
 <span class="fc" id="L91">        return empty();</span>
     }
     
+    
+    /**
+     * If true, subscriber should add a new line after the log message
+     * Prompting from command line would be an example where new line might be disabled
+     * @return true if new inline is enabled
+     */
+    default boolean newLine() {
+<span class="fc" id="L101">        return true;</span>
+    }
+    
     /**
      * Responsible for providing an easy way to build a meta instance used when logging
      * @param &lt;B&gt; the builder type
@@ -100,7 +110,7 @@ public interface Meta extends Entity {
         /**
          * Used to promise and claim the Meta.Builder implementation
          */
-<span class="fc" id="L103">        Contract&lt;Supplier&lt;Meta.Builder&lt;?&gt;&gt;&gt; FACTORY = Contract.create(&quot;Meta Builder Factory&quot;);</span>
+<span class="fc" id="L113">        Contract&lt;Supplier&lt;Meta.Builder&lt;?&gt;&gt;&gt; FACTORY = Contract.create(&quot;Meta Builder Factory&quot;);</span>
         
         /**
          * Set the name for the Meta
@@ -142,7 +152,7 @@ public interface Meta extends Entity {
          * @return this builder
          */
         default B block() {
-<span class="fc" id="L145">            return block(true);</span>
+<span class="fc" id="L155">            return block(true);</span>
         }
         
         /**
@@ -164,7 +174,7 @@ public interface Meta extends Entity {
          * @return this builder
          */
         default B time() {
-<span class="fc" id="L167">            return time(Instant.now());</span>
+<span class="fc" id="L177">            return time(Instant.now());</span>
         }
         
         /**
@@ -179,8 +189,15 @@ public interface Meta extends Entity {
          * @return this builder
          */
         default B thread() {
-<span class="fc" id="L182">            return thread(Thread.currentThread());</span>
+<span class="fc" id="L192">            return thread(Thread.currentThread());</span>
         }
+        
+        /**
+         * Enable or disable auto new line after the log message is output
+         * @param newLine true enables trailing new line (the default)
+         * @return this builder
+         */
+        B newLine(boolean newLine);
         
         /**
          * Copy the non-empty values from the given Meta

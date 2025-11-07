@@ -164,6 +164,12 @@ extends <a href="Entity.html" title="interface in io.github.jonloucks.metalog.ap
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
 <div class="block">if true the <a href="Log.html#get()"><code>Log.get()</code></a> will be invoked immediately (if needed).</div>
 </div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#newLine()" class="member-name-link">newLine</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">If true, subscriber should add a new line after the log message
+ Prompting from command line would be an example where new line might be disabled</div>
+</div>
 </div>
 </div>
 </div>
@@ -286,6 +292,18 @@ extends <a href="Entity.html" title="interface in io.github.jonloucks.metalog.ap
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>the optional time</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="newLine()">
+<h3>newLine</h3>
+<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">newLine</span>()</div>
+<div class="block">If true, subscriber should add a new line after the log message
+ Prompting from command line would be an example where new line might be disabled</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>true if new inline is enabled</dd>
 </dl>
 </section>
 </li>

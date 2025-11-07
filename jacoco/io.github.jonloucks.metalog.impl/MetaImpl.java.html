@@ -43,155 +43,168 @@ final class MetaImpl implements Meta.Builder&lt;MetaImpl&gt;, Entity.Builder&lt;
     }
     
     @Override
+    public MetaImpl newLine(boolean newLine) {
+<span class="fc" id="L47">        this.newLine = newLine;</span>
+<span class="fc" id="L48">        return this;</span>
+    }
+    
+    @Override
     public MetaImpl thrown(Throwable thrown) {
-<span class="fc" id="L47">        return setUniqueEntity(THROWN_ENTITY_NAME, thrown);</span>
+<span class="fc" id="L53">        return setUniqueEntity(THROWN_ENTITY_NAME, thrown);</span>
     }
     
     @Override
     public MetaImpl time(Temporal timestamp) {
-<span class="fc" id="L52">        return setUniqueEntity(TIME_ENTITY_NAME, timestamp);</span>
+<span class="fc" id="L58">        return setUniqueEntity(TIME_ENTITY_NAME, timestamp);</span>
     }
     
     @Override
     public boolean isBlocking() {
-<span class="fc" id="L57">        return block;</span>
+<span class="fc" id="L63">        return block;</span>
     }
     
     @Override
     public Optional&lt;Temporal&gt; getTime() {
-<span class="fc" id="L62">        return getUniqueEntity(TIME_ENTITY_NAME, Temporal.class);</span>
+<span class="fc" id="L68">        return getUniqueEntity(TIME_ENTITY_NAME, Temporal.class);</span>
     }
     
     @Override
     public Optional&lt;Throwable&gt; getThrown() {
-<span class="fc" id="L67">        return getUniqueEntity(THROWN_ENTITY_NAME, Throwable.class);</span>
+<span class="fc" id="L73">        return getUniqueEntity(THROWN_ENTITY_NAME, Throwable.class);</span>
     }
     
     @Override
     public Optional&lt;Thread&gt; getThread() {
-<span class="fc" id="L72">        return getUniqueEntity(THREAD_ENTITY_NAME, Thread.class);</span>
+<span class="fc" id="L78">        return getUniqueEntity(THREAD_ENTITY_NAME, Thread.class);</span>
+    }
+    
+    @Override
+    public boolean newLine() {
+<span class="fc" id="L83">        return newLine;</span>
     }
     
     @Override
     public Optional&lt;String&gt; getKey() {
-<span class="fc" id="L77">        return Optional.ofNullable(key);</span>
+<span class="fc" id="L88">        return Optional.ofNullable(key);</span>
     }
 
     @Override
     public Optional&lt;String&gt; getId() {
-<span class="fc" id="L82">        return thisEntity.getId();</span>
+<span class="fc" id="L93">        return thisEntity.getId();</span>
     }
     
     @Override
     public Optional&lt;String&gt; getName() {
-<span class="fc" id="L87">        return thisEntity.getName();</span>
+<span class="fc" id="L98">        return thisEntity.getName();</span>
     }
     
     @Override
     public Optional&lt;Object&gt; getValue() {
-<span class="fc" id="L92">        return thisEntity.getValue();</span>
+<span class="fc" id="L103">        return thisEntity.getValue();</span>
     }
     
     @Override
     public String getChannel() {
-<span class="fc" id="L97">        return channel;</span>
+<span class="fc" id="L108">        return channel;</span>
     }
     
     @Override
     public Optional&lt;Entities&gt; getCorrelations() {
-<span class="fc" id="L102">        return thisEntity.getCorrelations();</span>
+<span class="fc" id="L113">        return thisEntity.getCorrelations();</span>
     }
     
     @Override
     public boolean isUnique() {
-<span class="fc" id="L107">        return thisEntity.isUnique();</span>
+<span class="fc" id="L118">        return thisEntity.isUnique();</span>
     }
     
     @Override
     public MetaImpl name(String name) {
-<span class="fc" id="L112">        thisEntity.name(name);</span>
-<span class="fc" id="L113">        return this;</span>
+<span class="fc" id="L123">        thisEntity.name(name);</span>
+<span class="fc" id="L124">        return this;</span>
     }
     
     @Override
     public MetaImpl unique(boolean unique) {
-<span class="fc" id="L118">        thisEntity.unique(unique);</span>
-<span class="fc" id="L119">        return this;</span>
+<span class="fc" id="L129">        thisEntity.unique(unique);</span>
+<span class="fc" id="L130">        return this;</span>
     }
     
     @Override
     public MetaImpl text(Supplier&lt;CharSequence&gt; textSupplier) {
-<span class="fc" id="L124">        thisEntity.text(textSupplier);</span>
-<span class="fc" id="L125">        return this;</span>
+<span class="fc" id="L135">        thisEntity.text(textSupplier);</span>
+<span class="fc" id="L136">        return this;</span>
     }
     
     @Override
     public MetaImpl value(Object value) {
-<span class="fc" id="L130">        thisEntity.value(value);</span>
-<span class="fc" id="L131">        return this;</span>
+<span class="fc" id="L141">        thisEntity.value(value);</span>
+<span class="fc" id="L142">        return this;</span>
     }
     
     @Override
     public MetaImpl correlation(Consumer&lt;Entity.Builder&lt;?&gt;&gt; builderConsumer) {
-<span class="fc" id="L136">        thisEntity.correlation(builderConsumer);</span>
-<span class="fc" id="L137">        return this;</span>
+<span class="fc" id="L147">        thisEntity.correlation(builderConsumer);</span>
+<span class="fc" id="L148">        return this;</span>
     }
     
     @Override
     public MetaImpl correlation(Entity entity) {
-<span class="fc" id="L142">        thisEntity.correlation(entity);</span>
-<span class="fc" id="L143">        return this;</span>
+<span class="fc" id="L153">        thisEntity.correlation(entity);</span>
+<span class="fc" id="L154">        return this;</span>
     }
     
     @Override
     public MetaImpl correlations(Consumer&lt;Entities.Builder&lt;?&gt;&gt; builderConsumer) {
-<span class="fc" id="L148">        thisEntity.correlations(builderConsumer);</span>
-<span class="fc" id="L149">        return this;</span>
+<span class="fc" id="L159">        thisEntity.correlations(builderConsumer);</span>
+<span class="fc" id="L160">        return this;</span>
     }
     
     @Override
     public MetaImpl copy(Meta fromMeta) {
-<span class="fc" id="L154">        final Meta validFromMeta = metaCheck(fromMeta);</span>
+<span class="fc" id="L165">        final Meta validFromMeta = metaCheck(fromMeta);</span>
         
-<span class="fc" id="L156">        thisEntity.copy(validFromMeta);</span>
+<span class="fc" id="L167">        thisEntity.copy(validFromMeta);</span>
         
-<span class="fc" id="L158">        block(validFromMeta.isBlocking());</span>
-<span class="fc" id="L159">        channel(validFromMeta.getChannel());</span>
-<span class="fc" id="L160">        validFromMeta.getKey().ifPresent(this::key);</span>
+        // id, name, thread, thrown, and time are stored in thisEntity
+<span class="fc" id="L170">        block(validFromMeta.isBlocking());</span>
+<span class="fc" id="L171">        channel(validFromMeta.getChannel());</span>
+<span class="fc" id="L172">        newLine(validFromMeta.newLine());</span>
+<span class="fc" id="L173">        validFromMeta.getKey().ifPresent(this::key);</span>
         
-<span class="fc" id="L162">        return this;</span>
+<span class="fc" id="L175">        return this;</span>
     }
     
     @Override
     public MetaImpl copy(Entity entity) {
-<span class="fc" id="L167">        thisEntity.copy(entity);</span>
-<span class="fc" id="L168">        return this;</span>
+<span class="fc" id="L180">        thisEntity.copy(entity);</span>
+<span class="fc" id="L181">        return this;</span>
     }
     
     @Override
     public MetaImpl id(String id) {
-<span class="fc" id="L173">        thisEntity.id(id);</span>
-<span class="fc" id="L174">        return this;</span>
+<span class="fc" id="L186">        thisEntity.id(id);</span>
+<span class="fc" id="L187">        return this;</span>
     }
     
-<span class="fc" id="L177">    MetaImpl() {</span>
-<span class="fc" id="L178">    }</span>
+<span class="fc" id="L190">    MetaImpl() {</span>
+<span class="fc" id="L191">    }</span>
     
     private &lt;T&gt; MetaImpl setUniqueEntity(String name, T value) {
-<span class="fc bfc" id="L181" title="All 2 branches covered.">        if (value == null) {</span>
-<span class="fc" id="L182">            return correlations( b -&gt; b.removeIf(byName(name).and(byUnique())));</span>
+<span class="fc bfc" id="L194" title="All 2 branches covered.">        if (value == null) {</span>
+<span class="fc" id="L195">            return correlations( b -&gt; b.removeIf(byName(name).and(byUnique())));</span>
         } else {
-<span class="fc" id="L184">            return correlation(b -&gt; b.unique().name(name).value(value));</span>
+<span class="fc" id="L197">            return correlation(b -&gt; b.unique().name(name).value(value));</span>
         }
     }
     
     private &lt;T&gt; Optional&lt;T&gt; getUniqueEntity(String name, Class&lt;T&gt; type) {
-<span class="fc" id="L189">        final Optional&lt;Entities&gt; optional = getCorrelations();</span>
-<span class="fc bfc" id="L190" title="All 2 branches covered.">        if (optional.isPresent()) {</span>
-<span class="fc" id="L191">            final Entities entities = optional.get();</span>
-<span class="fc" id="L192">            return entities.findFirstValueWithType(byName(name).and(byUnique()), typeCheck(type));</span>
+<span class="fc" id="L202">        final Optional&lt;Entities&gt; optional = getCorrelations();</span>
+<span class="fc bfc" id="L203" title="All 2 branches covered.">        if (optional.isPresent()) {</span>
+<span class="fc" id="L204">            final Entities entities = optional.get();</span>
+<span class="fc" id="L205">            return entities.findFirstValueWithType(byName(name).and(byUnique()), typeCheck(type));</span>
         }
-<span class="fc" id="L194">        return Optional.empty();</span>
+<span class="fc" id="L207">        return Optional.empty();</span>
     }
     
     private static final String THROWN_ENTITY_NAME = &quot;thrown&quot;;
@@ -200,7 +213,8 @@ final class MetaImpl implements Meta.Builder&lt;MetaImpl&gt;, Entity.Builder&lt;
     
     private boolean block;
     private String key;
-<span class="fc" id="L203">    private String channel = Meta.DEFAULT.getChannel();</span>
-<span class="fc" id="L204">    private final EntityImpl thisEntity = new EntityImpl();</span>
+<span class="fc" id="L216">    private String channel = Meta.DEFAULT.getChannel();</span>
+<span class="fc" id="L217">    private final EntityImpl thisEntity = new EntityImpl();</span>
+<span class="fc" id="L218">    private boolean newLine = Meta.DEFAULT.newLine();</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
