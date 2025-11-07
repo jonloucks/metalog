@@ -63,19 +63,14 @@ public final class MetalogFactoryImpl implements MetalogFactory {
     }
     
     private void installConcurrency(Metalog.Config config, Repository repository) {
-        if (config.contracts().isBound(Concurrency.CONTRACT)) {
-            return;
-        }
-        
-        if (config.contracts().isBound(StateMachineFactory.CONTRACT)) {
-            return;
-        }
         final Concurrency.Config concurrencyConfig = new Concurrency.Config() {
             @Override
             public Contracts contracts() {
                 return config.contracts();
             }
         };
+        //noinspection ResultOfMethodCallIgnored
+        contractsCheck(concurrencyConfig.contracts());
         final Optional<ConcurrencyFactory> optionalFactory = findConcurrencyFactory(concurrencyConfig);
         
         optionalFactory.ifPresent(f -> f.install(concurrencyConfig, repository));
