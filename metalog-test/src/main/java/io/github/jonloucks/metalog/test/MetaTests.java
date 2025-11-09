@@ -44,15 +44,22 @@ public interface MetaTests {
             
             fromBuilder
                 .text(textSupplier)
+                .id(null)
                 .id("id1")
+                .name(null)
                 .name("name1")
+                .value(null)
                 .value("value1")
                 .channel("channel1")
+                .key(null)
                 .key("sequenceKey1")
                 .block()
+                .thread(null)
                 .thread(thread)
+                .thrown(null)
                 .thrown(thrown)
                 .unique(true)
+                .time(null)
                 .time(timestamp);
             
             metaBuilder.copy(fromBuilder);

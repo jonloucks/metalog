@@ -1,5 +1,6 @@
 package io.github.jonloucks.metalog.api;
 
+import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
@@ -25,5 +26,12 @@ public interface Subscriber extends Predicate<Meta> {
     @Override
     default boolean test(Meta meta) {
         return true;
+    }
+    
+    /**
+     * @return the optional key
+     */
+    default Optional<String> getKey() {
+        return Optional.empty();
     }
 }

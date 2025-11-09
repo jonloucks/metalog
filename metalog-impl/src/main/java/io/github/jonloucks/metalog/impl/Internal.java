@@ -2,10 +2,13 @@ package io.github.jonloucks.metalog.impl;
 
 import io.github.jonloucks.metalog.api.*;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import static io.github.jonloucks.contracts.api.Checks.nameCheck;
 import static io.github.jonloucks.contracts.api.Checks.nullCheck;
+import static java.lang.ThreadLocal.withInitial;
 
 final class Internal {
     
@@ -51,6 +54,10 @@ final class Internal {
         return nullCheck(subscriber, "Subscribers must be present.");
     }
     
+    static String keyCheck(String key) {
+        return nullCheck(key, "Key must be present.");
+    }
+    
     static Predicate<Entity> byName(String name) {
         final String validName = nameCheck(name);
         
@@ -71,4 +78,24 @@ final class Internal {
         
         }
     }
+    
+    @SuppressWarnings("UnusedReturnValue")
+    static Outcome guardedDelivery(Subscriber subscriber, Log log, Meta meta) {
+        final Map<String, Object> context = THREAD_CONTEXT.get();
+        final Meta previousMeta = (Meta)context.put(META_PROPERTY, meta);
+        final Subscriber previousSubscriber = (Subscriber) context.put(SUBSCRIBER_PROPERTY, subscriber);
+        try {
+            if (previousSubscriber == subscriber) {
+                return Outcome.REJECTED;
+            }
+            return subscriber.receive(log, meta);
+        } finally {
+            context.put(META_PROPERTY, previousMeta);
+            context.put(SUBSCRIBER_PROPERTY, previousSubscriber);
+        }
+    }
+    
+    private static final ThreadLocal<Map<String, Object>> THREAD_CONTEXT = withInitial(LinkedHashMap::new);
+    private static final String META_PROPERTY = "meta";
+    private static final String SUBSCRIBER_PROPERTY = "subscriber";
 }

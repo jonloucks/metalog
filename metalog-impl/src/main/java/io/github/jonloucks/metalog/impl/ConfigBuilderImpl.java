@@ -65,6 +65,12 @@ final class ConfigBuilderImpl implements Metalog.Config.Builder {
     }
     
     @Override
+    public Builder keyedSubscription(boolean keyedSubscription) {
+        this.keyedSubscription = keyedSubscription;
+        return this;
+    }
+    
+    @Override
     public boolean useReflection() {
         return useReflection;
     }
@@ -108,6 +114,11 @@ final class ConfigBuilderImpl implements Metalog.Config.Builder {
     public Duration shutdownTimeout() {
         return shutdownTimeout;
     }
+    
+    @Override
+    public boolean keyedSubscription() {
+        return keyedSubscription;
+    }
  
     ConfigBuilderImpl() {
     
@@ -122,4 +133,5 @@ final class ConfigBuilderImpl implements Metalog.Config.Builder {
     private Duration shutdownTimeout = DEFAULT.shutdownTimeout();
     private String reflectionClassName = DEFAULT.reflectionClassName();
     private Class<? extends MetalogFactory> serviceLoaderClass = DEFAULT.serviceLoaderClass();
+    private boolean keyedSubscription = DEFAULT.keyedSubscription();
 }

@@ -5,21 +5,18 @@ import io.github.jonloucks.concurrency.api.StateMachine;
 import io.github.jonloucks.contracts.api.*;
 import io.github.jonloucks.metalog.api.*;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static io.github.jonloucks.concurrency.api.Idempotent.withClose;
 import static io.github.jonloucks.concurrency.api.Idempotent.withOpen;
 import static io.github.jonloucks.contracts.api.Checks.*;
-import static io.github.jonloucks.contracts.api.GlobalContracts.lifeCycle;
 import static io.github.jonloucks.metalog.impl.Internal.*;
-import static java.lang.ThreadLocal.withInitial;
 
 final class MetalogImpl implements Metalog {
     
@@ -36,7 +33,7 @@ final class MetalogImpl implements Metalog {
             if (shouldTransmitNow(validMeta)) {
                 return transmitNow(validLog, validMeta);
             } else {
-                return relayToDispatcher(validMeta, validLog);
+                return transmitLater(validMeta, validLog);
             }
         } else {
             return Outcome.SKIPPED;
@@ -57,44 +54,51 @@ final class MetalogImpl implements Metalog {
     
     @Override
     public boolean test(Meta meta) {
-        return filters.test(meta) && subscribers.stream().anyMatch(s -> s.test(meta));
+        final Meta validMeta = metaCheck(meta);
+        return filters.test(validMeta) && subscribers.stream().anyMatch(matcher(validMeta));
     }
     
     @Override
     public AutoClose subscribe(Subscriber subscriber) {
         final Subscriber validSubscriber = subscriberCheck(subscriber);
         subscribers.add(validSubscriber);
-        return () -> subscribers.removeIf( x -> x == validSubscriber);
+        mainDispatcher.registerSubscriber(validSubscriber);
+        return () -> removeSubscriber(validSubscriber);
     }
-
+    
     @Override
     public AutoClose open() {
         return withOpen(stateMachine, this::realOpen);
     }
     
     MetalogImpl(Config config, Repository repository, boolean openRepository) {
+        final Repository validRepository = nullCheck(repository, "Repository must be present.");
         this.config = configCheck(config);
-        this.repository = nullCheck(repository, "Repository must be present.");
-        this.closeRepository = openRepository ? repository.open() : AutoClose.NONE;
+        this.closeRepository = openRepository ? validRepository.open() : AutoClose.NONE;
         this.stateMachine = Idempotent.createStateMachine(config.contracts());
     }
     
     private AutoClose realOpen() {
         metaFactory = config.contracts().claim(Meta.Builder.FACTORY);
-        keyedDispatcherFactory = config.contracts().claim(Dispatcher.KEYED_FACTORY);
-        unkeyedDispatcherFactory = config.contracts().claim(Dispatcher.UNKEYED_FACTORY);
-        createUnkeyedDispatcher();
+        this.mainDispatcher = config.contracts().claim(MainDispatcher.CONTRACT);
         activateConsole();
         return this::close;
     }
-
-    private void createUnkeyedDispatcher() {
-        final Contracts contracts = config.contracts();
-        final Contract<Dispatcher> contract = Contract.create(Dispatcher.class, n -> n.name("Unkeyed Dispatcher"));
-        repository.keep(contract, lifeCycle(unkeyedDispatcherFactory::get));
-        dispatchers.put(UNKEYED, contracts.claim(contract));
-    }
     
+    private Predicate<Subscriber> matcher(Meta meta) {
+        if (config.keyedSubscription()) {
+            final Optional<String> optionalKey = meta.getKey();
+            if (optionalKey.isPresent()) {
+                final String key = optionalKey.get();
+                return s -> s.getKey().isPresent() && key.equals(s.getKey().get()) && s.test(meta);
+            } else {
+                return s -> !s.getKey().isPresent() && s.test(meta);
+            }
+        } else {
+            return s -> s.test(meta); // legacy, subscriptions can receive any log
+        }
+    }
+
     private void activateConsole() {
         config.contracts().claim(Console.CONTRACT);
     }
@@ -106,73 +110,41 @@ final class MetalogImpl implements Metalog {
     private void realClose() {
         closeRepository.close();
     }
-    
+
     private boolean shouldTransmitNow(Meta meta) {
-        return meta.isBlocking() || onDispatchingThread();
+        return meta.isBlocking();
     }
     
-    private Outcome relayToDispatcher(Meta meta, Log log) {
-        final Dispatcher dispatcher = chooseDispatcher(meta);
+    private Outcome transmitLater(Meta meta, Log log) {
+        return forSubscriber(meta, s -> mainDispatcher.dispatch(meta, ()-> guardedDelivery(s, log, meta)));
+    }
+    
+    private Outcome forSubscriber(Meta meta, Function<Subscriber,Outcome> consumer) {
         final AtomicReference<Outcome> outcomeReference = new AtomicReference<>(Outcome.SKIPPED);
-        
-        subscribers.forEach(subscriber -> {
-            if (subscriber.test(meta)) {
-                outcomeReference.set(relayWithContext(subscriber, dispatcher, meta, log));
+        subscribers.stream().filter(matcher(meta)).forEach( subscriber -> {
+            final Outcome outcome = consumer.apply(subscriber);
+            if (outcome != Outcome.SKIPPED) {
+                outcomeReference.set(outcome);
             }
         });
-        
         return outcomeReference.get();
-    }
-    
-    private Outcome relayWithContext(Subscriber subscriber, Dispatcher dispatcher, Meta meta, Log log) {
-        return dispatcher.dispatch(meta,  () -> {
-            final Map<String,Object> context = THREAD_CONTEXT.get();
-            final Object oldValue = context.put(DISPATCHING_PROPERTY, true);
-            try {
-                subscriber.receive(log, meta);
-            } finally {
-                context.put(DISPATCHING_PROPERTY, oldValue);
-            }
-        });
-    }
-    
-    private boolean onDispatchingThread() {
-        return Boolean.TRUE.equals(THREAD_CONTEXT.get().get(DISPATCHING_PROPERTY));
-    }
-    
-    private Dispatcher chooseDispatcher(Meta meta) {
-        final String key = meta.getKey().orElse("");
-        return dispatchers.computeIfAbsent(key, this::createKeyedDispatcher);
-    }
-    
-    private Dispatcher createKeyedDispatcher(String key) {
-        final Contract<Dispatcher> contract = Contract.create(Dispatcher.class, n -> n.name("Keyed Dispatcher " + key));
-        repository.keep(contract, lifeCycle(keyedDispatcherFactory::get));
-        return config.contracts().claim(contract);
     }
     
     private Outcome transmitNow(Log log, Meta meta) {
-        final AtomicReference<Outcome> outcomeReference = new AtomicReference<>(Outcome.SKIPPED);
-        subscribers.forEach(subscriber -> {
-            if (subscriber.test(meta)) {
-                outcomeReference.set(subscriber.receive(log, meta));
-            }
-        });
-        return outcomeReference.get();
+        return forSubscriber(meta, s -> guardedDelivery(s, log, meta));
     }
     
-    private static final ThreadLocal<Map<String, Object>> THREAD_CONTEXT = withInitial(LinkedHashMap::new);
-    private static final String DISPATCHING_PROPERTY = "dispatching";
-    private static final String UNKEYED = "";
+    private void removeSubscriber(Subscriber subscriber) {
+        if (subscribers.removeIf( x -> x == subscriber)) {
+            mainDispatcher.unregisterSubscriber(subscriber);
+        }
+    }
     
     private final Config config;
     private final StateMachine<Idempotent> stateMachine;
-    private final Repository repository;
     private final AutoClose closeRepository;
     private final List<Subscriber> subscribers = new CopyOnWriteArrayList<>();
     private final Filterable filters = new FiltersImpl();
-    private final ConcurrentHashMap<String,Dispatcher> dispatchers = new ConcurrentHashMap<>();
+    private MainDispatcher mainDispatcher;
     private Supplier<Meta.Builder<?>> metaFactory;
-    private Supplier<Dispatcher> keyedDispatcherFactory;
-    private Supplier<Dispatcher> unkeyedDispatcherFactory;
 }

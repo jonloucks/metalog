@@ -16,10 +16,11 @@ import java.util.function.Predicate;
 
 import static io.github.jonloucks.contracts.test.Tools.*;
 import static io.github.jonloucks.metalog.api.GlobalMetalog.createMetalog;
+import static io.github.jonloucks.metalog.api.Outcome.CONSUMED;
+import static io.github.jonloucks.metalog.api.Outcome.REJECTED;
 import static io.github.jonloucks.metalog.test.MetalogTests.MetalogTestsTools.runWithScenario;
 import static io.github.jonloucks.metalog.test.Tools.*;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @SuppressWarnings("ALL")
@@ -29,7 +30,6 @@ public interface MetalogTests {
     
     @Test
     default void metalog_addFilter_WithNull_Throws() {
-
         runWithScenario(metalog -> {
             final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
                 //noinspection resource
@@ -119,6 +119,28 @@ public interface MetalogTests {
     }
     
     @Test
+    default void metalog_LoggingWhileDispatching() {
+ 
+        
+        runWithScenario(metalog -> {
+            final Subscriber subscriber = (Log log, Meta meta) -> {
+                if ("trigger".equals(log.get())) {
+                    metalog.publish(() -> "reentrant", b -> b.block());
+                    return CONSUMED;
+                }
+                return REJECTED;
+            };
+            
+            try (AutoClose closeSubscriber = metalog.subscribe(subscriber)) {
+                final AutoClose ignored = closeSubscriber;
+                
+                final Outcome outcome = metalog.publish(() -> "trigger", b -> b.block());
+                assertEquals(CONSUMED, outcome);
+            }
+        });
+    }
+    
+    @Test
     default void metalog_WhenConsoleFails() {
         withContracts(cc -> {
             
@@ -184,7 +206,7 @@ public interface MetalogTests {
                 final Metalog metalog = createMetalog(config);
                 final Subscriber subscriber = (l, m) -> {
                     sleep(Duration.ofMillis(10));
-                    return Outcome.CONSUMED;
+                    return CONSUMED;
                 };
                 final Subscriber skippedSubscriber = new Subscriber() {
                     @Override
