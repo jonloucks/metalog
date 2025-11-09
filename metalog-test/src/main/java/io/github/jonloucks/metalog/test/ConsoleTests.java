@@ -51,6 +51,17 @@ public interface ConsoleTests {
     }
     
     @Test
+    default void console_publish_WithLogAndNoNewLine_Works() {
+        withMetalog((contracts, metalog) -> {
+            final Console console = contracts.claim(Console.CONTRACT);
+            
+            final Outcome outcome = console.publish(() -> "Hello", b -> b.newLine(false));
+            
+            assertOutcomeSuccess(outcome);
+        });
+    }
+    
+    @Test
     default void console_publish_WithLog_Works() {
         withMetalog((contracts, metalog) -> {
             final Console console = contracts.claim(Console.CONTRACT);
@@ -127,7 +138,7 @@ public interface ConsoleTests {
             consoleRef.set(contracts.claim(Console.CONTRACT));
         });
         
-        assertNotNull(consoleRef.get().publish(() -> "Hello"));
+        assertNotNull(consoleRef.get().publish(() -> "Hello", b -> b.channel(channel)));
     }
     
     @ParameterizedTest(name = "channel = {0}")

@@ -25,6 +25,7 @@ public interface MetalogConfigTests {
             assertEquals(DEFAULT.unkeyedThreadCount(), builder.unkeyedThreadCount());
             assertEquals(DEFAULT.reflectionClassName(), builder.reflectionClassName());
             assertEquals(DEFAULT.shutdownTimeout(), builder.shutdownTimeout());
+            assertEquals(DEFAULT.keyedSubscription(), builder.keyedSubscription());
         });
     }
     
@@ -42,7 +43,8 @@ public interface MetalogConfigTests {
                 .keyedQueueLimit(DEFAULT.keyedQueueLimit()+1)
                 .unkeyedThreadCount(DEFAULT.unkeyedThreadCount()+1)
                 .reflectionClassName("MyReflectionClassName")
-                .shutdownTimeout(DEFAULT.shutdownTimeout().plus(Duration.ofSeconds(1)));
+                .shutdownTimeout(DEFAULT.shutdownTimeout().plus(Duration.ofSeconds(1)))
+                .keyedSubscription(!DEFAULT.keyedSubscription());
             
             assertEquals(!DEFAULT.useReflection(), builder.useReflection());
             assertEquals(!DEFAULT.useServiceLoader(), builder.useServiceLoader());
@@ -53,6 +55,7 @@ public interface MetalogConfigTests {
             assertEquals(DEFAULT.unkeyedThreadCount()+1, builder.unkeyedThreadCount());
             assertEquals("MyReflectionClassName", builder.reflectionClassName());
             assertEquals(DEFAULT.shutdownTimeout().plus(Duration.ofSeconds(1)), builder.shutdownTimeout());
+            assertEquals(!DEFAULT.keyedSubscription(), builder.keyedSubscription());
         });
     }
 }

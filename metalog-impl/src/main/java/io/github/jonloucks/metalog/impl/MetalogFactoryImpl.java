@@ -93,14 +93,17 @@ public final class MetalogFactoryImpl implements MetalogFactory {
         repository.require(WaitableFactory.CONTRACT);
         repository.require(StateMachineFactory.CONTRACT);
         
-        repository.keep(Metalog.Config.Builder.FACTORY, () -> ConfigBuilderImpl::new, IF_NOT_BOUND);
-        repository.keep(Entities.Builder.FACTORY, () -> EntitiesImpl::new, IF_NOT_BOUND);
-        repository.keep(Entity.Builder.FACTORY, () -> EntityImpl::new, IF_NOT_BOUND);
-        repository.keep(Meta.Builder.FACTORY, () -> MetaImpl::new, IF_NOT_BOUND);
+        final BindStrategy strategy = IF_NOT_BOUND;
         
-        repository.keep(MetalogFactory.CONTRACT, lifeCycle(MetalogFactoryImpl::new), IF_NOT_BOUND);
-        repository.keep(Dispatcher.KEYED_FACTORY, () -> () -> new KeyedDispatcherImpl(config), IF_NOT_BOUND);
-        repository.keep(Dispatcher.UNKEYED_FACTORY, () -> ()-> new UnkeyedDispatcherImpl(config), IF_NOT_BOUND);
-        repository.keep(Console.CONTRACT, lifeCycle(() -> new ConsoleImpl(config)), IF_NOT_BOUND);
+        repository.keep(Metalog.Config.Builder.FACTORY, () -> ConfigBuilderImpl::new, strategy);
+        repository.keep(Entities.Builder.FACTORY, () -> EntitiesImpl::new, strategy);
+        repository.keep(Entity.Builder.FACTORY, () -> EntityImpl::new, strategy);
+        repository.keep(Meta.Builder.FACTORY, () -> MetaImpl::new, strategy);
+        
+        repository.keep(MetalogFactory.CONTRACT, lifeCycle(MetalogFactoryImpl::new), strategy);
+        repository.keep(Dispatcher.KEYED_FACTORY, () -> () -> new KeyedDispatcherImpl(config), strategy);
+        repository.keep(Dispatcher.UNKEYED_FACTORY, () -> ()-> new UnkeyedDispatcherImpl(config), strategy);
+        repository.keep(MainDispatcher.CONTRACT, lifeCycle(() -> new MainDispatcherImpl(config, repository)), strategy);
+        repository.keep(Console.CONTRACT, lifeCycle(() -> new ConsoleImpl(config)), strategy);
     }
 }

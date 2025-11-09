@@ -10,6 +10,7 @@ public interface Tests extends
     ExceptionTests,
     GlobalMetalogTests,
     KeyedDispatcherTests,
+    KeyedSubscriptionTests,
     UnkeyedDispatcherTests,
     MetaTests,
     MetalogTests,

@@ -7,9 +7,7 @@ import io.github.jonloucks.contracts.api.AutoOpen;
 import io.github.jonloucks.metalog.api.*;
 
 import java.io.PrintStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -71,6 +69,11 @@ final class ConsoleImpl implements Console, AutoOpen {
             return getPrintStream(validMeta).map(toPrint(validLog, validMeta)).orElse(Outcome.SKIPPED);
         }
         return Outcome.SKIPPED;
+    }
+    
+    @Override
+    public Optional<String> getKey() {
+        return Optional.of(CONSOLE_KEY);
     }
     
     private static Function<PrintStream, Outcome> toPrint(Log log, Meta meta) {
