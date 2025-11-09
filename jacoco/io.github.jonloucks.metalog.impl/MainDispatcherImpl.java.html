@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MainDispatcherImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">metalog</a> &gt; <a href="index.source.html" class="el_package">io.github.jonloucks.metalog.impl</a> &gt; <span class="el_source">MainDispatcherImpl.java</span></div><h1>MainDispatcherImpl.java</h1><pre class="source lang-java linenums">package io.github.jonloucks.metalog.impl;
+
+import io.github.jonloucks.contracts.api.AutoClose;
+import io.github.jonloucks.contracts.api.Contract;
+import io.github.jonloucks.contracts.api.Repository;
+import io.github.jonloucks.metalog.api.*;
+
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
+
+import static io.github.jonloucks.contracts.api.GlobalContracts.lifeCycle;
+import static io.github.jonloucks.metalog.impl.Internal.*;
+import static java.util.Optional.ofNullable;
+
+final class MainDispatcherImpl implements MainDispatcher {
+
+    @Override
+    public Outcome dispatch(Meta meta, Runnable job) {
+<span class="fc" id="L20">        final Optional&lt;Dispatcher&gt; foundDispatcher = findDispatcher(meta);</span>
+<span class="pc bpc" id="L21" title="1 of 2 branches missed.">        if (foundDispatcher.isPresent()) {</span>
+<span class="fc" id="L22">            return foundDispatcher.get().dispatch(meta, job);</span>
+        }
+<span class="nc" id="L24">        return Outcome.SKIPPED;</span>
+    }
+    
+    @Override
+    public AutoClose open() {
+<span class="fc" id="L29">        return AutoClose.NONE;</span>
+    }
+    
+    @Override
+    public void registerSubscriber(Subscriber subscriber) {
+<span class="fc bfc" id="L34" title="All 2 branches covered.">        if (config.keyedSubscription()) {</span>
+<span class="fc" id="L35">            final Subscriber validSubscriber = subscriberCheck(subscriber);</span>
+<span class="fc" id="L36">            final String key = validSubscriber.getKey().orElse(&quot;&quot;);</span>
+<span class="fc" id="L37">            incrementKeyUsage(key);</span>
+        }
+<span class="fc" id="L39">    }</span>
+    
+    @Override
+    public void unregisterSubscriber(Subscriber subscriber) {
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        if (config.keyedSubscription()) {</span>
+<span class="fc" id="L44">            final Subscriber validSubscriber = subscriberCheck(subscriber);</span>
+<span class="fc" id="L45">            final String key = validSubscriber.getKey().orElse(&quot;&quot;);</span>
+<span class="fc" id="L46">            decrementKeyUsage(key);</span>
+        }
+<span class="fc" id="L48">    }</span>
+    
+<span class="fc" id="L50">    MainDispatcherImpl(Metalog.Config config, Repository repository) {</span>
+<span class="fc" id="L51">        this.config = config;</span>
+<span class="fc" id="L52">        this.repository = repository;</span>
+<span class="fc" id="L53">    }</span>
+    
+    private Optional&lt;Dispatcher&gt; findDispatcher(Meta meta) {
+<span class="fc" id="L56">        final Meta validMeta = metaCheck(meta);</span>
+<span class="fc" id="L57">        final String key = validMeta.getKey().orElse(&quot;&quot;);</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">        if (config.keyedSubscription()) {</span>
+<span class="fc" id="L59">            return ofNullable(keySmartMap.get(key)).flatMap(Smart::get);</span>
+        } else {
+<span class="fc" id="L61">            return keySmartMap.computeIfAbsent(key, k -&gt; {</span>
+<span class="fc" id="L62">                final Smart smart = new Smart(k);</span>
+<span class="fc" id="L63">                smart.incrementUsage();</span>
+<span class="fc" id="L64">                return smart;</span>
+<span class="fc" id="L65">            }).get();</span>
+        }
+    }
+    
+    private void incrementKeyUsage(String key) {
+<span class="fc" id="L70">        keySmartMap.computeIfAbsent(keyCheck(key), Smart::new).incrementUsage();</span>
+<span class="fc" id="L71">    }</span>
+    
+    private void decrementKeyUsage(String key) {
+<span class="fc" id="L74">        ofNullable(keySmartMap.get(keyCheck(key))).ifPresent(Smart::decrementUsage);</span>
+<span class="fc" id="L75">    }</span>
+    
+    private Supplier&lt;Dispatcher&gt; getDispatcherFactory(String key) {
+<span class="fc bfc" id="L78" title="All 2 branches covered.">        return config.contracts().claim(key.isEmpty() ? UNKEYED_FACTORY : KEYED_FACTORY);</span>
+    }
+    
+    private final class Smart {
+<span class="fc" id="L82">        Smart(String key) {</span>
+<span class="fc" id="L83">            this.key = key;</span>
+<span class="fc" id="L84">            this.contract = Contract.create(Dispatcher.class, n -&gt; n.name(&quot;Dispatcher &quot; + key));</span>
+<span class="fc" id="L85">        }</span>
+        
+        Optional&lt;Dispatcher&gt; get() {
+<span class="fc" id="L88">            final Optional&lt;Dispatcher&gt; optionalDispatcher = ofNullable(dispatcher);</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">            if (optionalDispatcher.isPresent()) {</span>
+<span class="fc" id="L90">                return optionalDispatcher;</span>
+            }
+<span class="fc" id="L92">            return acquire();</span>
+        }
+        
+        private synchronized Optional&lt;Dispatcher&gt; acquire() {
+<span class="fc" id="L96">            final Optional&lt;Dispatcher&gt; optionalDispatcher = ofNullable(dispatcher);</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">            if (optionalDispatcher.isPresent()) {</span>
+<span class="fc" id="L98">                return optionalDispatcher;</span>
+            }
+<span class="fc" id="L100">            closeBinding = repository.store(contract, lifeCycle(getDispatcherFactory(key)::get));</span>
+<span class="fc" id="L101">            dispatcher = config.contracts().claim(contract);</span>
+            
+<span class="fc" id="L103">            return Optional.of(dispatcher);</span>
+        }
+        
+        synchronized void incrementUsage() {
+<span class="fc" id="L107">            ++usageCount;</span>
+<span class="fc" id="L108">        }</span>
+        
+        synchronized void decrementUsage() {
+<span class="fc bfc" id="L111" title="All 2 branches covered.">            if (--usageCount == 0) {</span>
+<span class="fc" id="L112">                ofNullable(closeBinding).ifPresent(AutoClose::close);</span>
+<span class="fc" id="L113">                keySmartMap.remove(key, this);</span>
+            }
+<span class="fc" id="L115">        }</span>
+        
+        private final String key;
+        private final Contract&lt;Dispatcher&gt; contract;
+        private volatile Dispatcher dispatcher;
+<span class="fc" id="L120">        private int usageCount = 0;</span>
+        private AutoClose closeBinding;
+    }
+    
+    private final Metalog.Config config;
+    private final Repository repository;
+<span class="fc" id="L126">    private final ConcurrentHashMap&lt;String, Smart&gt; keySmartMap = new ConcurrentHashMap&lt;&gt;();</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

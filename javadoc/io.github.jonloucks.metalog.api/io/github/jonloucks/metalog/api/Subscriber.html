@@ -103,15 +103,18 @@ extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/ja
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Outcome.html" title="enum class in io.github.jonloucks.metalog.api">Outcome</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#receive(io.github.jonloucks.metalog.api.Log,io.github.jonloucks.metalog.api.Meta)" class="member-name-link">receive</a><wbr>(<a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a>&nbsp;log,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#getKey()" class="member-name-link">getKey</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Outcome.html" title="enum class in io.github.jonloucks.metalog.api">Outcome</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#receive(io.github.jonloucks.metalog.api.Log,io.github.jonloucks.metalog.api.Meta)" class="member-name-link">receive</a><wbr>(<a href="Log.html" title="interface in io.github.jonloucks.metalog.api">Log</a>&nbsp;log,
  <a href="Meta.html" title="interface in io.github.jonloucks.metalog.api">Meta</a>&nbsp;meta)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Invoked for each published log message</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#test(io.github.jonloucks.metalog.api.Meta)" class="member-name-link">test</a><wbr>(<a href="Meta.html" title="interface in io.github.jonloucks.metalog.api">Meta</a>&nbsp;meta)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#test(io.github.jonloucks.metalog.api.Meta)" class="member-name-link">test</a><wbr>(<a href="Meta.html" title="interface in io.github.jonloucks.metalog.api">Meta</a>&nbsp;meta)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
 <div class="block">Used to short circuit needless processing</div>
 </div>
 </div>
@@ -158,6 +161,16 @@ extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/ja
 <dd><code>meta</code> - the Meta to check</dd>
 <dt>Returns:</dt>
 <dd>true if Meta matches</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getKey()">
+<h3>getKey</h3>
+<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</span>&nbsp;<span class="element-name">getKey</span>()</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the optional key</dd>
 </dl>
 </section>
 </li>

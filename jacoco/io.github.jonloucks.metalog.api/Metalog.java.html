@@ -104,8 +104,12 @@ public interface Metalog extends Publisher, Filterable, AutoOpen {
 <span class="fc" id="L104">            return Duration.ofSeconds(60);</span>
         }
         
+        default boolean keyedSubscription() {
+<span class="fc" id="L108">            return false;</span>
+        }
+        
         interface Builder extends Config {
-<span class="fc" id="L108">            Contract&lt;Supplier&lt;Builder&gt;&gt; FACTORY = Contract.create(&quot;Metalog Config Builder Factory&quot;);</span>
+<span class="fc" id="L112">            Contract&lt;Supplier&lt;Builder&gt;&gt; FACTORY = Contract.create(&quot;Metalog Config Builder Factory&quot;);</span>
             
             Builder useReflection(boolean useReflection);
             Builder useServiceLoader(boolean useServiceLoader);
@@ -116,6 +120,7 @@ public interface Metalog extends Publisher, Filterable, AutoOpen {
             Builder shutdownTimeout(Duration shutdownTimeout);
             Builder reflectionClassName(String reflectionClassName);
             Builder serviceLoaderClass(Class&lt;? extends MetalogFactory&gt; serviceLoaderClass);
+            Builder keyedSubscription(boolean keyedSubscription);
         }
     }
 }

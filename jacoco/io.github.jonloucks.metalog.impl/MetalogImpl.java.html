@@ -5,175 +5,147 @@ import io.github.jonloucks.concurrency.api.StateMachine;
 import io.github.jonloucks.contracts.api.*;
 import io.github.jonloucks.metalog.api.*;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static io.github.jonloucks.concurrency.api.Idempotent.withClose;
 import static io.github.jonloucks.concurrency.api.Idempotent.withOpen;
 import static io.github.jonloucks.contracts.api.Checks.*;
-import static io.github.jonloucks.contracts.api.GlobalContracts.lifeCycle;
 import static io.github.jonloucks.metalog.impl.Internal.*;
-import static java.lang.ThreadLocal.withInitial;
 
 final class MetalogImpl implements Metalog {
     
     @Override
     public Outcome publish(Log log, Meta meta) {
-<span class="fc" id="L28">        final Log validLog = new InvokeOnlyOnce(log);</span>
-<span class="fc" id="L29">        final Meta validMeta = metaCheck(meta);</span>
+<span class="fc" id="L25">        final Log validLog = new InvokeOnlyOnce(log);</span>
+<span class="fc" id="L26">        final Meta validMeta = metaCheck(meta);</span>
         
-<span class="fc bfc" id="L31" title="All 2 branches covered.">        if (stateMachine.getState().isRejecting()) {</span>
-<span class="fc" id="L32">            return Outcome.REJECTED;</span>
+<span class="fc bfc" id="L28" title="All 2 branches covered.">        if (stateMachine.getState().isRejecting()) {</span>
+<span class="fc" id="L29">            return Outcome.REJECTED;</span>
         }
         
-<span class="fc bfc" id="L35" title="All 2 branches covered.">        if (test(validMeta)) {</span>
-<span class="fc bfc" id="L36" title="All 2 branches covered.">            if (shouldTransmitNow(validMeta)) {</span>
-<span class="fc" id="L37">                return transmitNow(validLog, validMeta);</span>
+<span class="fc bfc" id="L32" title="All 2 branches covered.">        if (test(validMeta)) {</span>
+<span class="fc bfc" id="L33" title="All 2 branches covered.">            if (shouldTransmitNow(validMeta)) {</span>
+<span class="fc" id="L34">                return transmitNow(validLog, validMeta);</span>
             } else {
-<span class="fc" id="L39">                return relayToDispatcher(validMeta, validLog);</span>
+<span class="fc" id="L36">                return transmitLater(validMeta, validLog);</span>
             }
         } else {
-<span class="fc" id="L42">            return Outcome.SKIPPED;</span>
+<span class="fc" id="L39">            return Outcome.SKIPPED;</span>
         }
     }
     
     @Override
     public Outcome publish(Log log, Consumer&lt;Meta.Builder&lt;?&gt;&gt; builderConsumer) {
-<span class="fc" id="L48">        final Meta.Builder&lt;?&gt; metaBuilder = metaFactory.get();</span>
-<span class="fc" id="L49">        builderConsumerCheck(builderConsumer).accept(metaBuilder);</span>
-<span class="fc" id="L50">        return publish(logCheck(log), metaBuilder);</span>
+<span class="fc" id="L45">        final Meta.Builder&lt;?&gt; metaBuilder = metaFactory.get();</span>
+<span class="fc" id="L46">        builderConsumerCheck(builderConsumer).accept(metaBuilder);</span>
+<span class="fc" id="L47">        return publish(logCheck(log), metaBuilder);</span>
     }
 
     @Override
     public AutoClose addFilter(Predicate&lt;Meta&gt; filter) {
-<span class="fc" id="L55">        return filters.addFilter(filter);</span>
+<span class="fc" id="L52">        return filters.addFilter(filter);</span>
     }
     
     @Override
     public boolean test(Meta meta) {
-<span class="pc bpc" id="L60" title="1 of 4 branches missed.">        return filters.test(meta) &amp;&amp; subscribers.stream().anyMatch(s -&gt; s.test(meta));</span>
+<span class="fc" id="L57">        final Meta validMeta = metaCheck(meta);</span>
+<span class="fc bfc" id="L58" title="All 4 branches covered.">        return filters.test(validMeta) &amp;&amp; subscribers.stream().anyMatch(matcher(validMeta));</span>
     }
     
     @Override
     public AutoClose subscribe(Subscriber subscriber) {
-<span class="fc" id="L65">        final Subscriber validSubscriber = subscriberCheck(subscriber);</span>
-<span class="fc" id="L66">        subscribers.add(validSubscriber);</span>
-<span class="fc bfc" id="L67" title="All 2 branches covered.">        return () -&gt; subscribers.removeIf( x -&gt; x == validSubscriber);</span>
+<span class="fc" id="L63">        final Subscriber validSubscriber = subscriberCheck(subscriber);</span>
+<span class="fc" id="L64">        subscribers.add(validSubscriber);</span>
+<span class="fc" id="L65">        mainDispatcher.registerSubscriber(validSubscriber);</span>
+<span class="fc" id="L66">        return () -&gt; removeSubscriber(validSubscriber);</span>
     }
-
+    
     @Override
     public AutoClose open() {
-<span class="fc" id="L72">        return withOpen(stateMachine, this::realOpen);</span>
+<span class="fc" id="L71">        return withOpen(stateMachine, this::realOpen);</span>
     }
     
-<span class="fc" id="L75">    MetalogImpl(Config config, Repository repository, boolean openRepository) {</span>
+<span class="fc" id="L74">    MetalogImpl(Config config, Repository repository, boolean openRepository) {</span>
+<span class="fc" id="L75">        final Repository validRepository = nullCheck(repository, &quot;Repository must be present.&quot;);</span>
 <span class="fc" id="L76">        this.config = configCheck(config);</span>
-<span class="fc" id="L77">        this.repository = nullCheck(repository, &quot;Repository must be present.&quot;);</span>
-<span class="fc bfc" id="L78" title="All 2 branches covered.">        this.closeRepository = openRepository ? repository.open() : AutoClose.NONE;</span>
-<span class="fc" id="L79">        this.stateMachine = Idempotent.createStateMachine(config.contracts());</span>
-<span class="fc" id="L80">    }</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        this.closeRepository = openRepository ? validRepository.open() : AutoClose.NONE;</span>
+<span class="fc" id="L78">        this.stateMachine = Idempotent.createStateMachine(config.contracts());</span>
+<span class="fc" id="L79">    }</span>
     
     private AutoClose realOpen() {
-<span class="fc" id="L83">        metaFactory = config.contracts().claim(Meta.Builder.FACTORY);</span>
-<span class="fc" id="L84">        keyedDispatcherFactory = config.contracts().claim(Dispatcher.KEYED_FACTORY);</span>
-<span class="fc" id="L85">        unkeyedDispatcherFactory = config.contracts().claim(Dispatcher.UNKEYED_FACTORY);</span>
-<span class="fc" id="L86">        createUnkeyedDispatcher();</span>
-<span class="fc" id="L87">        activateConsole();</span>
-<span class="fc" id="L88">        return this::close;</span>
+<span class="fc" id="L82">        metaFactory = config.contracts().claim(Meta.Builder.FACTORY);</span>
+<span class="fc" id="L83">        this.mainDispatcher = config.contracts().claim(MainDispatcher.CONTRACT);</span>
+<span class="fc" id="L84">        activateConsole();</span>
+<span class="fc" id="L85">        return this::close;</span>
+    }
+    
+    private Predicate&lt;Subscriber&gt; matcher(Meta meta) {
+<span class="fc bfc" id="L89" title="All 2 branches covered.">        if (config.keyedSubscription()) {</span>
+<span class="fc" id="L90">            final Optional&lt;String&gt; optionalKey = meta.getKey();</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">            if (optionalKey.isPresent()) {</span>
+<span class="fc" id="L92">                final String key = optionalKey.get();</span>
+<span class="fc bfc" id="L93" title="All 6 branches covered.">                return s -&gt; s.getKey().isPresent() &amp;&amp; key.equals(s.getKey().get()) &amp;&amp; s.test(meta);</span>
+            } else {
+<span class="fc bfc" id="L95" title="All 4 branches covered.">                return s -&gt; !s.getKey().isPresent() &amp;&amp; s.test(meta);</span>
+            }
+        } else {
+<span class="fc" id="L98">            return s -&gt; s.test(meta); // legacy, subscriptions can receive any log</span>
+        }
     }
 
-    private void createUnkeyedDispatcher() {
-<span class="fc" id="L92">        final Contracts contracts = config.contracts();</span>
-<span class="fc" id="L93">        final Contract&lt;Dispatcher&gt; contract = Contract.create(Dispatcher.class, n -&gt; n.name(&quot;Unkeyed Dispatcher&quot;));</span>
-<span class="fc" id="L94">        repository.keep(contract, lifeCycle(unkeyedDispatcherFactory::get));</span>
-<span class="fc" id="L95">        dispatchers.put(UNKEYED, contracts.claim(contract));</span>
-<span class="fc" id="L96">    }</span>
-    
     private void activateConsole() {
-<span class="fc" id="L99">        config.contracts().claim(Console.CONTRACT);</span>
-<span class="fc" id="L100">    }</span>
-    
-    private void close() {
-<span class="fc" id="L103">        withClose(stateMachine, this::realClose);</span>
+<span class="fc" id="L103">        config.contracts().claim(Console.CONTRACT);</span>
 <span class="fc" id="L104">    }</span>
     
-    private void realClose() {
-<span class="fc" id="L107">        closeRepository.close();</span>
+    private void close() {
+<span class="fc" id="L107">        withClose(stateMachine, this::realClose);</span>
 <span class="fc" id="L108">    }</span>
     
+    private void realClose() {
+<span class="fc" id="L111">        closeRepository.close();</span>
+<span class="fc" id="L112">    }</span>
+
     private boolean shouldTransmitNow(Meta meta) {
-<span class="pc bpc" id="L111" title="1 of 4 branches missed.">        return meta.isBlocking() || onDispatchingThread();</span>
+<span class="fc" id="L115">        return meta.isBlocking();</span>
     }
     
-    private Outcome relayToDispatcher(Meta meta, Log log) {
-<span class="fc" id="L115">        final Dispatcher dispatcher = chooseDispatcher(meta);</span>
-<span class="fc" id="L116">        final AtomicReference&lt;Outcome&gt; outcomeReference = new AtomicReference&lt;&gt;(Outcome.SKIPPED);</span>
-        
-<span class="fc" id="L118">        subscribers.forEach(subscriber -&gt; {</span>
-<span class="fc bfc" id="L119" title="All 2 branches covered.">            if (subscriber.test(meta)) {</span>
-<span class="fc" id="L120">                outcomeReference.set(relayWithContext(subscriber, dispatcher, meta, log));</span>
+    private Outcome transmitLater(Meta meta, Log log) {
+<span class="fc" id="L119">        return forSubscriber(meta, s -&gt; mainDispatcher.dispatch(meta, ()-&gt; guardedDelivery(s, log, meta)));</span>
+    }
+    
+    private Outcome forSubscriber(Meta meta, Function&lt;Subscriber,Outcome&gt; consumer) {
+<span class="fc" id="L123">        final AtomicReference&lt;Outcome&gt; outcomeReference = new AtomicReference&lt;&gt;(Outcome.SKIPPED);</span>
+<span class="fc" id="L124">        subscribers.stream().filter(matcher(meta)).forEach( subscriber -&gt; {</span>
+<span class="fc" id="L125">            final Outcome outcome = consumer.apply(subscriber);</span>
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">            if (outcome != Outcome.SKIPPED) {</span>
+<span class="fc" id="L127">                outcomeReference.set(outcome);</span>
             }
-<span class="fc" id="L122">        });</span>
-        
-<span class="fc" id="L124">        return outcomeReference.get();</span>
-    }
-    
-    private Outcome relayWithContext(Subscriber subscriber, Dispatcher dispatcher, Meta meta, Log log) {
-<span class="fc" id="L128">        return dispatcher.dispatch(meta,  () -&gt; {</span>
-<span class="fc" id="L129">            final Map&lt;String,Object&gt; context = THREAD_CONTEXT.get();</span>
-<span class="fc" id="L130">            final Object oldValue = context.put(DISPATCHING_PROPERTY, true);</span>
-            try {
-<span class="fc" id="L132">                subscriber.receive(log, meta);</span>
-            } finally {
-<span class="fc" id="L134">                context.put(DISPATCHING_PROPERTY, oldValue);</span>
-            }
-<span class="fc" id="L136">        });</span>
-    }
-    
-    private boolean onDispatchingThread() {
-<span class="fc" id="L140">        return Boolean.TRUE.equals(THREAD_CONTEXT.get().get(DISPATCHING_PROPERTY));</span>
-    }
-    
-    private Dispatcher chooseDispatcher(Meta meta) {
-<span class="fc" id="L144">        final String key = meta.getKey().orElse(&quot;&quot;);</span>
-<span class="fc" id="L145">        return dispatchers.computeIfAbsent(key, this::createKeyedDispatcher);</span>
-    }
-    
-    private Dispatcher createKeyedDispatcher(String key) {
-<span class="fc" id="L149">        final Contract&lt;Dispatcher&gt; contract = Contract.create(Dispatcher.class, n -&gt; n.name(&quot;Keyed Dispatcher &quot; + key));</span>
-<span class="fc" id="L150">        repository.keep(contract, lifeCycle(keyedDispatcherFactory::get));</span>
-<span class="fc" id="L151">        return config.contracts().claim(contract);</span>
+<span class="fc" id="L129">        });</span>
+<span class="fc" id="L130">        return outcomeReference.get();</span>
     }
     
     private Outcome transmitNow(Log log, Meta meta) {
-<span class="fc" id="L155">        final AtomicReference&lt;Outcome&gt; outcomeReference = new AtomicReference&lt;&gt;(Outcome.SKIPPED);</span>
-<span class="fc" id="L156">        subscribers.forEach(subscriber -&gt; {</span>
-<span class="fc bfc" id="L157" title="All 2 branches covered.">            if (subscriber.test(meta)) {</span>
-<span class="fc" id="L158">                outcomeReference.set(subscriber.receive(log, meta));</span>
-            }
-<span class="fc" id="L160">        });</span>
-<span class="fc" id="L161">        return outcomeReference.get();</span>
+<span class="fc" id="L134">        return forSubscriber(meta, s -&gt; guardedDelivery(s, log, meta));</span>
     }
     
-<span class="fc" id="L164">    private static final ThreadLocal&lt;Map&lt;String, Object&gt;&gt; THREAD_CONTEXT = withInitial(LinkedHashMap::new);</span>
-    private static final String DISPATCHING_PROPERTY = &quot;dispatching&quot;;
-    private static final String UNKEYED = &quot;&quot;;
+    private void removeSubscriber(Subscriber subscriber) {
+<span class="pc bpc" id="L138" title="1 of 4 branches missed.">        if (subscribers.removeIf( x -&gt; x == subscriber)) {</span>
+<span class="fc" id="L139">            mainDispatcher.unregisterSubscriber(subscriber);</span>
+        }
+<span class="fc" id="L141">    }</span>
     
     private final Config config;
     private final StateMachine&lt;Idempotent&gt; stateMachine;
-    private final Repository repository;
     private final AutoClose closeRepository;
-<span class="fc" id="L172">    private final List&lt;Subscriber&gt; subscribers = new CopyOnWriteArrayList&lt;&gt;();</span>
-<span class="fc" id="L173">    private final Filterable filters = new FiltersImpl();</span>
-<span class="fc" id="L174">    private final ConcurrentHashMap&lt;String,Dispatcher&gt; dispatchers = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="fc" id="L146">    private final List&lt;Subscriber&gt; subscribers = new CopyOnWriteArrayList&lt;&gt;();</span>
+<span class="fc" id="L147">    private final Filterable filters = new FiltersImpl();</span>
+    private MainDispatcher mainDispatcher;
     private Supplier&lt;Meta.Builder&lt;?&gt;&gt; metaFactory;
-    private Supplier&lt;Dispatcher&gt; keyedDispatcherFactory;
-    private Supplier&lt;Dispatcher&gt; unkeyedDispatcherFactory;
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

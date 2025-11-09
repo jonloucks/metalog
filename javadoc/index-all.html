@@ -91,6 +91,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">The Contract for the Console.</div>
 </dd>
+<dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/MainDispatcher.html#CONTRACT" class="member-name-link">CONTRACT</a> - Static variable in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/MainDispatcher.html" title="interface in io.github.jonloucks.metalog.api">MainDispatcher</a></dt>
+<dd>
+<div class="block">The Contract for the main dispatcher</div>
+</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Metalog.html#CONTRACT" class="member-name-link">CONTRACT</a> - Static variable in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Metalog.html" title="interface in io.github.jonloucks.metalog.api">Metalog</a></dt>
 <dd>
 <div class="block">Access the current Metalog implementation</div>
@@ -258,6 +262,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Optional key to ensure ordering of messages.</div>
 </dd>
+<dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Subscriber.html#getKey()" class="member-name-link">getKey()</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Subscriber.html" title="interface in io.github.jonloucks.metalog.api">Subscriber</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entity.html#getName()" class="member-name-link">getName()</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Entity.html" title="interface in io.github.jonloucks.metalog.api">Entity</a></dt>
 <dd>
 <div class="block">The optional user defined name for this entity
@@ -331,6 +337,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Metalog.Config.Builder.html#keyedQueueLimit(int)" class="member-name-link">keyedQueueLimit(int)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Metalog.Config.Builder.html" title="interface in io.github.jonloucks.metalog.api">Metalog.Config.Builder</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Metalog.Config.html#keyedSubscription()" class="member-name-link">keyedSubscription()</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Metalog.Config.html" title="interface in io.github.jonloucks.metalog.api">Metalog.Config</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Metalog.Config.Builder.html#keyedSubscription(boolean)" class="member-name-link">keyedSubscription(boolean)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Metalog.Config.Builder.html" title="interface in io.github.jonloucks.metalog.api">Metalog.Config.Builder</a></dt>
+<dd>&nbsp;</dd>
 </dl>
 <h2 class="title" id="I:L">L</h2>
 <dl class="index">
@@ -341,6 +351,10 @@ loadScripts(document, 'script');</script>
 </dl>
 <h2 class="title" id="I:M">M</h2>
 <dl class="index">
+<dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/MainDispatcher.html" class="type-name-link" title="interface in io.github.jonloucks.metalog.api">MainDispatcher</a> - Interface in <a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/package-summary.html">io.github.jonloucks.metalog.api</a></dt>
+<dd>
+<div class="block">Responsibility: Create delegate dispatchers on demand and discard them when no longer needed</div>
+</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Meta.html" class="type-name-link" title="interface in io.github.jonloucks.metalog.api">Meta</a> - Interface in <a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/package-summary.html">io.github.jonloucks.metalog.api</a></dt>
 <dd>
 <div class="block">The meta information for a log message</div>
@@ -450,6 +464,10 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Metalog.Config.Builder.html#reflectionClassName(java.lang.String)" class="member-name-link">reflectionClassName(String)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Metalog.Config.Builder.html" title="interface in io.github.jonloucks.metalog.api">Metalog.Config.Builder</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/MainDispatcher.html#registerSubscriber(io.github.jonloucks.metalog.api.Subscriber)" class="member-name-link">registerSubscriber(Subscriber)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/MainDispatcher.html" title="interface in io.github.jonloucks.metalog.api">MainDispatcher</a></dt>
+<dd>
+<div class="block">Uses the Subscriber to determine which dispatchers are required</div>
+</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Outcome.html#REJECTED" class="member-name-link">REJECTED</a> - Enum constant in enum class io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Outcome.html" title="enum class in io.github.jonloucks.metalog.api">Outcome</a></dt>
 <dd>
 <div class="block">The publisher can't fulfill the request, for example during shutdown</div>
@@ -557,6 +575,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Metalog.Config.Builder.html#unkeyedThreadCount(int)" class="member-name-link">unkeyedThreadCount(int)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Metalog.Config.Builder.html" title="interface in io.github.jonloucks.metalog.api">Metalog.Config.Builder</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/MainDispatcher.html#unregisterSubscriber(io.github.jonloucks.metalog.api.Subscriber)" class="member-name-link">unregisterSubscriber(Subscriber)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/MainDispatcher.html" title="interface in io.github.jonloucks.metalog.api">MainDispatcher</a></dt>
+<dd>
+<div class="block">Used the Subscriber to determine which dispatchers are no longer needed</div>
+</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Metalog.Config.html#useReflection()" class="member-name-link">useReflection()</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Metalog.Config.html" title="interface in io.github.jonloucks.metalog.api">Metalog.Config</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Metalog.Config.Builder.html#useReflection(boolean)" class="member-name-link">useReflection(boolean)</a> - Method in interface io.github.jonloucks.metalog.api.<a href="io.github.jonloucks.metalog.api/io/github/jonloucks/metalog/api/Metalog.Config.Builder.html" title="interface in io.github.jonloucks.metalog.api">Metalog.Config.Builder</a></dt>

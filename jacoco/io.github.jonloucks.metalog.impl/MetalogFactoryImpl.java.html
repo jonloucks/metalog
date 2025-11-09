@@ -93,15 +93,18 @@ public final class MetalogFactoryImpl implements MetalogFactory {
 <span class="fc" id="L93">        repository.require(WaitableFactory.CONTRACT);</span>
 <span class="fc" id="L94">        repository.require(StateMachineFactory.CONTRACT);</span>
         
-<span class="fc" id="L96">        repository.keep(Metalog.Config.Builder.FACTORY, () -&gt; ConfigBuilderImpl::new, IF_NOT_BOUND);</span>
-<span class="fc" id="L97">        repository.keep(Entities.Builder.FACTORY, () -&gt; EntitiesImpl::new, IF_NOT_BOUND);</span>
-<span class="fc" id="L98">        repository.keep(Entity.Builder.FACTORY, () -&gt; EntityImpl::new, IF_NOT_BOUND);</span>
-<span class="fc" id="L99">        repository.keep(Meta.Builder.FACTORY, () -&gt; MetaImpl::new, IF_NOT_BOUND);</span>
+<span class="fc" id="L96">        final BindStrategy strategy = IF_NOT_BOUND;</span>
         
-<span class="fc" id="L101">        repository.keep(MetalogFactory.CONTRACT, lifeCycle(MetalogFactoryImpl::new), IF_NOT_BOUND);</span>
-<span class="fc" id="L102">        repository.keep(Dispatcher.KEYED_FACTORY, () -&gt; () -&gt; new KeyedDispatcherImpl(config), IF_NOT_BOUND);</span>
-<span class="fc" id="L103">        repository.keep(Dispatcher.UNKEYED_FACTORY, () -&gt; ()-&gt; new UnkeyedDispatcherImpl(config), IF_NOT_BOUND);</span>
-<span class="fc" id="L104">        repository.keep(Console.CONTRACT, lifeCycle(() -&gt; new ConsoleImpl(config)), IF_NOT_BOUND);</span>
-<span class="fc" id="L105">    }</span>
+<span class="fc" id="L98">        repository.keep(Metalog.Config.Builder.FACTORY, () -&gt; ConfigBuilderImpl::new, strategy);</span>
+<span class="fc" id="L99">        repository.keep(Entities.Builder.FACTORY, () -&gt; EntitiesImpl::new, strategy);</span>
+<span class="fc" id="L100">        repository.keep(Entity.Builder.FACTORY, () -&gt; EntityImpl::new, strategy);</span>
+<span class="fc" id="L101">        repository.keep(Meta.Builder.FACTORY, () -&gt; MetaImpl::new, strategy);</span>
+        
+<span class="fc" id="L103">        repository.keep(MetalogFactory.CONTRACT, lifeCycle(MetalogFactoryImpl::new), strategy);</span>
+<span class="fc" id="L104">        repository.keep(Dispatcher.KEYED_FACTORY, () -&gt; () -&gt; new KeyedDispatcherImpl(config), strategy);</span>
+<span class="fc" id="L105">        repository.keep(Dispatcher.UNKEYED_FACTORY, () -&gt; ()-&gt; new UnkeyedDispatcherImpl(config), strategy);</span>
+<span class="fc" id="L106">        repository.keep(MainDispatcher.CONTRACT, lifeCycle(() -&gt; new MainDispatcherImpl(config, repository)), strategy);</span>
+<span class="fc" id="L107">        repository.keep(Console.CONTRACT, lifeCycle(() -&gt; new ConsoleImpl(config)), strategy);</span>
+<span class="fc" id="L108">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
