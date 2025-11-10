@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import static io.github.jonloucks.contracts.test.Tools.*;
 import static io.github.jonloucks.metalog.test.Tools.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SuppressWarnings("CodeBlock2Expr")
@@ -55,7 +56,7 @@ public interface MetalogFactoryTests {
     }
     
     @Test
-    default void metalogFactory_install_AlreadyBound_Throws() {
+    default void metalogFactory_install_AlreadyBound_DoesNotThrow() {
         withMetalog(b -> {}, (contracts, metalog)-> {
             final Metalog.Config config = new Metalog.Config() {
                 @Override
@@ -67,11 +68,9 @@ public interface MetalogFactoryTests {
             final Repository repository = contracts.claim(Repository.FACTORY).get();
             final MetalogFactory metalogFactory = getMetalogFactory(config);
             
-            final MetalogException thrown = assertThrows(MetalogException.class, () -> {
+            assertDoesNotThrow(() -> {
                 metalogFactory.install(config, repository);
             });
-            
-            assertThrown(thrown);
         });
     }
     

@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import static io.github.jonloucks.concurrency.api.GlobalConcurrency.findConcurrencyFactory;
+import static io.github.jonloucks.contracts.api.BindStrategy.IF_ALLOWED;
 import static io.github.jonloucks.contracts.api.BindStrategy.IF_NOT_BOUND;
 import static io.github.jonloucks.contracts.api.Checks.*;
 import static io.github.jonloucks.contracts.api.GlobalContracts.lifeCycle;
@@ -35,7 +36,7 @@ public final class MetalogFactoryImpl implements MetalogFactory {
         installCore(validConfig, repository);
         
         final MetalogImpl metalog = new MetalogImpl(validConfig, repository, true);
-        repository.keep(Metalog.CONTRACT, () -> metalog);
+        repository.keep(Metalog.CONTRACT, () -> metalog, IF_ALLOWED);
         return metalog;
     }
     
@@ -59,7 +60,7 @@ public final class MetalogFactoryImpl implements MetalogFactory {
         
         final Promisor<Metalog> metalogPromisor = lifeCycle(() -> new MetalogImpl(validConfig, validRepository, false));
         
-        validRepository.keep(Metalog.CONTRACT, metalogPromisor, IF_NOT_BOUND);
+        validRepository.keep(Metalog.CONTRACT, metalogPromisor, IF_ALLOWED);
     }
     
     private void installConcurrency(Metalog.Config config, Repository repository) {
@@ -78,17 +79,12 @@ public final class MetalogFactoryImpl implements MetalogFactory {
     
     private Metalog.Config enhancedConfigCheck(Metalog.Config config) {
         final Metalog.Config candidateConfig = configCheck(config);
-        final Contracts contracts = contractsCheck(candidateConfig.contracts());
-        
-        if (contracts.isBound(Metalog.CONTRACT)) {
-            throw new MetalogException("Metalog is already bound.");
-        }
-        
+        //noinspection ResultOfMethodCallIgnored
+        contractsCheck(candidateConfig.contracts());
         return candidateConfig;
     }
     
     private void installCore(Metalog.Config config, Repository repository) {
-  
         repository.require(Repository.FACTORY);
         repository.require(WaitableFactory.CONTRACT);
         repository.require(StateMachineFactory.CONTRACT);
