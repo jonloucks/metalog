@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import static io.github.jonloucks.concurrency.api.GlobalConcurrency.findConcurrencyFactory;
+import static io.github.jonloucks.contracts.api.BindStrategy.IF_ALLOWED;
 import static io.github.jonloucks.contracts.api.BindStrategy.IF_NOT_BOUND;
 import static io.github.jonloucks.contracts.api.Checks.*;
 import static io.github.jonloucks.contracts.api.GlobalContracts.lifeCycle;
@@ -23,88 +24,83 @@ public final class MetalogFactoryImpl implements MetalogFactory {
      * Publicly accessible constructor as an entry point into this library.
      * It can be invoked via reflection, ServiceLoader or directly.
      */
-<span class="fc" id="L26">    public MetalogFactoryImpl() {</span>
-<span class="fc" id="L27">    }</span>
+<span class="fc" id="L27">    public MetalogFactoryImpl() {</span>
+<span class="fc" id="L28">    }</span>
     
     @Override
     public Metalog create(Metalog.Config config) {
-<span class="fc" id="L31">        final Metalog.Config validConfig = enhancedConfigCheck(config);</span>
-<span class="fc" id="L32">        final Repository repository = validConfig.contracts().claim(Repository.FACTORY).get();</span>
+<span class="fc" id="L32">        final Metalog.Config validConfig = enhancedConfigCheck(config);</span>
+<span class="fc" id="L33">        final Repository repository = validConfig.contracts().claim(Repository.FACTORY).get();</span>
         
-<span class="fc" id="L34">        installConcurrency(validConfig, repository);</span>
-<span class="fc" id="L35">        installCore(validConfig, repository);</span>
+<span class="fc" id="L35">        installConcurrency(validConfig, repository);</span>
+<span class="fc" id="L36">        installCore(validConfig, repository);</span>
         
-<span class="fc" id="L37">        final MetalogImpl metalog = new MetalogImpl(validConfig, repository, true);</span>
-<span class="fc" id="L38">        repository.keep(Metalog.CONTRACT, () -&gt; metalog);</span>
-<span class="fc" id="L39">        return metalog;</span>
+<span class="fc" id="L38">        final MetalogImpl metalog = new MetalogImpl(validConfig, repository, true);</span>
+<span class="fc" id="L39">        repository.keep(Metalog.CONTRACT, () -&gt; metalog, IF_ALLOWED);</span>
+<span class="fc" id="L40">        return metalog;</span>
     }
     
     @Override
     public Metalog create(Consumer&lt;Metalog.Config.Builder&gt; builderConsumer) {
-<span class="fc" id="L44">        final Consumer&lt;Metalog.Config.Builder&gt; validBuilderConsumer = builderConsumerCheck(builderConsumer);</span>
-<span class="fc" id="L45">        final ConfigBuilderImpl builder = new ConfigBuilderImpl();</span>
+<span class="fc" id="L45">        final Consumer&lt;Metalog.Config.Builder&gt; validBuilderConsumer = builderConsumerCheck(builderConsumer);</span>
+<span class="fc" id="L46">        final ConfigBuilderImpl builder = new ConfigBuilderImpl();</span>
         
-<span class="fc" id="L47">        validBuilderConsumer.accept(builder);</span>
+<span class="fc" id="L48">        validBuilderConsumer.accept(builder);</span>
         
-<span class="fc" id="L49">        return create(builder);</span>
+<span class="fc" id="L50">        return create(builder);</span>
     }
     
     @Override
     public void install(Metalog.Config config, Repository repository) {
-<span class="fc" id="L54">        final Metalog.Config validConfig = enhancedConfigCheck(config);</span>
-<span class="fc" id="L55">        final Repository validRepository = nullCheck(repository, &quot;Repository must be present.&quot;);</span>
+<span class="fc" id="L55">        final Metalog.Config validConfig = enhancedConfigCheck(config);</span>
+<span class="fc" id="L56">        final Repository validRepository = nullCheck(repository, &quot;Repository must be present.&quot;);</span>
         
-<span class="fc" id="L57">        installConcurrency(validConfig, validRepository);</span>
-<span class="fc" id="L58">        installCore(validConfig, validRepository);</span>
+<span class="fc" id="L58">        installConcurrency(validConfig, validRepository);</span>
+<span class="fc" id="L59">        installCore(validConfig, validRepository);</span>
         
-<span class="fc" id="L60">        final Promisor&lt;Metalog&gt; metalogPromisor = lifeCycle(() -&gt; new MetalogImpl(validConfig, validRepository, false));</span>
+<span class="fc" id="L61">        final Promisor&lt;Metalog&gt; metalogPromisor = lifeCycle(() -&gt; new MetalogImpl(validConfig, validRepository, false));</span>
         
-<span class="fc" id="L62">        validRepository.keep(Metalog.CONTRACT, metalogPromisor, IF_NOT_BOUND);</span>
-<span class="fc" id="L63">    }</span>
+<span class="fc" id="L63">        validRepository.keep(Metalog.CONTRACT, metalogPromisor, IF_ALLOWED);</span>
+<span class="fc" id="L64">    }</span>
     
     private void installConcurrency(Metalog.Config config, Repository repository) {
-<span class="fc" id="L66">        final Concurrency.Config concurrencyConfig = new Concurrency.Config() {</span>
+<span class="fc" id="L67">        final Concurrency.Config concurrencyConfig = new Concurrency.Config() {</span>
             @Override
             public Contracts contracts() {
-<span class="fc" id="L69">                return config.contracts();</span>
+<span class="fc" id="L70">                return config.contracts();</span>
             }
         };
         //noinspection ResultOfMethodCallIgnored
-<span class="fc" id="L73">        contractsCheck(concurrencyConfig.contracts());</span>
-<span class="fc" id="L74">        final Optional&lt;ConcurrencyFactory&gt; optionalFactory = findConcurrencyFactory(concurrencyConfig);</span>
+<span class="fc" id="L74">        contractsCheck(concurrencyConfig.contracts());</span>
+<span class="fc" id="L75">        final Optional&lt;ConcurrencyFactory&gt; optionalFactory = findConcurrencyFactory(concurrencyConfig);</span>
         
-<span class="fc" id="L76">        optionalFactory.ifPresent(f -&gt; f.install(concurrencyConfig, repository));</span>
-<span class="fc" id="L77">    }</span>
+<span class="fc" id="L77">        optionalFactory.ifPresent(f -&gt; f.install(concurrencyConfig, repository));</span>
+<span class="fc" id="L78">    }</span>
     
     private Metalog.Config enhancedConfigCheck(Metalog.Config config) {
-<span class="fc" id="L80">        final Metalog.Config candidateConfig = configCheck(config);</span>
-<span class="fc" id="L81">        final Contracts contracts = contractsCheck(candidateConfig.contracts());</span>
-        
-<span class="fc bfc" id="L83" title="All 2 branches covered.">        if (contracts.isBound(Metalog.CONTRACT)) {</span>
-<span class="fc" id="L84">            throw new MetalogException(&quot;Metalog is already bound.&quot;);</span>
-        }
-        
-<span class="fc" id="L87">        return candidateConfig;</span>
+<span class="fc" id="L81">        final Metalog.Config candidateConfig = configCheck(config);</span>
+        //noinspection ResultOfMethodCallIgnored
+<span class="fc" id="L83">        contractsCheck(candidateConfig.contracts());</span>
+<span class="fc" id="L84">        return candidateConfig;</span>
     }
     
     private void installCore(Metalog.Config config, Repository repository) {
-  
-<span class="fc" id="L92">        repository.require(Repository.FACTORY);</span>
-<span class="fc" id="L93">        repository.require(WaitableFactory.CONTRACT);</span>
-<span class="fc" id="L94">        repository.require(StateMachineFactory.CONTRACT);</span>
+<span class="fc" id="L88">        repository.require(Repository.FACTORY);</span>
+<span class="fc" id="L89">        repository.require(WaitableFactory.CONTRACT);</span>
+<span class="fc" id="L90">        repository.require(StateMachineFactory.CONTRACT);</span>
         
-<span class="fc" id="L96">        final BindStrategy strategy = IF_NOT_BOUND;</span>
+<span class="fc" id="L92">        final BindStrategy strategy = IF_NOT_BOUND;</span>
         
-<span class="fc" id="L98">        repository.keep(Metalog.Config.Builder.FACTORY, () -&gt; ConfigBuilderImpl::new, strategy);</span>
-<span class="fc" id="L99">        repository.keep(Entities.Builder.FACTORY, () -&gt; EntitiesImpl::new, strategy);</span>
-<span class="fc" id="L100">        repository.keep(Entity.Builder.FACTORY, () -&gt; EntityImpl::new, strategy);</span>
-<span class="fc" id="L101">        repository.keep(Meta.Builder.FACTORY, () -&gt; MetaImpl::new, strategy);</span>
+<span class="fc" id="L94">        repository.keep(Metalog.Config.Builder.FACTORY, () -&gt; ConfigBuilderImpl::new, strategy);</span>
+<span class="fc" id="L95">        repository.keep(Entities.Builder.FACTORY, () -&gt; EntitiesImpl::new, strategy);</span>
+<span class="fc" id="L96">        repository.keep(Entity.Builder.FACTORY, () -&gt; EntityImpl::new, strategy);</span>
+<span class="fc" id="L97">        repository.keep(Meta.Builder.FACTORY, () -&gt; MetaImpl::new, strategy);</span>
         
-<span class="fc" id="L103">        repository.keep(MetalogFactory.CONTRACT, lifeCycle(MetalogFactoryImpl::new), strategy);</span>
-<span class="fc" id="L104">        repository.keep(Dispatcher.KEYED_FACTORY, () -&gt; () -&gt; new KeyedDispatcherImpl(config), strategy);</span>
-<span class="fc" id="L105">        repository.keep(Dispatcher.UNKEYED_FACTORY, () -&gt; ()-&gt; new UnkeyedDispatcherImpl(config), strategy);</span>
-<span class="fc" id="L106">        repository.keep(MainDispatcher.CONTRACT, lifeCycle(() -&gt; new MainDispatcherImpl(config, repository)), strategy);</span>
-<span class="fc" id="L107">        repository.keep(Console.CONTRACT, lifeCycle(() -&gt; new ConsoleImpl(config)), strategy);</span>
-<span class="fc" id="L108">    }</span>
+<span class="fc" id="L99">        repository.keep(MetalogFactory.CONTRACT, lifeCycle(MetalogFactoryImpl::new), strategy);</span>
+<span class="fc" id="L100">        repository.keep(Dispatcher.KEYED_FACTORY, () -&gt; () -&gt; new KeyedDispatcherImpl(config), strategy);</span>
+<span class="fc" id="L101">        repository.keep(Dispatcher.UNKEYED_FACTORY, () -&gt; ()-&gt; new UnkeyedDispatcherImpl(config), strategy);</span>
+<span class="fc" id="L102">        repository.keep(MainDispatcher.CONTRACT, lifeCycle(() -&gt; new MainDispatcherImpl(config, repository)), strategy);</span>
+<span class="fc" id="L103">        repository.keep(Console.CONTRACT, lifeCycle(() -&gt; new ConsoleImpl(config)), strategy);</span>
+<span class="fc" id="L104">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
