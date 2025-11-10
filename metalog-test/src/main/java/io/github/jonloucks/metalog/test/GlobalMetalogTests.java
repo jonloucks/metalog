@@ -21,7 +21,6 @@ import static io.github.jonloucks.metalog.test.Tools.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SuppressWarnings("CodeBlock2Expr")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public interface GlobalMetalogTests {
@@ -97,21 +96,15 @@ public interface GlobalMetalogTests {
     @ParameterizedTest
     @MethodSource("io.github.jonloucks.metalog.test.GlobalMetalogTests$GlobalMetalogTestsTools#invalidConfigs")
     default void globalMetalog_createMetalog_Invalid(Metalog.Config config) {
-        final MetalogException thrown = assertThrows(MetalogException.class, () -> {
-            GlobalMetalog.createMetalog(config);
-        });
-        
-        assertThrown(thrown);
+        assertThrown(MetalogException.class,
+            () -> GlobalMetalog.createMetalog(config));
     }
     
     @ParameterizedTest
     @MethodSource("io.github.jonloucks.metalog.test.GlobalMetalogTests$GlobalMetalogTestsTools#invalidConfigs")
     default void globalMetalog_SadPath(Metalog.Config config) {
-        final MetalogException thrown = assertThrows(MetalogException.class, () -> {
-            GlobalMetalog.createMetalog(config);
-        });
-        
-        assertThrown(thrown);
+        assertThrown(MetalogException.class,
+            () -> GlobalMetalog.createMetalog(config));
     }
     
     @Test

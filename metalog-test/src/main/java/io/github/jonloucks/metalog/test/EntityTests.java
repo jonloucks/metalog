@@ -17,7 +17,6 @@ import static io.github.jonloucks.metalog.test.Tools.createTestEntity;
 import static io.github.jonloucks.metalog.test.Tools.withMetalog;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SuppressWarnings("CodeBlock2Expr")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public interface EntityTests {
@@ -105,12 +104,9 @@ public interface EntityTests {
     
     @Test
     default void entity_correlation_WithNullEntity_Throws() {
-        runWithScenario( builder -> {
-            final IllegalArgumentException thrown = assertThrows( IllegalArgumentException.class, () -> {
-                builder.correlation((Entity) null);
-            });
-            assertThrown(thrown);
-        });
+        runWithScenario( builder ->
+            assertThrown( IllegalArgumentException.class,
+                () -> builder.correlation((Entity) null)));
     }
     
     @Test
@@ -130,12 +126,9 @@ public interface EntityTests {
     
     @Test
     default void entity_copy_WithNullEntity_Throws() {
-        runWithScenario( builder -> {
-            final IllegalArgumentException thrown = assertThrows( IllegalArgumentException.class, () -> {
-                builder.copy( null);
-            });
-            assertThrown(thrown);
-        });
+        runWithScenario( builder ->
+            assertThrown( IllegalArgumentException.class,
+                () -> builder.copy( null)));
     }
     
     @Test
@@ -206,12 +199,9 @@ public interface EntityTests {
     
     @Test
     default void entity_correlation_WithNullAction_Throws() {
-        runWithScenario( builder -> {
-            final IllegalArgumentException thrown = assertThrows( IllegalArgumentException.class, () -> {
-                builder.correlation((Consumer<Entity.Builder<?>>) null);
-            });
-            assertThrown(thrown);
-        });
+        runWithScenario( builder ->
+            assertThrown( IllegalArgumentException.class,
+                () -> builder.correlation((Consumer<Entity.Builder<?>>) null)));
     }
     
     @Test
@@ -231,22 +221,16 @@ public interface EntityTests {
     
     @Test
     default void entity_correlations_WithNullAction_Throws() {
-        runWithScenario( builder -> {
-            final IllegalArgumentException thrown = assertThrows( IllegalArgumentException.class, () -> {
-                builder.correlations(null);
-            });
-            assertThrown(thrown);
-        });
+        runWithScenario( builder ->
+            assertThrown( IllegalArgumentException.class,
+                () -> builder.correlations(null)));
     }
     
     @Test
     default void entity_correlations_Action() {
         runWithScenario( builder -> {
-            final Entity.Builder<?> resultBuilder = builder.correlations(list -> {
-                list.entity(e -> {
-                    e.name("hello");
-                });
-            });
+            final Entity.Builder<?> resultBuilder = builder
+                .correlations(list -> list.entity(e -> e.name("hello")));
             
             assertTrue(builder.getCorrelations().isPresent());
             assertEquals(1, builder.getCorrelations().get().size());

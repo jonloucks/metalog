@@ -23,21 +23,16 @@ import static io.github.jonloucks.metalog.test.Tools.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SuppressWarnings("ALL")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public interface MetalogTests {
     
     @Test
     default void metalog_addFilter_WithNull_Throws() {
-        runWithScenario(metalog -> {
-            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-                //noinspection resource
-                metalog.addFilter(null);
-            });
-            
-            assertThrown(thrown);
-        });
+        //noinspection resource
+        runWithScenario(metalog ->
+            assertThrown(IllegalArgumentException.class,
+                () -> metalog.addFilter(null)));
     }
     
     @Test
@@ -124,8 +119,8 @@ public interface MetalogTests {
         
         runWithScenario(metalog -> {
             final Subscriber subscriber = (Log log, Meta meta) -> {
-                if ("trigger".equals(log.get())) {
-                    metalog.publish(() -> "reentrant", b -> b.block());
+                if ("trigger".equals(log.get().toString())) {
+                    metalog.publish(() -> "reentrant", Meta.Builder::block);
                     return CONSUMED;
                 }
                 return REJECTED;
@@ -134,7 +129,7 @@ public interface MetalogTests {
             try (AutoClose closeSubscriber = metalog.subscribe(subscriber)) {
                 final AutoClose ignored = closeSubscriber;
                 
-                final Outcome outcome = metalog.publish(() -> "trigger", b -> b.block());
+                final Outcome outcome = metalog.publish(() -> "trigger", Meta.Builder::block);
                 assertEquals(CONSUMED, outcome);
             }
         });
@@ -181,11 +176,8 @@ public interface MetalogTests {
                 }
             };
             final Metalog metalog = createMetalog(config);
-            final IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> {
-                //noinspection resource
-                metalog.open();
-            });
-            assertThrown(thrown, "Test Error Injection.");
+            
+            assertThrown(IllegalStateException.class, metalog::open, "Test Error Injection.");
         });
     }
     
@@ -259,9 +251,7 @@ public interface MetalogTests {
         }
         
         static void runWithScenario(ScenarioConfig scenarioConfig) {
-            withMetalog((contracts,metalog) -> {
-                scenarioConfig.accept(metalog);
-            });
+            withMetalog((contracts,metalog) -> scenarioConfig.accept(metalog));
         }
     }
 }
