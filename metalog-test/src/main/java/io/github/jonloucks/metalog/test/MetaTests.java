@@ -23,7 +23,6 @@ import static io.github.jonloucks.metalog.test.Tools.createTestEntity;
 import static io.github.jonloucks.metalog.test.Tools.withMetalog;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SuppressWarnings("CodeBlock2Expr")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public interface MetaTests {
@@ -108,6 +107,7 @@ public interface MetaTests {
             
             metaBuilder.copy(fromBuilder);
             
+            //noinspection DuplicatedCode
             assertTrue(metaBuilder.getName().isPresent());
             assertEquals("name1", metaBuilder.getName().get());
             assertTrue(metaBuilder.getId().isPresent());
@@ -125,6 +125,7 @@ public interface MetaTests {
             assertEquals(fromBuilder.isBlocking(), metaBuilder.isBlocking());
             assertTrue(metaBuilder.getThread().isPresent());
             assertEquals(thread, metaBuilder.getThread().get());
+            //noinspection SimplifiableAssertion
             assertEquals(false, metaBuilder.newLine());
         });
     }
@@ -171,6 +172,7 @@ public interface MetaTests {
             assertFalse(metaBuilder.isBlocking());
             assertTrue(metaBuilder.getThread().isPresent());
             assertEquals(thread, metaBuilder.getThread().get());
+            //noinspection SimplifiableAssertion
             assertEquals(true, metaBuilder.newLine());
         });
     }
@@ -294,12 +296,9 @@ public interface MetaTests {
     
     @Test
     default void meta_correlation_WithNullEntity_Throws() {
-        runWithScenario(builder -> {
-            final IllegalArgumentException thrown = assertThrows( IllegalArgumentException.class, () -> {
-                builder.correlation((Entity) null);
-            });
-            assertThrown(thrown);
-        });
+        runWithScenario(builder ->
+            assertThrown( IllegalArgumentException.class,
+                () -> builder.correlation((Entity) null)));
     }
     
     @Test
@@ -319,12 +318,9 @@ public interface MetaTests {
     
     @Test
     default void meta_correlations_WithNullBuilder_Throws() {
-        runWithScenario(builder -> {
-            final IllegalArgumentException thrown = assertThrows( IllegalArgumentException.class, () -> {
-                builder.correlations( null);
-            });
-            assertThrown(thrown);
-        });
+        runWithScenario(builder ->
+            assertThrown( IllegalArgumentException.class,
+                () -> builder.correlations( null)));
     }
     
     @Test

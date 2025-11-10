@@ -21,7 +21,6 @@ import static io.github.jonloucks.metalog.test.Tools.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SuppressWarnings("CodeBlock2Expr")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public interface ConsoleTests {
@@ -30,12 +29,9 @@ public interface ConsoleTests {
     default void console_output_WithNull_Throws() {
         withMetalog((contracts, metalog) -> {
             final Console console = contracts.claim(Console.CONTRACT);
-            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-             
-                console.output(null);
-           
-            });
-            assertThrown(thrown);
+            
+            assertThrown(IllegalArgumentException.class,
+                () -> console.output(null));
         });
     }
     
@@ -98,12 +94,9 @@ public interface ConsoleTests {
     default void console_error_WithNull_Throws() {
         withMetalog((contracts, metalog) -> {
             final Console console = contracts.claim(Console.CONTRACT);
-            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-           
-                console.error(null);
-           
-            });
-            assertThrown(thrown);
+            
+            assertThrown(IllegalArgumentException.class,
+                () -> console.error(null));
         });
     }
     
@@ -111,32 +104,26 @@ public interface ConsoleTests {
     default void console_publish_WithNull_Throws() {
         withMetalog((contracts, metalog) -> {
             final Console console = contracts.claim(Console.CONTRACT);
-            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-          
-                console.publish(null);
-         
-            });
-            assertThrown(thrown);
+            
+            assertThrown(IllegalArgumentException.class,
+                () -> console.publish(null));
         });
     }
     
     @ParameterizedTest(name = "channel = {0}")
     @ValueSource(strings = {"System.out", "System.err", "Console.output", "Console.error"})
     default void console_publish_Indirect_WithSupportedChannel(String channel) {
-        withMetalog((contracts, metalog) -> {
-      
-            assertOutcomeSuccess(assertIndirectConsole(metalog, channel, 1));
-       
-        });
+        withMetalog((contracts, metalog) ->
+            assertOutcomeSuccess(assertIndirectConsole(metalog, channel, 1)));
     }
     
     @ParameterizedTest(name = "channel = {0}")
     @ValueSource(strings = {"System.out", "System.err", "Console.output", "Console.error"})
     default void console_publish_AfterMetalogShutdown_Works(String channel) {
         final AtomicReference<Console> consoleRef = new AtomicReference<>();
-        withMetalog((contracts, metalog) -> {
-            consoleRef.set(contracts.claim(Console.CONTRACT));
-        });
+        
+        withMetalog((contracts, metalog) ->
+            consoleRef.set(contracts.claim(Console.CONTRACT)));
         
         assertNotNull(consoleRef.get().publish(() -> "Hello", b -> b.channel(channel)));
     }
@@ -160,11 +147,8 @@ public interface ConsoleTests {
     @ParameterizedTest(name = "channel = {0}")
     @ValueSource(strings = {"Console.error", "Console.output", "System.out", "System.err"})
     default void console_publish_Direct_WithSupportedChannel(String channel) {
-        withMetalog((contracts, metalog) -> {
-            
-            assertOutcomeSuccess(assertDirectConsole(contracts, channel, 1));
-            
-        });
+        withMetalog((contracts, metalog) ->
+            assertOutcomeSuccess(assertDirectConsole(contracts, channel, 1)));
     }
     
     @ParameterizedTest(name = "channel = {0}")
@@ -186,21 +170,15 @@ public interface ConsoleTests {
     @ParameterizedTest(name = "channel = {0}")
     @ValueSource(strings = {"error", "info", "warn", "", "unknown"})
     default void console_publish_Direct_UnsupportedChannel(String channel) {
-        withMetalog((contracts, metalog) -> {
-            
-            assertOutcomeSkipped(assertDirectConsole(contracts, channel, 0));
-            
-        });
+        withMetalog((contracts, metalog) ->
+            assertOutcomeSkipped(assertDirectConsole(contracts, channel, 0)));
     }
     
     @ParameterizedTest(name = "channel = {0}")
     @ValueSource(strings = {"error", "info", "warn", "", "unknown"})
     default void console_receive_WithUnsupportedChannel(String channel) {
-        withMetalog((contracts, metalog) -> {
-            
-            assertOutcomeSkipped(assertIndirectConsole(metalog, channel, 0));
-            
-        });
+        withMetalog((contracts, metalog) ->
+            assertOutcomeSkipped(assertIndirectConsole(metalog, channel, 0)));
     }
     
     @Test

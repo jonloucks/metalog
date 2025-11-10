@@ -4,16 +4,13 @@ import io.github.jonloucks.contracts.api.AutoClose;
 import io.github.jonloucks.contracts.api.Contracts;
 import io.github.jonloucks.contracts.api.Repository;
 import io.github.jonloucks.metalog.api.Metalog;
-import io.github.jonloucks.metalog.api.MetalogException;
 import io.github.jonloucks.metalog.api.MetalogFactory;
 import org.junit.jupiter.api.Test;
 
 import static io.github.jonloucks.contracts.test.Tools.*;
 import static io.github.jonloucks.metalog.test.Tools.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SuppressWarnings("CodeBlock2Expr")
 public interface MetalogFactoryTests {
     
     @Test
@@ -28,11 +25,8 @@ public interface MetalogFactoryTests {
             final Repository repository = contracts.claim(Repository.FACTORY).get();
             final MetalogFactory metalogFactory = getMetalogFactory(config);
             
-            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-                metalogFactory.install(null, repository);
-            });
-            
-            assertThrown(thrown);
+            assertThrown(IllegalArgumentException.class,
+                () -> metalogFactory.install(null, repository));
         });
     }
     
@@ -47,11 +41,8 @@ public interface MetalogFactoryTests {
             };
             final MetalogFactory metalogFactory = getMetalogFactory(config);
             
-            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-                metalogFactory.install(config, null);
-            });
-            
-            assertThrown(thrown);
+            assertThrown(IllegalArgumentException.class,
+                () -> metalogFactory.install(config, null));
         });
     }
     
@@ -68,9 +59,7 @@ public interface MetalogFactoryTests {
             final Repository repository = contracts.claim(Repository.FACTORY).get();
             final MetalogFactory metalogFactory = getMetalogFactory(config);
             
-            assertDoesNotThrow(() -> {
-                metalogFactory.install(config, repository);
-            });
+            assertDoesNotThrow(() -> metalogFactory.install(config, repository));
         });
     }
     

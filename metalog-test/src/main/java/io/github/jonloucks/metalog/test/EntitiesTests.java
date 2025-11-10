@@ -21,33 +21,27 @@ import static io.github.jonloucks.metalog.test.EntitiesTests.EntitiesTestsTools.
 import static io.github.jonloucks.metalog.test.Tools.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SuppressWarnings({"Convert2MethodRef", "CodeBlock2Expr"})
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public interface EntitiesTests {
     
     @Test
     default void entities_IsObject() {
-        runWithScenario( entities -> {
-            assertObject(entities);
-        });
+        //noinspection Convert2MethodRef
+        runWithScenario( entities -> assertObject(entities));
     }
     
     @Test
     default void entities_entity_WithNullEntity_Throws() {
-        runWithScenario( entities -> {
-            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-                entities.entity((Entity) null);
-            });
-            
-            assertThrown(thrown);
-        });
+        runWithScenario( entities ->
+            assertThrown(IllegalArgumentException.class,
+                () -> entities.entity((Entity) null)));
     }
     
     @Test
     default void entities_entity_AsBuilderWithUniqueAndWithoutName_Works() {
         runWithScenario( entitiesBuilder -> {
-            final Entities.Builder<?> returnBuilder = entitiesBuilder.entity(b -> b.unique());
+            final Entities.Builder<?> returnBuilder = entitiesBuilder.entity(Entity.Builder::unique);
      
             assertNotNull(returnBuilder);
             assertFalse(entitiesBuilder.isEmpty(), "Entities should not be empty");
@@ -150,106 +144,70 @@ public interface EntitiesTests {
     
     @Test
     default void entities_entity_WithNullAction_Throws() {
-        runWithScenario( entities -> {
-            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-                entities.entity((Consumer<Entity.Builder<?>>) null);
-            });
-            
-            assertThrown(thrown);
-        });
+        runWithScenario( entities ->
+            assertThrown(IllegalArgumentException.class,
+                () -> entities.entity((Consumer<Entity.Builder<?>>) null)));
     }
     
     @Test
     default void entities_replaceIf_WithNullFilter_Throws() {
         final Entity entity = () -> "";
-        runWithScenario( entities -> {
-            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-                entities.replaceIf(null, entity);
-            });
-            
-            assertThrown(thrown);
-        });
+        runWithScenario( entities ->
+            assertThrown(IllegalArgumentException.class,
+                () -> entities.replaceIf(null, entity)));
     }
     
     @Test
     default void entities_replaceIf_WithNullEntity_Throws() {
         final Predicate<? super Entity> filter = e -> true;
-        runWithScenario( entities -> {
-            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-                entities.replaceIf(filter, null);
-            });
-            
-            assertThrown(thrown);
-        });
+        runWithScenario( entities ->
+            assertThrown(IllegalArgumentException.class,
+                () -> entities.replaceIf(filter, null)));
     }
 
     @Test
     default void entities_visitEach_WithNullVisitor_Throws() {
-        runWithScenario( entities -> {
-            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-                entities.visitEach(null);
-            });
-            
-            assertThrown(thrown);
-        });
+        runWithScenario( entities ->
+            assertThrown(IllegalArgumentException.class,
+                () -> entities.visitEach(null)));
     }
     
     @Test
     default void entities_removeIf_WithNullFilter_Throws() {
-        runWithScenario( entities -> {
-            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-                entities.removeIf(null);
-            });
-            
-            assertThrown(thrown);
-        });
+        runWithScenario( entities ->
+            assertThrown(IllegalArgumentException.class,
+                () -> entities.removeIf(null)));
     }
     
     @Test
     default void entities_findAllIf_WithNullFilter_Throws() {
-        runWithScenario( entities -> {
-            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-                entities.findAllIf(null);
-            });
-            
-            assertThrown(thrown);
-        });
+        runWithScenario( entities ->
+            assertThrown(IllegalArgumentException.class,
+                () -> entities.findAllIf(null)));
     }
     
     @Test
     default void entities_findAllWithType_Values_WithNullFilter_Throws() {
-        runWithScenario( entities -> {
-            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-                entities.findAllValuesWithType(null, String.class);
-            });
-            
-            assertThrown(thrown);
-        });
+        runWithScenario( entities ->
+            assertThrown(IllegalArgumentException.class,
+                () -> entities.findAllValuesWithType(null, String.class)));
     }
     
     @Test
     default void entities_findAllWithType_Values_WithNullType_Throws() {
         final Predicate<? super Entity> filter = e -> true;
         
-        runWithScenario( entities -> {
-            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-                entities.findAllValuesWithType(filter, null);
-            });
-            
-            assertThrown(thrown);
-        });
+        runWithScenario( entities ->
+            assertThrown(IllegalArgumentException.class,
+                () -> entities.findAllValuesWithType(filter, null)));
     }
     
     
     @Test
     default void entities_findFirstIf_WithNullFilter_Throws() {
-        runWithScenario( entities -> {
-            final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-                entities.findFirstIf(null);
-            });
-            
-            assertThrown(thrown);
-        });
+        runWithScenario( entities ->
+            assertThrown(IllegalArgumentException.class,
+                () -> entities.findFirstIf(null)));
     }
     
     @Test
@@ -267,9 +225,8 @@ public interface EntitiesTests {
         }
         
         static void runWithScenario(ScenarioConfig scenarioConfig) {
-            withMetalog((contracts, metalog) -> {
-                scenarioConfig.accept(contracts.claim(Entities.Builder.FACTORY).get());
-            });
+            withMetalog((contracts, metalog) ->
+                scenarioConfig.accept(contracts.claim(Entities.Builder.FACTORY).get()));
         }
     }
 }
