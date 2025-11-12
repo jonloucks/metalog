@@ -9,3 +9,5 @@ rootProject.name = 'metalog'
 include 'metalog-api'
 include 'metalog-test'
 include 'metalog-impl'
+
+include 'metalog-smoke'

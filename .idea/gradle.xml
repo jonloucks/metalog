@@ -11,6 +11,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/metalog-api" />
             <option value="$PROJECT_DIR$/metalog-impl" />
+            <option value="$PROJECT_DIR$/metalog-smoke" />
             <option value="$PROJECT_DIR$/metalog-test" />
           </set>
         </option>

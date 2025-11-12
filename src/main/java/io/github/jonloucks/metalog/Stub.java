@@ -1,7 +1,13 @@
 package io.github.jonloucks.metalog;
 
-import io.github.jonloucks.contracts.api.Checks;
+import io.github.jonloucks.metalog.api.Metalog;
+import io.github.jonloucks.metalog.api.MetalogException;
+import io.github.jonloucks.metalog.api.GlobalMetalog;
+import io.github.jonloucks.contracts.api.ContractException;
+import io.github.jonloucks.contracts.api.Contracts;
 import io.github.jonloucks.contracts.api.GlobalContracts;
+
+import static io.github.jonloucks.metalog.api.Checks.validateMetalog;
 
 /**
  * A placeholder class to make sure dependencies are correct for api and implementation.
@@ -19,9 +25,27 @@ public final class Stub {
     }
     
     /**
-     * Validates basic functionality.
+     * Quickly validates Global Contracts and Metalog
+     *
+     * @throws ContractException when invalid
+     * @throws MetalogException when invalid
+     * @throws IllegalArgumentException when invalid
      */
     public static void validate() {
-        Checks.validateContracts(GlobalContracts.getInstance());
+        validate(GlobalContracts.getInstance(), GlobalMetalog.getInstance());
+    }
+    
+    /**
+     * Quickly validates a Contracts and Metalog
+     *
+     * @param contracts the Contracts to validate
+     * @param metalog the Metalog to validate
+     *
+     * @throws ContractException when invalid
+     * @throws MetalogException when invalid
+     * @throws IllegalArgumentException when invalid
+     */
+    public static void validate(Contracts contracts, Metalog metalog) {
+        validateMetalog(contracts, metalog);
     }
 }
