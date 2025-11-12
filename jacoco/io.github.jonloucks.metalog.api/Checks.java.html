@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Checks.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">metalog</a> &gt; <a href="index.source.html" class="el_package">io.github.jonloucks.metalog.api</a> &gt; <span class="el_source">Checks.java</span></div><h1>Checks.java</h1><pre class="source lang-java linenums">package io.github.jonloucks.metalog.api;
+
+import io.github.jonloucks.contracts.api.ContractException;
+import io.github.jonloucks.contracts.api.Contracts;
+import io.github.jonloucks.contracts.api.Repository;
+
+import static io.github.jonloucks.contracts.api.Checks.nullCheck;
+import static io.github.jonloucks.contracts.api.Checks.validateContracts;
+
+/**
+ * Checks used internally and supported for external use.
+ */
+public final class Checks {
+    
+    /**
+     * Check if given Metalog is not null or invalid
+     *
+     * @param metalog the Metalog to check
+     * @return a valid Metalog
+     * @throws IllegalArgumentException when invalid
+     */
+    public static Metalog metalogCheck(Metalog metalog) {
+<span class="fc" id="L23">        return nullCheck(metalog, &quot;Metalog must be present.&quot;);</span>
+    }
+    
+    /**
+     * Quickly validates a Contracts and Metalog
+     *
+     * @param contracts the Contracts to validate
+     * @param metalog the Metalog to validate
+     *
+     * @throws ContractException when invalid
+     * @throws MetalogException when invalid
+     * @throws IllegalArgumentException when invalid
+     */
+    public static void validateMetalog(Contracts contracts, Metalog metalog) {
+<span class="fc" id="L37">        final Metalog validMetalog = metalogCheck(metalog);</span>
+<span class="fc" id="L38">        validateContracts(contracts);</span>
+        
+<span class="fc" id="L40">        final Metalog promisedMetalog = contracts.claim(Metalog.CONTRACT);</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">        if (validMetalog != promisedMetalog) {</span>
+<span class="fc" id="L42">            throw new MetalogException(&quot;Metalog.CONTRACT claim is different.&quot;);</span>
+        }
+        
+<span class="fc" id="L45">        final Repository repository = contracts.claim(Repository.FACTORY).get();</span>
+<span class="fc" id="L46">        repository.require(MetalogFactory.CONTRACT);</span>
+<span class="fc" id="L47">        repository.require(Console.CONTRACT);</span>
+<span class="fc" id="L48">        repository.require(MainDispatcher.CONTRACT);</span>
+<span class="fc" id="L49">        repository.require(Dispatcher.KEYED_FACTORY);</span>
+<span class="fc" id="L50">        repository.require(Dispatcher.UNKEYED_FACTORY);</span>
+        
+<span class="fc" id="L52">        repository.open().close();</span>
+<span class="fc" id="L53">    }</span>
+    
+    
+    private Checks() {
+        
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
