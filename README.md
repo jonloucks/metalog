@@ -106,7 +106,7 @@ Channels categorize log messages for routing. Common channels include:
 Metalog supports extensive configuration through `Metalog.Config`:
 
 ```java
-Metalog metalog = GlobalMetalog.create(builder -> builder
+Metalog metalog = GlobalMetalog.createMetalog(builder -> builder
     .unkeyedThreadCount(20)           // Worker threads for unkeyed messages
     .keyedQueueLimit(1000)            // Queue limit for keyed messages
     .unkeyedFairness(false)           // FIFO processing for unkeyed messages
