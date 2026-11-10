@@ -94,8 +94,8 @@ final class MainDispatcherImpl implements MainDispatcher {
         
         private synchronized Optional&lt;Dispatcher&gt; acquire() {
 <span class="fc" id="L96">            final Optional&lt;Dispatcher&gt; optionalDispatcher = ofNullable(dispatcher);</span>
-<span class="fc bfc" id="L97" title="All 2 branches covered.">            if (optionalDispatcher.isPresent()) {</span>
-<span class="fc" id="L98">                return optionalDispatcher;</span>
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">            if (optionalDispatcher.isPresent()) {</span>
+<span class="nc" id="L98">                return optionalDispatcher;</span>
             }
 <span class="fc" id="L100">            closeBinding = repository.store(contract, lifeCycle(getDispatcherFactory(key)::get));</span>
 <span class="fc" id="L101">            dispatcher = config.contracts().claim(contract);</span>
